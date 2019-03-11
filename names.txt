@@ -1,5 +1,5 @@
 java the hutt
-;DROP TABLE teams;
+;'DROP TABLE teams;
 overREACT
 REACTors
 the di-teers
