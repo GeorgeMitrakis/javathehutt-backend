@@ -1,1 +1,11 @@
 java the hutt
+;DROP TABLE teams;
+overREACT
+REACTors
+the di-teers
+οι αβάφτιστοι
+eponymous
+Intellijent
+Devalappars
+//TODO: Team Name
+The Cheeky Scrum Lords
