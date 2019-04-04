@@ -1,7 +1,7 @@
-package ys09.data.jdbc;
+package back.data.jdbc;
 
 import org.springframework.jdbc.core.RowMapper;
-import ys09.model.User;
+import back.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

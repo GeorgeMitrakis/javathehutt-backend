@@ -1,4 +1,4 @@
-package ys09.conf;
+package back.conf;
 
 public class ConfigurationException extends RuntimeException {
 

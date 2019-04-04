@@ -1,4 +1,4 @@
-package ys09.model;
+package back.model;
 
 public class User {
 

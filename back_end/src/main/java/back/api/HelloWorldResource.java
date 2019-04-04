@@ -1,9 +1,9 @@
-package back_end.api;
+package back.api;
 
-import org.back_end.representation.Representation;
+import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
-import ys09.conf.Configuration;
+import back.conf.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,8 +1,8 @@
-package ys09.conf;
+package back.conf;
 
-import ys09.data.UserDAO;
-import ys09.data.jdbc.DataAccess;
-import ys09.data.jdbc.UserDAOImpl;
+import back.data.UserDAO;
+import back.data.jdbc.DataAccess;
+import back.data.jdbc.UserDAOImpl;
 
 import java.util.Properties;
 import java.util.Set;
