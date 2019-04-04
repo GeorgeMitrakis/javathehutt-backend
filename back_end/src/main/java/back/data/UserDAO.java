@@ -1,6 +1,6 @@
 package back.data;
 
-import ys09.model.User;
+import back.model.User;
 
 import java.util.List;
 import java.util.Optional;
