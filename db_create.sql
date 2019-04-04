@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2019-03-30 15:56:58.842
+-- Last modification date: 2019-04-04 15:51:05.402
 
 -- tables
 -- Table: administrator
@@ -64,17 +64,18 @@ CREATE TABLE transactions (
     visitor_id int  NOT NULL,
     room_id int  NOT NULL,
     cost money  NOT NULL,
-    datetime timestamp  NOT NULL,
+    closure_date timestamp  NOT NULL,
+    start_date date  NOT NULL,
+    end_date date  NOT NULL,
     CONSTRAINT transactions_pk PRIMARY KEY (visitor_id,room_id)
 );
 
 -- Table: user
 CREATE TABLE "user" (
     id int  NOT NULL,
-    email varchar(32)  NOT NULL,
-    username varchar(32)  NOT NULL,
-    password varchar(50)  NOT NULL,
-    role varchar(50)  NOT NULL,
+    email varchar(64)  NOT NULL,
+    password varchar(256)  NOT NULL,
+    role varchar(32)  NOT NULL,
     CONSTRAINT user_pk PRIMARY KEY (id)
 );
 
