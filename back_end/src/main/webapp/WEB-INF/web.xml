@@ -38,7 +38,7 @@
     </servlet-mapping>
 
     <listener>
-        <listener-class>ys09.conf.Listener</listener-class>
+        <listener-class>back.conf.Listener</listener-class>
     </listener>
 
 </web-app>
