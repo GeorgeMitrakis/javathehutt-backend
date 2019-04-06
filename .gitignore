@@ -1,3 +1,4 @@
 back_end/.*/*
-back_end/build/
-back_end/out/
+back_end/build/*
+back_end/out/*
+
