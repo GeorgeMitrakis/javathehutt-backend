@@ -50,8 +50,8 @@ public class DataAccess {
     }
 
     public List<User> getUsers(long start, long count) {
-        Long[] params = new Long[]{start, count};
-        return jdbcTemplate.query("select * from user limit ?, ?", params, new UserRowMapper());
+        Long[] params = new Long[]{count, start};
+        return jdbcTemplate.query("select * from \"user\" limit ? offset ?", params, new UserRowMapper());
     }
 
     public Optional<User> getUser(Long id) {
