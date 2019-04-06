@@ -56,7 +56,7 @@ public class DataAccess {
 
     public Optional<User> getUser(Long id) {
         Long[] params = new Long[]{id};
-        List<User> users = jdbcTemplate.query("select * from user where id = ?", params, new UserRowMapper());
+        List<User> users = jdbcTemplate.query("select * from \"user\" where id = ?", params, new UserRowMapper());
         if (users.size() == 1)  {
             return Optional.of(users.get(0));
         }
