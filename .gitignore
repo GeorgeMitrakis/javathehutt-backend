@@ -1,1 +1,3 @@
-.idea/
+back_end/.*
+back_end/build/
+back_end/out/
