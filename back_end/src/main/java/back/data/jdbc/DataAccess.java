@@ -35,7 +35,7 @@ public class DataAccess {
         bds.setTestOnBorrow(true);
         bds.setDefaultAutoCommit(true);
 
-        //check that everything works OK        
+        //check that everything works OK
         bds.getConnection().close();
 
         //initialize the jdbc template utility

@@ -18,24 +18,24 @@ repositories {
 }
 
 dependencies {
-    compile "javax.servlet:javax.servlet-api:3.1.0"              //the Java servlet libraries
-    compile "org.restlet.jee:org.restlet:2.3.12"                 //for writing RESTful APIs
-    compile "com.google.code.gson:gson:2.8.2"                    //json library
-    compile "org.apache.commons:commons-dbcp2:2.6.0"             //db connection pool
-    compile "org.springframework:spring-jdbc:5.0.2.RELEASE"      //spring JDBC template utility
+    compile "javax.servlet:javax.servlet-api:3.1.0"              // the Java servlet libraries
+    compile "org.restlet.jee:org.restlet:2.3.12"                 // for writing RESTful APIs
+    compile "com.google.code.gson:gson:2.8.2"                    // json library
+    compile "org.apache.commons:commons-dbcp2:2.6.0"             // db connection pool
+    compile "org.springframework:spring-jdbc:5.0.2.RELEASE"      // spring JDBC template utility
 
-    providedRuntime "javax.servlet:javax.servlet-api:3.1.0"      //provided by the servlet container at runtime
+    providedRuntime "javax.servlet:javax.servlet-api:3.1.0"      // provided by the servlet container at runtime
 
-    runtime "org.restlet.jee:org.restlet.ext.servlet:2.3.12"     //Servlet adapter for Restlet framework
-
-    runtime "mysql:mysql-connector-java:8.0.15"                  //the MySQL JDBC driver
+    runtime "org.restlet.jee:org.restlet.ext.servlet:2.3.12"     // servlet adapter for Restlet framework
+    runtime "org.postgresql:postgresql:42.2.0"                   // connect to database
 }
 
+
 gretty {
-    //scanInterval = 0 //disable hot deployment
+    //scanInterval = 0           // disable hot deployment
     httpEnabled = true
     httpsEnabled = false
     httpPort = 8765
     contextPath = 'app'
-    //servletContainer = 'tomcat8' //use the default (jetty)
+    servletContainer = 'tomcat8' // CONFIG: use tomcat or the default (jetty) ?
 }

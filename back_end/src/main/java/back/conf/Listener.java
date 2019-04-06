@@ -34,6 +34,12 @@ public class Listener implements ServletContextListener {
 
             try (final InputStream inputStream = getClass().getResourceAsStream(pathToProperties)) {
                 props.load(inputStream);
+            } catch (Exception e) {
+                System.out.println("\nWarning: Could not find app.properties in: " + pathToProperties + ".Resorting to hardcoded properties instead...\n");
+                props.setProperty("db.driver", "org.postgresql.Driver");
+                props.setProperty("db.url", "jdbc:postgresql://javathehutt.cvxx5xqkn7zi.us-east-1.rds.amazonaws.com:5432/javathehutt");
+                props.setProperty("db.user", "javathehutt");
+                props.setProperty("db.pass", "passwordtouftoxou");
             }
 
             Configuration.getInstance().setup(ctx.getContextPath(), props);
