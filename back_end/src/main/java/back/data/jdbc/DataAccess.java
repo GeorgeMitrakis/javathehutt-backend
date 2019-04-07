@@ -65,4 +65,14 @@ public class DataAccess {
         }
     }
 
+    public Optional<User> getUser(String email, String hashedPassword){
+        String[] params = {email, hashedPassword};
+        List<User> users = jdbcTemplate.query("select * from \"user\" where email = ? and hashedPassword = ?", params, new UserRowMapper());
+        if(users.size() == 1){
+            return Optional.of(users.get(0));
+        }else{
+            return Optional.empty();
+        }
+    }
+
 }

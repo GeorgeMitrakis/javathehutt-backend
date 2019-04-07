@@ -25,11 +25,18 @@ dependencies {
     compile "org.springframework:spring-jdbc:5.0.2.RELEASE"      // spring JDBC template utility
 
     providedRuntime "javax.servlet:javax.servlet-api:3.1.0"      // provided by the servlet container at runtime
-
+    compile 'io.jsonwebtoken:jjwt-jackson:0.10.5'
     runtime "org.restlet.jee:org.restlet.ext.servlet:2.3.12"     // servlet adapter for Restlet framework
     runtime "org.postgresql:postgresql:42.2.0"                   // connect to database
 }
 
+dependencies {
+    compile 'io.jsonwebtoken:jjwt-api:0.10.5'
+    runtime 'io.jsonwebtoken:jjwt-impl:0.10.5',
+            // Uncomment the next line if you want to use RSASSA-PSS (PS256, PS384, PS512) algorithms:
+            //'org.bouncycastle:bcprov-jdk15on:1.60',
+            'io.jsonwebtoken:jjwt-jackson:0.10.5'
+}
 
 gretty {
     //scanInterval = 0           // disable hot deployment

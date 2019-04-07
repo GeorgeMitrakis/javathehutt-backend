@@ -11,4 +11,6 @@ public interface UserDAO {
 
     Optional<User> getById(long id);
 
+    Optional<User> getByCredentials(String email, String hashedPassword) throws JTHAuthException;
+
 }

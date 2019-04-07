@@ -15,7 +15,7 @@ class UserRowMapper implements RowMapper<User>  {
         String email = rs.getString("email");
         String name = rs.getString("name");
         String surname = rs.getString("surname");
-
+        String hashedPassword = rs.getString("hashedPassword");
         return new User(id, email, name, surname);
     }
 }

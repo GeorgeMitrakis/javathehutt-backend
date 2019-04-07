@@ -1,5 +1,6 @@
 package back.data.jdbc;
 
+import back.data.JTHAuthException;
 import back.data.Limits;
 import back.data.UserDAO;
 import back.model.User;
@@ -25,5 +26,12 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public Optional<User> getById(long id) {
         return dataAccess.getUser(id);
+    }
+
+    @Override
+    public Optional<User> getByCredentials(String email, String hashedPassword) throws JTHAuthException {
+
+        Optional<User> u = dataAccess.getUser(email, hashedPassword);
+        return u;
     }
 }
