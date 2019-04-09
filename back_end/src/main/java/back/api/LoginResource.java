@@ -4,6 +4,7 @@ import back.conf.Configuration;
 import back.data.JTHAuthException;
 import back.data.UserDAO;
 import back.model.User;
+import back.util.JWT;
 import back.util.TokenFactory;
 import org.restlet.data.Form;
 import org.restlet.data.Status;
@@ -17,7 +18,7 @@ import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
+import io.jsonwebtoken.Claims;
 
 public class LoginResource extends ServerResource {
 
@@ -25,28 +26,19 @@ public class LoginResource extends ServerResource {
 
     @Override
     protected Representation post(Representation entity) throws ResourceException {
-
+//        check authentication and take the claims with Claims claims = JWT.decodeJWT(jwt);
         try{
-//            Optional<User> u = userDAO.getByCredentials("test@test.com","asdf");
-//            if(!u.isPresent()) {
-//                throw new JTHAuthException();
-//            }
+            Optional<User> u = userDAO.getByCredentials("test@test.com","asdf");
+            if(!u.isPresent()) {
+                throw new JTHAuthException();
+            }
             Map<String,Object> claimsMap = new HashMap<String, Object>();
-            claimsMap.put("userid", Long.toString(u.get().getId()));
-            String jws = TokenFactory.getTokenFor(claimsMap);
-            return JsonMapRepresentation.forSimpleResult(jws);
+            String jwt = JWT.createJWT(u.get().getId(), u.get().getEmail(), "subject", 800000);
+            return JsonMapRepresentation.forSimpleResult(jwt);
 
         }catch (Exception e){
             e.printStackTrace();
             return JsonMapRepresentation.forSimpleResult("No login for you!");
         }
-
-
-
-
-
-
     }
-
-
 }
