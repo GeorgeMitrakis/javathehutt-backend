@@ -27,10 +27,10 @@ public class LoginResource extends ServerResource {
     protected Representation post(Representation entity) throws ResourceException {
 
         try{
-            Optional<User> u = userDAO.getByCredentials("test@test.com","asdf");
-            if(!u.isPresent()) {
-                throw new JTHAuthException();
-            }
+//            Optional<User> u = userDAO.getByCredentials("test@test.com","asdf");
+//            if(!u.isPresent()) {
+//                throw new JTHAuthException();
+//            }
             Map<String,Object> claimsMap = new HashMap<String, Object>();
             claimsMap.put("userid", Long.toString(u.get().getId()));
             String jws = TokenFactory.getTokenFor(claimsMap);
@@ -47,5 +47,6 @@ public class LoginResource extends ServerResource {
 
 
     }
-    
+
+
 }

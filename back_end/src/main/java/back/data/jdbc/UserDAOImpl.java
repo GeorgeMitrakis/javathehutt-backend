@@ -30,8 +30,6 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public Optional<User> getByCredentials(String email, String hashedPassword) throws JTHAuthException {
-
-        Optional<User> u = dataAccess.getUser(email, hashedPassword);
-        return u;
+        return dataAccess.getUser(email, hashedPassword);
     }
 }
