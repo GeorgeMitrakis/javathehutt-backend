@@ -31,7 +31,7 @@ public class JWT {
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 
         //Let's set the JWT Claims
-        JwtBuilder builder = Jwts.builder().setId(id)
+        JwtBuilder builder = Jwts.builder().setId(String.valueOf(id))
                 .setIssuedAt(now)
                 .setSubject(subject)
                 .setIssuer(issuer)
