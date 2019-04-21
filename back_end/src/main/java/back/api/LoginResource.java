@@ -2,6 +2,7 @@ package back.api;
 
 import back.conf.Configuration;
 import back.data.JTHAuthException;
+import back.data.JTHSecurity;
 import back.data.UserDAO;
 import back.model.User;
 import back.util.JWT;

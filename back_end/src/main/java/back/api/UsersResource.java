@@ -2,6 +2,7 @@ package back.api;
 
 import back.model.Provider;
 import back.model.Visitor;
+import back.util.Util;
 import org.restlet.data.Form;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -73,9 +74,7 @@ public class UsersResource extends ServerResource {
             String name = form.getFirstValue("name");
             String surname = form.getFirstValue("surname");
 
-            if(password == null || email == null || name == null || surname == null){
-                throw new JTHInputException();
-            }
+            Util.validateArgs(password,email,name,surname);
 
             Provider p = new Provider(0,email,name, surname);
             userDAO.storeUser(p,password);
@@ -92,9 +91,8 @@ public class UsersResource extends ServerResource {
             String name = form.getFirstValue("name");
             String surname = form.getFirstValue("surname");
 
-            if(password == null || email == null || name == null || surname == null){
-                throw new JTHInputException();
-            }
+            Util.validateArgs(password,email,name,surname);
+
             Visitor v = new Visitor(0,email,name,surname);
             userDAO.storeUser(v,password);
         }catch(JTHInputException e){
