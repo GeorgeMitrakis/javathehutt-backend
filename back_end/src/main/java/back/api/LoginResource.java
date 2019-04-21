@@ -6,7 +6,7 @@ import back.data.JTHSecurity;
 import back.data.UserDAO;
 import back.model.User;
 import back.util.JWT;
-import back.util.TokenFactory;
+
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;

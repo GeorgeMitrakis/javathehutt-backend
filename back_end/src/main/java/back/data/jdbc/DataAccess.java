@@ -65,10 +65,10 @@ public class DataAccess {
             switch (u.getRole()) {
                 case "visitor":
                     Visitor v = jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
-                    return (v == null) ? Optional.of(v) : Optional.empty();
+                    return (v != null) ? Optional.of(v) : Optional.empty();
                 case "provider":
                     Provider p = jdbcTemplate.queryForObject("SELECT * FROM provider WHERE id = ?", par, new ProviderRowMapper(u));
-                    return (p == null) ? Optional.of(p) : Optional.empty();
+                    return (p != null) ? Optional.of(p) : Optional.empty();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -84,10 +84,10 @@ public class DataAccess {
             switch (u.getRole()) {
                 case "visitor":
                     Visitor v = jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
-                    return (v == null) ? Optional.of(v) : Optional.empty();
+                    return (v != null) ? Optional.of(v) : Optional.empty();
                 case "provider":
                     Provider p = jdbcTemplate.queryForObject("SELECT * FROM provider WHERE id = ?", par, new ProviderRowMapper(u));
-                    return (p == null) ? Optional.of(p) : Optional.empty();
+                    return (p != null) ? Optional.of(p) : Optional.empty();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,6 +96,7 @@ public class DataAccess {
     }
 
     public Optional<User> getUser(String email, String hashedPassword) {
+
         try {
             String[] params = new String[]{email, hashedPassword};
             User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ? and password = ?", params, new UserRowMapper());
@@ -104,10 +105,10 @@ public class DataAccess {
             switch (u.getRole()) {
                 case "visitor":
                     Visitor v = jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
-                    return (v == null) ? Optional.of(v) : Optional.empty();
+                    return (v != null) ? Optional.of(v) : Optional.empty();
                 case "provider":
                     Provider p = jdbcTemplate.queryForObject("SELECT * FROM provider WHERE id = ?", par, new ProviderRowMapper(u));
-                    return (p == null) ? Optional.of(p) : Optional.empty();
+                    return (p != null) ? Optional.of(p) : Optional.empty();
             }
         } catch (Exception e) {
             e.printStackTrace();
