@@ -19,7 +19,7 @@ import java.util.Optional;
 public class DataAccess {
 
     private static final int MAX_TOTAL_CONNECTIONS = 16;
-    private static final int MAX_IDLE_CONNECTIONS   = 8;
+    private static final int MAX_IDLE_CONNECTIONS  = 8;
     
     private DataSource dataSource;
     private JdbcTemplate jdbcTemplate;
@@ -58,68 +58,58 @@ public class DataAccess {
     }
 
     public Optional<User> getUser(Long id) {
-        Long[] params = new Long[]{id};
-        List<User> users = jdbcTemplate.query("select * from \"user\" where id = ?", params, new UserRowMapper());
-        if (users.size() == 1)  {
-            return Optional.of(users.get(0));
-        }
-        else {
-            return Optional.empty();
-        }
-    }
-
-    public Optional<User> getUser(String email, String hashedPassword){
-        String[] params = {email, hashedPassword};
-        User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ? and hashedPassword = ?", params, new UserRowMapper());
-        if(u == null) return Optional.empty();
-        String role = u.getRole();
-        String[] par = {Long.toString(u.getId())};
-        switch(role){
-            case "visitor":
-                String sql = "select usr.id, usr.email, usr.name, usr.surname, usr.hashedpassword, usr.role from \"user\" as usr " +
-                        "left join visitor p on usr.id = p.id " +
-                        "where usr.id == ?";
-                Visitor v = jdbcTemplate.queryForObject(sql, par, new VisitorRowMapper());
-                return ( v == null) ? Optional.of(v) : Optional.empty();
-            case "provider":
-                String sql2 = "select usr.id, usr.email, usr.name, usr.surname, usr.hashedpassword, usr.role from \"user\" as usr " +
-                        "left join provider p on usr.id = p.id " +
-                        "where usr.id == ?";
-                Provider p = jdbcTemplate.queryForObject(sql2, par , new ProviderRowMapper());
-                return (p == null) ? Optional.of(p) : Optional.empty();
-        }
-        return Optional.empty();
-
-    }
-
-    public void storeUser(Provider p, String password) {
-
         try {
-            jdbcTemplate.update("INSERT INTO \"user\"(email, name, surname, hashedpassword, role) VALUES (?,?,?,?,?)",
-                    p.getEmail(),
-                    p.getName(),
-                    p.getSurname(),
-                    JTHSecurity.makeSHA(password),
-                    "provider"
-            );
-            jdbcTemplate.update("INSERT INTO \"provider\" (id) VALUES ( ? )",p.getId());
+            Long[] par = new Long[]{id};
+            User u = jdbcTemplate.queryForObject("select * from \"user\" where id = ?", par, new UserRowMapper());
+            if (u == null) return Optional.empty();
+            switch (u.getRole()) {
+                case "visitor":
+                    Visitor v = jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
+                    return (v == null) ? Optional.of(v) : Optional.empty();
+                case "provider":
+                    Provider p = jdbcTemplate.queryForObject("SELECT * FROM provider WHERE id = ?", par, new ProviderRowMapper(u));
+                    return (p == null) ? Optional.of(p) : Optional.empty();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-    public void storeUser(Visitor v, String password) {
-
+    public Optional<User> getUser(String email, String hashedPassword) {
         try {
-            jdbcTemplate.update("INSERT INTO \"user\"(email, name, surname, hashedpassword, role) VALUES (?,?,?,?,?)",
-                    v.getEmail(),
-                    v.getName(),
-                    v.getSurname(),
-                    JTHSecurity.makeSHA(password),
-                    "provider"
-            );
-            jdbcTemplate.update("INSERT INTO \"visitor\" (id) VALUES ( ? )",v.getId());
+            String[] params = new String[]{email, hashedPassword};
+            User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ? and password = ?", params, new UserRowMapper());
+            if (u == null) return Optional.empty();
+            Long[] par = new Long[]{u.getId()};
+            switch (u.getRole()) {
+                case "visitor":
+                    Visitor v = jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
+                    return (v == null) ? Optional.of(v) : Optional.empty();
+                case "provider":
+                    Provider p = jdbcTemplate.queryForObject("SELECT * FROM provider WHERE id = ?", par, new ProviderRowMapper(u));
+                    return (p == null) ? Optional.of(p) : Optional.empty();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+    public void storeUser(Provider p, String hashedPassword) {
+        try {
+            jdbcTemplate.update("INSERT INTO \"user\"(email, name, surname, password, role) VALUES (?,?,?,?,?)",
+                                 p.getEmail(), p.getName(), p.getSurname(), hashedPassword, "provider");
+            jdbcTemplate.update("INSERT INTO provider (id) VALUES (?)", p.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void storeUser(Visitor v, String hashedPassword) {
+        try {
+            jdbcTemplate.update("INSERT INTO \"user\"(email, name, surname, password, role) VALUES (?,?,?,?,?)",
+                                v.getEmail(), v.getName(), v.getSurname(), hashedPassword, "provider");
+            jdbcTemplate.update("INSERT INTO visitor (id) VALUES (?)", v.getId());
         } catch (Exception e) {
             e.printStackTrace();
         }

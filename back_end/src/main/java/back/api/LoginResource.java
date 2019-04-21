@@ -23,27 +23,37 @@ import java.util.Map;
 import java.util.Optional;
 import io.jsonwebtoken.Claims;
 
+
 public class LoginResource extends ServerResource {
 
     private final UserDAO userDAO = Configuration.getInstance().getUserDAO();
 
 
-
     @Override
     protected Representation post(Representation entity) throws ResourceException {
-//        check authentication and take the claims with Claims claims = JWT.decodeJWT(jwt);
-        try{
-            Optional<User> u = userDAO.getByCredentials("test@test.com","asdf");
+        //Create a new restlet form
+        Form form = new Form(entity);
+
+        //Read the parameters
+        String email = form.getFirstValue("email");
+        String hashedPassword = JTHSecurity.makeSHA(form.getFirstValue("password"));
+
+        if (email == null || hashedPassword == null) {
+            return JsonMapRepresentation.forSimpleResult("Missing login parameters");
+        }
+
+        // check authentication and take the claims with Claims claims = JWT.decodeJWT(jwt);
+        try {
+            Optional<User> u = userDAO.getByCredentials(email, hashedPassword);
             if(!u.isPresent()) {
                 throw new JTHAuthException();
             }
-            String jwt = JWT.createJWT(u.get(),Configuration.getInstance().getLoginTTL());
+            String jwt = JWT.createJWT(u.get(), Configuration.getInstance().getLoginTTL());
             //String jwt = JWT.createJWT(u.get().getId(), u.get().getEmail(), "subject", 800000);
             return JsonMapRepresentation.forSimpleResult(jwt);
-
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            return JsonMapRepresentation.forSimpleResult("No login for you!");
+            return JsonMapRepresentation.forSimpleResult("Incorrect credentials");
         }
     }
 

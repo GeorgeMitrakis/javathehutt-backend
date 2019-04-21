@@ -9,18 +9,18 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ProviderRowMapper implements RowMapper<Provider> {
 
+class ProviderRowMapper implements RowMapper<Provider>  {
+
+    private User user = null;
+
+    public ProviderRowMapper(User _user){
+        super();
+        user = _user;
+    }
 
     @Override
-    public Provider mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-            return new Provider(
-                    rs.getLong("id"),
-                    rs.getString("email"),
-                    rs.getString("name"),
-                    rs.getString("surname")
-            );
-
+    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return new Provider(user);
     }
 }

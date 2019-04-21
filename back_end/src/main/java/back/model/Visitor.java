@@ -1,18 +1,16 @@
 package back.model;
 
 import back.api.JTHInputException;
-import org.restlet.data.Form;
+
 
 public class Visitor extends User{
 
-    public Visitor(Form form) throws JTHInputException{
-        super(0,null,null,null, "visitor");
+    public Visitor(User usr /* TODO: add extras */) throws JTHInputException{
+        super(usr.getId(), usr.getEmail(), usr.getName(), usr.getSurname(), "visitor");
     }
 
-    public Visitor(long id, String email, String name, String surname){
+    public Visitor(long id, String email, String name, String surname /* TODO: add extras */){
         super(id, email, name, surname, "visitor");
     }
-    public static void validateForm(Form form) throws JTHInputException {
-        throw new JTHInputException(); //incomplete
-    }
+
 }

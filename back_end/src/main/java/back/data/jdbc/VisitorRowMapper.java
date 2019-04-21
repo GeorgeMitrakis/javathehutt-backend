@@ -7,15 +7,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
-public class VisitorRowMapper implements RowMapper<Visitor> {
+class VisitorRowMapper implements RowMapper<Provider>  {
+
+    private User user = null;
+
+    public VisitorRowMapper(User _user){
+        super();
+        user = _user;
+    }
 
     @Override
-    public Visitor mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new Visitor(
-            rs.getLong("id"),
-            rs.getString("email"),
-            rs.getString("name"),
-            rs.getString("surname")
-        );
+    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return new Visitor(user);
     }
 }
+
