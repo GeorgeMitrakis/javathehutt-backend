@@ -6,13 +6,16 @@ public class User {
     private final String email;
     private final String name;
     private final String surname;
+    private final String role;
 
-    public User(long id, String email, String name, String surname) {
+    public User(long id, String email, String name, String surname, String role) {
         this.id = id;
         this.email = email;
         this.name = name;
         this.surname = surname;
+        this.role = role;
     }
+
 
     public long getId() {
         return id;
@@ -25,4 +28,6 @@ public class User {
     }
 
     public String getSurname() { return surname; }
+
+    public String getRole() { return role;}
 }

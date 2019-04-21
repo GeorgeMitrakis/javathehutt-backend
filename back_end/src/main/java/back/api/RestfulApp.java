@@ -1,9 +1,8 @@
 package back.api;
 
+
 import org.restlet.Application;
 import org.restlet.Restlet;
-import org.restlet.resource.Finder;
-import org.restlet.resource.ServerResource;
 import org.restlet.routing.Router;
 
 /**
@@ -14,15 +13,18 @@ public class RestfulApp extends Application {
 	@Override
 	public synchronized Restlet createInboundRoot() {
 
+
 		Router router = new Router(getContext());
 
 		//GET
 		router.attach("/hello", HelloWorldResource.class);
 
 		//GET, POST (admin)
-		router.attach("/admin/users", UsersResource.class);
+		router.attach("/users", UsersResource.class);
 
 		router.attach("/login",LoginResource.class);
+
+
 		return router;
 	}
 

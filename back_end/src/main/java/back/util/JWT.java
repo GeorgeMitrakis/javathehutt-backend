@@ -4,6 +4,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 
+import back.model.User;
 import io.jsonwebtoken.*;
 
 import java.util.Date;
@@ -37,6 +38,8 @@ public class JWT {
                 .setIssuer(issuer)
                 .signWith(signatureAlgorithm, signingKey);
 
+
+
         //if it has been specified, let's add the expiration
         if (ttlMillis >= 0) {
             long expMillis = nowMillis + ttlMillis;
@@ -55,6 +58,22 @@ public class JWT {
                 .setSigningKey(DatatypeConverter.parseBase64Binary(SECRET_KEY))
                 .parseClaimsJws(jwt).getBody();
         return claims;
+    }
+
+    public static String createJWT(User u, long ttlMillis){
+        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(SECRET_KEY);
+        Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
+        long nowMillis = System.currentTimeMillis();
+        JwtBuilder b = Jwts.builder()
+                .claim("user",u)
+                .setIssuedAt(new Date(nowMillis))
+                .setIssuer("Java the Hutt")
+                .setSubject("user_session_info");
+        if(ttlMillis > 0){
+            b.setExpiration(new Date(ttlMillis + nowMillis));
+        }
+        return b.compact();
     }
 
 }

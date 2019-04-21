@@ -1,5 +1,7 @@
 package back.api;
 
+import back.model.Provider;
+import back.model.Visitor;
 import org.restlet.data.Form;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -48,19 +50,39 @@ public class UsersResource extends ServerResource {
 
         //Create a new restlet form
         Form form = new Form(entity);
+
         //Read the parameters
-        String name = form.getFirstValue("name");
-        //...
+        String type = form.getFirstValue("type");
+        switch (type){
+            case "visitor":
+                return visitorSignUp(form);
+            case "provider":
+                return providerSignUp(form);
+        }
 
-        //validate the values (in the general case)
-        //...
-
-        //use the DAO machinery to add the new user
-        //...
-
-        //return a json representation of the newly created record
-        //...
 
         throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED);
+    }
+
+    private Representation providerSignUp(Form form){
+        //...
+        try{
+            Provider p = new Provider(form);
+            userDAO.storeUser(p,form.getFirstValue("password"));
+        }catch(JTHInputException e){
+            return JsonMapRepresentation.forSimpleResult(false);
+        }
+        return JsonMapRepresentation.forSimpleResult(true);
+    }
+
+    private Representation visitorSignUp(Form form) throws ResourceException{
+        try{
+            Visitor.validateForm(form);
+            Visitor v = new Visitor(form);
+            userDAO.storeUser(v,form.getFirstValue("password"));
+        }catch(JTHInputException e){
+            return JsonMapRepresentation.forSimpleResult(false);
+        }
+        return JsonMapRepresentation.forSimpleResult(true);
     }
 }

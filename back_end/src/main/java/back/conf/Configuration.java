@@ -24,19 +24,18 @@ public class Configuration {
         return self;
     }
 
-    void setup(String contextPath, Properties props) throws ConfigurationException{
+    void setup(String contextPath, Properties props) throws ConfigurationException {
         this.contextPath = contextPath;
         this.props = props;
 
         try {
             dataAccess.setup(
-                getProperty("db.driver"),
-                getProperty("db.url"),
-                getProperty("db.user"),
-                getProperty("db.pass")
+                    getProperty("db.driver"),
+                    getProperty("db.url"),
+                    getProperty("db.user"),
+                    getProperty("db.pass")
             );
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             throw new ConfigurationException(e.getMessage(), e);
         }
     }
@@ -59,5 +58,9 @@ public class Configuration {
 
     public UserDAO getUserDAO() {
         return new UserDAOImpl(dataAccess);
+    }
+
+    public long getLoginTTL() {
+        return 800000;
     }
 }
