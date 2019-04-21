@@ -20,7 +20,7 @@ class ProviderRowMapper implements RowMapper<Provider>  {
     }
 
     @Override
-    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public Provider mapRow(ResultSet rs, int rowNum) throws SQLException {
         return new Provider(user);
     }
 }

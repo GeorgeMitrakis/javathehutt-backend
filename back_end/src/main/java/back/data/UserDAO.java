@@ -13,6 +13,8 @@ public interface UserDAO {
 
     Optional<User> getById(long id);
 
+    Optional<User> getByEmail(String email);
+
     Optional<User> getByCredentials(String email, String hashedPassword) throws JTHAuthException;
 
     void storeUser(Provider p,String password);

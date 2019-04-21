@@ -45,30 +45,40 @@ public class UsersResource extends ServerResource {
     @Override
     protected Representation post(Representation entity) throws ResourceException {
 
-        //we assume that the user with id = 1 is logged in
-        long ownerId = 1;
-
-        //Create a new restlet form
-        Form form = new Form(entity);
-
-        //Read the parameters
-        String type = form.getFirstValue("type");
-        switch (type){
-            case "visitor":
-                return visitorSignUp(form);
-            case "provider":
-                return providerSignUp(form);
+        try{
+            Form form = new Form(entity);
+            String email = form.getFirstValue("username");
+            if(userDAO.getByEmail(email).isPresent()){
+                throw new JTHInputException();
+            }
+            String type = form.getFirstValue("type");
+            switch (type){
+                case "visitor":
+                    return visitorSignUp(form);
+                case "provider":
+                    return providerSignUp(form);
+            }
+        }catch (JTHInputException e){
+            return JsonMapRepresentation.forSimpleResult("No signup for you");
         }
+        return  JsonMapRepresentation.forSimpleResult("Success");
 
-
-        throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED);
     }
 
     private Representation providerSignUp(Form form){
         //...
         try{
-            Provider p = new Provider(form);
-            userDAO.storeUser(p,form.getFirstValue("password"));
+            String password = form.getFirstValue("password");
+            String email = form.getFirstValue("email");
+            String name = form.getFirstValue("name");
+            String surname = form.getFirstValue("surname");
+
+            if(password == null || email == null || name == null || surname == null){
+                throw new JTHInputException();
+            }
+
+            Provider p = new Provider(0,email,name, surname);
+            userDAO.storeUser(p,password);
         }catch(JTHInputException e){
             return JsonMapRepresentation.forSimpleResult(false);
         }
@@ -77,9 +87,16 @@ public class UsersResource extends ServerResource {
 
     private Representation visitorSignUp(Form form) throws ResourceException{
         try{
-            Visitor.validateForm(form);
-            Visitor v = new Visitor(form);
-            userDAO.storeUser(v,form.getFirstValue("password"));
+            String password = form.getFirstValue("password");
+            String email = form.getFirstValue("email");
+            String name = form.getFirstValue("name");
+            String surname = form.getFirstValue("surname");
+
+            if(password == null || email == null || name == null || surname == null){
+                throw new JTHInputException();
+            }
+            Visitor v = new Visitor(0,email,name,surname);
+            userDAO.storeUser(v,password);
         }catch(JTHInputException e){
             return JsonMapRepresentation.forSimpleResult(false);
         }

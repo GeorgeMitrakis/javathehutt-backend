@@ -73,6 +73,26 @@ public class DataAccess {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return Optional.empty();
+    }
+
+    public Optional<User> getUser(String email) {
+        try {
+            String[] par = new String[]{email};
+            User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ?", par, new UserRowMapper());
+            if (u == null) return  Optional.empty();
+            switch (u.getRole()) {
+                case "visitor":
+                    Visitor v = jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
+                    return (v == null) ? Optional.of(v) : Optional.empty();
+                case "provider":
+                    Provider p = jdbcTemplate.queryForObject("SELECT * FROM provider WHERE id = ?", par, new ProviderRowMapper(u));
+                    return (p == null) ? Optional.of(p) : Optional.empty();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
     }
 
     public Optional<User> getUser(String email, String hashedPassword) {

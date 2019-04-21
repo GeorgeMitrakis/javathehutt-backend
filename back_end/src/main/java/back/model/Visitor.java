@@ -5,7 +5,7 @@ import back.api.JTHInputException;
 
 public class Visitor extends User{
 
-    public Visitor(User usr /* TODO: add extras */) throws JTHInputException{
+    public Visitor(User usr /* TODO: add extras */){
         super(usr.getId(), usr.getEmail(), usr.getName(), usr.getSurname(), "visitor");
     }
 

@@ -1,5 +1,7 @@
 package back.data.jdbc;
 
+import back.model.Provider;
+import back.model.User;
 import back.model.Visitor;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -7,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
-class VisitorRowMapper implements RowMapper<Provider>  {
+class VisitorRowMapper implements RowMapper<Visitor>  {
 
     private User user = null;
 
@@ -17,7 +19,7 @@ class VisitorRowMapper implements RowMapper<Provider>  {
     }
 
     @Override
-    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public Visitor mapRow(ResultSet rs, int rowNum) throws SQLException {
         return new Visitor(user);
     }
 }
