@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import back.data.Limits;
 import back.model.User;
+import org.springframework.jdbc.support.KeyHolder;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -103,8 +104,17 @@ public class DataAccess {
 
     public boolean storeUser(Provider p, String hashedPassword) {
         try {
-            int id = jdbcTemplate.update("INSERT INTO \"user\"(email, password, role) VALUES (?, ?, ?) RETURNING id",
-                                         p.getEmail(), hashedPassword, "provider");
+            // insert into user and keep id
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO \"user\"(email, password, role) VALUES (?, ?, ?)");
+                ps.setString(1, p.getEmail());
+                ps.setString(2, hashedPassword);
+                ps.setString(3, "provider");
+                return ps;
+            }, keyHolder);
+            long id = (long) keyHolder.getKey();
+            // use the same id to insert to provider
             jdbcTemplate.update("INSERT INTO provider (id, providername) VALUES (?, ?)", id, p.getProvidername());
             p.setId(id);
         } catch (Exception e) {
@@ -117,9 +127,18 @@ public class DataAccess {
 
     public boolean storeUser(Visitor v, String hashedPassword) {
         try {
-            int id = jdbcTemplate.update("INSERT INTO \"user\"(email, password, role) VALUES (?, ?, ?) RETURNING id",
-                                         v.getEmail(), hashedPassword, "visitor");
-            jdbcTemplate.update("INSERT INTO visitor (\"name\", surnmae) VALUES (?, ?, ?)", id, v.getName(), v.getSurname());
+            // insert into user and keep id
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO \"user\"(email, password, role) VALUES (?, ?, ?)");
+                ps.setString(1, v.getEmail());
+                ps.setString(2, hashedPassword);
+                ps.setString(3, "visitor");
+                return ps;
+            }, keyHolder);
+            long id = (long) keyHolder.getKey();
+            // use the same id to insert to visitor
+            jdbcTemplate.update("INSERT INTO visitor (id, \"name\", surnmae) VALUES (?, ?, ?)", id, v.getName(), v.getSurname());
             v.setId(id);
         } catch (Exception e) {
             System.err.println("Failed to store visitor user");
