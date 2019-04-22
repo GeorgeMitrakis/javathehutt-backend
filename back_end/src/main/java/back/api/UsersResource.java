@@ -38,6 +38,7 @@ public class UsersResource extends ServerResource {
             String password = form.getFirstValue("password");
             String password1 = form.getFirstValue("password1");
             String type = form.getFirstValue("type");
+
             if ( email == null || password == null || password1 == null || type == null
                  || password.equals("") || password1.equals("") || type.equals("")){
                 throw new JTHInputException("missing or empty parameters");
