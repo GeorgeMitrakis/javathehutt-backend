@@ -1,10 +1,12 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2019-04-04 15:51:05.402
+-- Last modification date: 2019-04-22 12:50:36.149
 
 -- tables
 -- Table: administrator
 CREATE TABLE administrator (
     id int  NOT NULL,
+    name varchar(64)  NOT NULL,
+    surname varchar(64)  NOT NULL,
     CONSTRAINT administrator_pk PRIMARY KEY (id)
 );
 
@@ -34,6 +36,7 @@ CREATE TABLE location (
 -- Table: provider
 CREATE TABLE provider (
     id int  NOT NULL,
+    providername varchar(256)  NOT NULL,
     CONSTRAINT provider_pk PRIMARY KEY (id)
 );
 
@@ -82,6 +85,8 @@ CREATE TABLE "user" (
 -- Table: visitor
 CREATE TABLE visitor (
     id int  NOT NULL,
+    name varchar(64)  NOT NULL,
+    surname varchar(64)  NOT NULL,
     CONSTRAINT visitor_pk PRIMARY KEY (id)
 );
 
