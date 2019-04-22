@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 public class DataAccess {
 
@@ -57,82 +57,73 @@ public class DataAccess {
         return jdbcTemplate.query("select * from \"user\" limit ? offset ?", params, new UserRowMapper());
     }
 
-    public Optional<User> getUser(Long id) {
+    private User getUserByRole(String role, Object[] par, User u){
+        switch (role) {
+            case "visitor":
+                Visitor v = jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
+                return v;
+            case "provider":
+                Provider p = jdbcTemplate.queryForObject("SELECT * FROM provider WHERE id = ?", par, new ProviderRowMapper(u));
+                return p;
+            default:
+                return null;
+        }
+    }
+
+    public User getUser(Long id) {
         try {
             Long[] par = new Long[]{id};
-            User u = jdbcTemplate.queryForObject("select * from \"user\" where id = ?", par, new UserRowMapper());
-            if (u == null) return Optional.empty();
-            switch (u.getRole()) {
-                case "visitor":
-                    Visitor v = jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
-                    return (v != null) ? Optional.of(v) : Optional.empty();
-                case "provider":
-                    Provider p = jdbcTemplate.queryForObject("SELECT * FROM provider WHERE id = ?", par, new ProviderRowMapper(u));
-                    return (p != null) ? Optional.of(p) : Optional.empty();
-            }
+            User u = jdbcTemplate.queryForObject("select * from `user` where id = ?", par, new UserRowMapper());
+            return (u != null) ? getUserByRole(u.getRole(), par, u) : null;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Optional.empty();
+        return null;
     }
 
-    public Optional<User> getUser(String email) {
+    public User getUser(String email) {
         try {
-            String[] par = new String[]{email};
-            User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ?", par, new UserRowMapper());
-            if (u == null) return  Optional.empty();
-            switch (u.getRole()) {
-                case "visitor":
-                    Visitor v = jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
-                    return (v != null) ? Optional.of(v) : Optional.empty();
-                case "provider":
-                    Provider p = jdbcTemplate.queryForObject("SELECT * FROM provider WHERE id = ?", par, new ProviderRowMapper(u));
-                    return (p != null) ? Optional.of(p) : Optional.empty();
-            }
+            User u = jdbcTemplate.queryForObject("select * from `user` where email = ?", new String[]{email}, new UserRowMapper());
+            return (u != null) ? getUserByRole(u.getRole(), new Long[]{u.getId()}, u) : null;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Optional.empty();
+        return null;
     }
 
-    public Optional<User> getUser(String email, String hashedPassword) {
-
+    public User getUser(String email, String hashedPassword) {
         try {
-            String[] params = new String[]{email, hashedPassword};
-            User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ? and password = ?", params, new UserRowMapper());
-            if (u == null) return Optional.empty();
-            Long[] par = new Long[]{u.getId()};
-            switch (u.getRole()) {
-                case "visitor":
-                    Visitor v = jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
-                    return (v != null) ? Optional.of(v) : Optional.empty();
-                case "provider":
-                    Provider p = jdbcTemplate.queryForObject("SELECT * FROM provider WHERE id = ?", par, new ProviderRowMapper(u));
-                    return (p != null) ? Optional.of(p) : Optional.empty();
-            }
+            User u = jdbcTemplate.queryForObject("select * from `user` where email = ? and password = ?", new String[]{email, hashedPassword}, new UserRowMapper());
+            return (u != null) ? getUserByRole(u.getRole(), new Long[]{u.getId()}, u) : null;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Optional.empty();
+        return null;
     }
 
-    public void storeUser(Provider p, String hashedPassword) {
+    public boolean storeUser(Provider p, String hashedPassword) {
         try {
-            jdbcTemplate.update("INSERT INTO \"user\"(email, name, surname, password, role) VALUES (?,?,?,?,?)",
-                                 p.getEmail(), p.getName(), p.getSurname(), hashedPassword, "provider");
-            jdbcTemplate.update("INSERT INTO provider (id) VALUES (?)", p.getId());
+            jdbcTemplate.update("INSERT INTO `user`(email, password, role) VALUES (?,?,?,?,?)",
+                                 p.getEmail(), hashedPassword, "provider");
+            jdbcTemplate.update("INSERT INTO provider (id, providername) VALUES (?)", p.getId(), p.getProvidername());
         } catch (Exception e) {
+            System.err.println("Failed to store provider user");
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
-    public void storeUser(Visitor v, String hashedPassword) {
+    public boolean storeUser(Visitor v, String hashedPassword) {
         try {
-            jdbcTemplate.update("INSERT INTO \"user\"(email, name, surname, password, role) VALUES (?,?,?,?,?)",
-                                v.getEmail(), v.getName(), v.getSurname(), hashedPassword, "provider");
-            jdbcTemplate.update("INSERT INTO visitor (id) VALUES (?)", v.getId());
+            jdbcTemplate.update("INSERT INTO `user`(email, password, role) VALUES (?,?,?,?,?)",
+                                v.getEmail(), hashedPassword, "visitor");
+            jdbcTemplate.update("INSERT INTO visitor (id, `name`, surnmae) VALUES (?)", v.getId(), v.getName(), v.getSurname());
         } catch (Exception e) {
+            System.err.println("Failed to store visitor user");
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 }

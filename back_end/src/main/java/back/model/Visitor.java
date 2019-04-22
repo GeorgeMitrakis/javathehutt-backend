@@ -5,12 +5,27 @@ import back.api.JTHInputException;
 
 public class Visitor extends User{
 
-    public Visitor(User usr /* TODO: add extras */){
-        super(usr.getId(), usr.getEmail(), usr.getName(), usr.getSurname(), "visitor");
+    private final String name;
+    private final String surname;
+
+    public Visitor(User usr, String _name, String _surname){
+        super(usr.getId(), usr.getEmail(), "visitor");
+        name = _name;
+        surname = _surname;
     }
 
-    public Visitor(long id, String email, String name, String surname /* TODO: add extras */){
-        super(id, email, name, surname, "visitor");
+    public Visitor(long id, String email, String _name, String _surname){
+        super(id, email, "visitor");
+        name = _name;
+        surname = _surname;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSurname() {
+        return surname;
     }
 
 }

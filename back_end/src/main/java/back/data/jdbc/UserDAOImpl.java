@@ -8,7 +8,7 @@ import back.model.User;
 import back.model.Visitor;
 
 import java.util.List;
-import java.util.Optional;
+
 
 public class UserDAOImpl implements UserDAO {
 
@@ -26,27 +26,31 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public Optional<User> getById(long id) {
+    public User getById(long id) {
         return dataAccess.getUser(id);
     }
 
     @Override
-    public Optional<User> getByEmail(String email) {
+    public User getByEmail(String email) {
         return dataAccess.getUser(email);
     }
 
     @Override
-    public Optional<User> getByCredentials(String email, String hashedPassword) throws JTHAuthException {
-        return dataAccess.getUser(email, hashedPassword);
+    public User getByCredentials(String email, String hashedPassword) throws JTHAuthException {
+        if ( dataAccess.getUser(email) != null ){                 // if email exists..
+            User u = dataAccess.getUser(email, hashedPassword);
+            if (u == null) throw new JTHAuthException();          // ..but password is wrong then AUTH exception
+            return u;
+        } else return null;
     }
 
     @Override
-    public void storeUser(Provider p, String password) {
-        dataAccess.storeUser(p,password);
+    public boolean storeUser(Provider p, String password) {
+        return dataAccess.storeUser(p, password);
     }
 
     @Override
-    public void storeUser(Visitor v, String password) {
-        dataAccess.storeUser(v,password);
+    public boolean storeUser(Visitor v, String password) {
+        return dataAccess.storeUser(v, password);
     }
 }

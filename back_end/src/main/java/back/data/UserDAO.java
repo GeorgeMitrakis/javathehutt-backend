@@ -11,13 +11,13 @@ public interface UserDAO {
 
     List<User> getUsers(Limits limits);
 
-    Optional<User> getById(long id);
+    User getById(long id);
 
-    Optional<User> getByEmail(String email);
+    User getByEmail(String email);
 
-    Optional<User> getByCredentials(String email, String hashedPassword) throws JTHAuthException;
+    User getByCredentials(String email, String hashedPassword) throws JTHAuthException;
 
-    void storeUser(Provider p,String password);
+    boolean storeUser(Provider p, String password);
 
-    void storeUser(Visitor v,String password);
+    boolean storeUser(Visitor v, String password);
 }

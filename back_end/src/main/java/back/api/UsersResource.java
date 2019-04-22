@@ -24,80 +24,62 @@ public class UsersResource extends ServerResource {
 
     @Override
     protected Representation get() throws ResourceException {
-
-        //we assume that we have the ADMIN role. Your should write code to ensure it.
-        //Consult Restlet filters for implementing your code as a filter.
-
-        //read request parameters to create the limits
-        //String start = getQueryValue("start");
-        //...
-        Limits limits = new Limits(0, 10);
-        List<User> users = userDAO.getUsers(limits);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("start", limits.getStart());
-        map.put("count", limits.getCount());
-        map.put("total", limits.getTotal());
-        map.put("results", users);
-
-        return new JsonMapRepresentation(map);
+        // TODO: return user profile info
+        return null;
     }
 
     @Override
     protected Representation post(Representation entity) throws ResourceException {
-
+        // Registers a new user
         try{
             Form form = new Form(entity);
-            String email = form.getFirstValue("username");
-            if(userDAO.getByEmail(email).isPresent()){
-                throw new JTHInputException();
-            }
+            String email = form.getFirstValue("email");
+            String password = form.getFirstValue("password");
+            String password1 = form.getFirstValue("password1");
             String type = form.getFirstValue("type");
+            if ( email == null || password == null || password1 == null || type == null
+                 || password.equals("") || password1.equals("") || type.equals("")){
+                throw new JTHInputException("missing or empty parameters");
+            }
+            else if ( !password.equals(password1) ){
+                throw new JTHInputException("mismatching password");
+            }
+            else if (userDAO.getByEmail(email) != null){
+                throw new JTHInputException("email is already taken");
+            }
+
+            // TODO (@by_mike): hash password
+
+            boolean success = false;
             switch (type){
                 case "visitor":
-                    return visitorSignUp(form);
+                    String name =  form.getFirstValue("name");
+                    String surname =  form.getFirstValue("surname");
+                    if (name == null || surname == null || name.equals("") || surname.equals("")) throw new JTHInputException("missing or empty parameters");
+                    success = userDAO.storeUser(new Visitor(0, email, name, surname), password);
+                    break;
                 case "provider":
-                    return providerSignUp(form);
+                    String providername =  form.getFirstValue("providername");
+                    if (providername == null || providername.equals("")) throw new JTHInputException("missing or empty parameters");
+                    success = userDAO.storeUser(new Provider(0, email, providername), password);
+                    break;
+                default:
+                    throw new JTHInputException("unknown type");
             }
-        }catch (JTHInputException e){
-            return JsonMapRepresentation.forSimpleResult("No signup for you");
+            if (!success){
+                throw new JTHInputException("Database error");
+            }
+        } catch (JTHInputException e){
+            return JsonMapRepresentation.forSimpleResult("Sign up error: " + e.getErrorMsg());
         }
-        return  JsonMapRepresentation.forSimpleResult("Success");
+        return JsonMapRepresentation.forSimpleResult("Sign up successful");
 
     }
 
-    private Representation providerSignUp(Form form){
-        //...
-        try{
-            String password = form.getFirstValue("password");
-            String email = form.getFirstValue("email");
-            String name = form.getFirstValue("name");
-            String surname = form.getFirstValue("surname");
-
-            Util.validateArgs(password,email,name,surname);
-
-            Provider p = new Provider(0,email,name, surname);
-            userDAO.storeUser(p,password);
-        }catch(JTHInputException e){
-            return JsonMapRepresentation.forSimpleResult(false);
-        }
-        return JsonMapRepresentation.forSimpleResult(true);
+    @Override
+    protected Representation put(Representation entity) throws ResourceException {
+        // TODO: updates user information
+        return null;
     }
 
-    private Representation visitorSignUp(Form form) throws ResourceException{
-        try{
-            String password = form.getFirstValue("password");
-            String email = form.getFirstValue("email");
-            String name = form.getFirstValue("name");
-            String surname = form.getFirstValue("surname");
-
-            Util.validateArgs(password,email,name,surname);
-
-            Visitor v = new Visitor(0,email,name,surname);
-            userDAO.storeUser(v,password);
-        }catch(JTHInputException e){
-            return JsonMapRepresentation.forSimpleResult(false);
-        }
-        return JsonMapRepresentation.forSimpleResult(true);
-    }
 }
