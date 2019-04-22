@@ -110,7 +110,7 @@ ALTER TABLE favorites ADD CONSTRAINT Favorites_visitor
 -- Reference: administrator_user (table: administrator)
 ALTER TABLE administrator ADD CONSTRAINT administrator_user
     FOREIGN KEY (id)
-    REFERENCES "user" (long)
+    REFERENCES "user" (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -126,7 +126,7 @@ ALTER TABLE location ADD CONSTRAINT location_city
 -- Reference: provider_user (table: provider)
 ALTER TABLE provider ADD CONSTRAINT provider_user
     FOREIGN KEY (id)
-    REFERENCES "user" (long)
+    REFERENCES "user" (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -184,7 +184,7 @@ ALTER TABLE transactions ADD CONSTRAINT transactions_visitor
 -- Reference: visitor_user (table: visitor)
 ALTER TABLE visitor ADD CONSTRAINT visitor_user
     FOREIGN KEY (id)
-    REFERENCES "user" (long)
+    REFERENCES "user" (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
