@@ -21,6 +21,6 @@ class ProviderRowMapper implements RowMapper<Provider>  {
 
     @Override
     public Provider mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new Provider(user);
+        return new Provider(user, rs.getString("providername"));
     }
 }

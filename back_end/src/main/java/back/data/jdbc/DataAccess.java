@@ -73,7 +73,7 @@ public class DataAccess {
     public User getUser(Long id) {
         try {
             Long[] par = new Long[]{id};
-            User u = jdbcTemplate.queryForObject("select * from `user` where id = ?", par, new UserRowMapper());
+            User u = jdbcTemplate.queryForObject("select * from \"user\" where id = ?", par, new UserRowMapper());
             return (u != null) ? getUserByRole(u.getRole(), par, u) : null;
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,7 +83,7 @@ public class DataAccess {
 
     public User getUser(String email) {
         try {
-            User u = jdbcTemplate.queryForObject("select * from `user` where email = ?", new String[]{email}, new UserRowMapper());
+            User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ?", new String[]{email}, new UserRowMapper());
             return (u != null) ? getUserByRole(u.getRole(), new Long[]{u.getId()}, u) : null;
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,7 +93,7 @@ public class DataAccess {
 
     public User getUser(String email, String hashedPassword) {
         try {
-            User u = jdbcTemplate.queryForObject("select * from `user` where email = ? and password = ?", new String[]{email, hashedPassword}, new UserRowMapper());
+            User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ? and password = ?", new String[]{email, hashedPassword}, new UserRowMapper());
             return (u != null) ? getUserByRole(u.getRole(), new Long[]{u.getId()}, u) : null;
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,9 +103,10 @@ public class DataAccess {
 
     public boolean storeUser(Provider p, String hashedPassword) {
         try {
-            jdbcTemplate.update("INSERT INTO `user`(email, password, role) VALUES (?,?,?,?,?)",
-                                 p.getEmail(), hashedPassword, "provider");
-            jdbcTemplate.update("INSERT INTO provider (id, providername) VALUES (?)", p.getId(), p.getProvidername());
+            int id = jdbcTemplate.update("INSERT INTO \"user\"(email, password, role) VALUES (?, ?, ?) RETURNING id",
+                                         p.getEmail(), hashedPassword, "provider");
+            jdbcTemplate.update("INSERT INTO provider (id, providername) VALUES (?, ?)", id, p.getProvidername());
+            p.setId(id);
         } catch (Exception e) {
             System.err.println("Failed to store provider user");
             e.printStackTrace();
@@ -116,9 +117,10 @@ public class DataAccess {
 
     public boolean storeUser(Visitor v, String hashedPassword) {
         try {
-            jdbcTemplate.update("INSERT INTO `user`(email, password, role) VALUES (?,?,?,?,?)",
-                                v.getEmail(), hashedPassword, "visitor");
-            jdbcTemplate.update("INSERT INTO visitor (id, `name`, surnmae) VALUES (?)", v.getId(), v.getName(), v.getSurname());
+            int id = jdbcTemplate.update("INSERT INTO \"user\"(email, password, role) VALUES (?, ?, ?) RETURNING id",
+                                         v.getEmail(), hashedPassword, "visitor");
+            jdbcTemplate.update("INSERT INTO visitor (\"name\", surnmae) VALUES (?, ?, ?)", id, v.getName(), v.getSurname());
+            v.setId(id);
         } catch (Exception e) {
             System.err.println("Failed to store visitor user");
             e.printStackTrace();

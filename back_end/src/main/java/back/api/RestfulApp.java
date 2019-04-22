@@ -26,7 +26,7 @@ public class RestfulApp extends Application {
 		// GET  /users             -> get (my) user info (profile)
 		// POST /users?signup=yes  -> sign up
         // PUT  /users?edit=yes    -> edit
-		router.attach("/users" ,UsersResource.class);
+		router.attach("/users" , UsersResource.class);
 
 		return router;
 	}

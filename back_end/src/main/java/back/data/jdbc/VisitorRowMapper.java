@@ -20,7 +20,7 @@ class VisitorRowMapper implements RowMapper<Visitor>  {
 
     @Override
     public Visitor mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new Visitor(user);
+        return new Visitor(user, rs.getString("name"), rs.getString("surname"));
     }
 }
 

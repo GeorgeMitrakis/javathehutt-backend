@@ -13,10 +13,8 @@ class UserRowMapper implements RowMapper<User>  {
         
         long id = rs.getLong("id");
         String email = rs.getString("email");
-        String name = rs.getString("name");
-        String surname = rs.getString("surname");
         String role = rs.getString("role");
-        return new User(id, email, name, surname, role);
+        return new User(id, email, role);
 
     }
 }
