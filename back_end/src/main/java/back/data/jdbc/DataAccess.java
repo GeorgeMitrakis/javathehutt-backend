@@ -76,7 +76,7 @@ public class DataAccess {
     public User getUser(Long id) {
         try {
             Long[] par = new Long[]{id};
-            User u = jdbcTemplate.queryForObject("select * from \"user\" where id = ?", par, new UserRowMapper());
+            User u = jdbcTemplate.queryForObject("select * from \"user\" where long = ?", par, new UserRowMapper());
             return (u != null) ? getUserByRole(u.getRole(), par, u) : null;
         }catch (EmptyResultDataAccessException e){
             return null;
