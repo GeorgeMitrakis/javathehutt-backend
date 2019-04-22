@@ -69,7 +69,7 @@ public class UsersResource extends ServerResource {
                     throw new JTHInputException("unknown type");
             }
             if (!success){
-                throw new JTHInputException("Database error");
+                throw new JTHInputException("database error");
             }
         } catch (JTHInputException e){
             return JsonMapRepresentation.forSimpleResult("Sign up error: " + e.getErrorMsg());

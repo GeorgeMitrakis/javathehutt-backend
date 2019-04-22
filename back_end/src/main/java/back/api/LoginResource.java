@@ -5,6 +5,7 @@ import back.data.JTHAuthException;
 import back.data.JTHSecurity;
 import back.data.UserDAO;
 import back.model.User;
+import back.util.Hashing;
 import back.util.JWT;
 
 import org.restlet.Context;
@@ -37,24 +38,24 @@ public class LoginResource extends ServerResource {
 
         //Read the parameters
         String email = form.getFirstValue("email");
-        String hashedPassword = JTHSecurity.makeSHA(form.getFirstValue("password"));
+        String password = JTHSecurity.makeSHA(form.getFirstValue("password"));
 
-        if (email == null || hashedPassword == null) {
-            return JsonMapRepresentation.forSimpleResult("Missing login parameters");
+        if (email == null || password == null || email.equals("") || password.equals("")) {
+            return JsonMapRepresentation.forSimpleResult("Login error: missing or empty parameters");
         }
+
+        // hash password
+        password = Hashing.getHashSHA256(password);
 
         // check authentication and take the claims with Claims claims = JWT.decodeJWT(jwt);
         try {
-            Optional<User> u = userDAO.getByCredentials(email, hashedPassword);
-            if(!u.isPresent()) {
-                throw new JTHAuthException();
-            }
-            String jwt = JWT.createJWT(u.get(), Configuration.getInstance().getLoginTTL());
+            User u = userDAO.getByCredentials(email, password);   // throws JWTAuthException if return value would be null
+            String jwt = JWT.createJWT(u, Configuration.getInstance().getLoginTTL());
             //String jwt = JWT.createJWT(u.get().getId(), u.get().getEmail(), "subject", 800000);
             return JsonMapRepresentation.forSimpleResult(jwt);
         } catch (Exception e) {
             e.printStackTrace();
-            return JsonMapRepresentation.forSimpleResult("Incorrect credentials");
+            return JsonMapRepresentation.forSimpleResult("Login error: incorrect credentials");
         }
     }
 
