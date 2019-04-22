@@ -2,6 +2,7 @@ package back.api;
 
 import back.model.Provider;
 import back.model.Visitor;
+import back.util.Hashing;
 import back.util.Util;
 import org.restlet.data.Form;
 import org.restlet.data.Status;
@@ -48,7 +49,8 @@ public class UsersResource extends ServerResource {
                 throw new JTHInputException("email is already taken");
             }
 
-            // TODO (@by_mike): hash password
+            // hash password
+            password = Hashing.getHashSHA256(password);
 
             boolean success = false;
             switch (type){
