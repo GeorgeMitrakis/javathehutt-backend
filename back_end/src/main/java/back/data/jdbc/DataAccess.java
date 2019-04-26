@@ -1,6 +1,5 @@
 package back.data.jdbc;
 
-import back.data.JTHSecurity;
 import back.model.Provider;
 import back.model.Visitor;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -164,47 +163,5 @@ public class DataAccess {
         }
         return true;
     }
-
-    /* Another stupider but working way:
-    public boolean storeUser(Provider p, String hashedPassword) {
-        try {
-            // insert to user
-            jdbcTemplate.update("INSERT INTO \"user\"(email, password, role) VALUES (?, ?, ?)",
-                                p.getEmail(), hashedPassword, "provider");
-            // get the generated id from user (TODO: can this be done without a query?) NEEDs: email unique
-            Long idwrapper = jdbcTemplate.queryForObject("SELECT id FROM \"user\" WHERE email = ?;", new String[]{p.getEmail()}, Long.class);
-            if (idwrapper == null) throw new Exception();
-            long id = idwrapper;
-            // use the same id to insert to provider
-            jdbcTemplate.update("INSERT INTO provider (id, providername) VALUES (?, ?)", id, p.getProvidername());
-            p.setId(id);
-        } catch (Exception e) {
-            System.err.println("Failed to store provider user");
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    public boolean storeUser(Visitor v, String hashedPassword) {
-        try {
-            // insert to user
-            jdbcTemplate.update("INSERT INTO \"user\"(email, password, role) VALUES (?, ?, ?)",
-                    v.getEmail(), hashedPassword, "provider");
-            // get the generated id from user (TODO: can this be done without a query?) NEEDs: email unique
-            Long idwrapper = jdbcTemplate.queryForObject("SELECT id FROM \"user\" WHERE email = ?;", new String[]{v.getEmail()}, Long.class);
-            if (idwrapper == null) throw new Exception();
-            long id = idwrapper;
-            // use the same id to insert to visitor
-            jdbcTemplate.update("INSERT INTO visitor (id, \"name\", surname) VALUES (?, ?, ?)", id, v.getName(), v.getSurname());
-            v.setId(id);
-        } catch (Exception e) {
-            System.err.println("Failed to store visitor user");
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-    */
 
 }

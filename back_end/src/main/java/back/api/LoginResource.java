@@ -2,7 +2,6 @@ package back.api;
 
 import back.conf.Configuration;
 import back.data.JTHAuthException;
-import back.data.JTHSecurity;
 import back.data.UserDAO;
 import back.model.User;
 import back.util.Hashing;
@@ -38,7 +37,7 @@ public class LoginResource extends ServerResource {
 
         //Read the parameters
         String email = form.getFirstValue("email");
-        String password = JTHSecurity.makeSHA(form.getFirstValue("password"));
+        String password = form.getFirstValue("password");
 
         if (email == null || password == null || email.equals("") || password.equals("")) {
             return JsonMapRepresentation.forSimpleResult("Login error: missing or empty parameters");
