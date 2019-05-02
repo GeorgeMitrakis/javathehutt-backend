@@ -20,4 +20,11 @@ public interface UserDAO {
     boolean storeUser(Provider p, String password);
 
     boolean storeUser(Visitor v, String password);
+
+    boolean setUserBan(User user, boolean ban);
+
+    boolean promoteUserToAdmin(User user);
+
+    boolean deleteUser(User user);
+
 }

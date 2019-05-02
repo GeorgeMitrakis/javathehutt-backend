@@ -2,8 +2,6 @@ package back.model;
 
 public class User {
 
-
-
     private long id;
     private final String email;
     private final String role;

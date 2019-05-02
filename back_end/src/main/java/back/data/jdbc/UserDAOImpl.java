@@ -19,6 +19,21 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public boolean setUserBan(User user, boolean ban){
+        return dataAccess.setUserBan(user, ban);
+    }
+
+    @Override
+    public boolean promoteUserToAdmin(User user){
+        return dataAccess.promoteUser(user);
+    }
+
+    @Override
+    public boolean deleteUser(User user){
+        return dataAccess.deleteUser(user);
+    }
+
+    @Override
     public List<User> getUsers(Limits limits) {
         List<User> users = dataAccess.getUsers(limits.getStart(), limits.getCount());
         limits.setTotal(dataAccess.countUsers());

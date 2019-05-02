@@ -16,9 +16,10 @@ public class RestfulApp extends Application {
 
 		Router router = new Router(getContext());
 
-		//TODO: /admin resource
-
 		router.attach("/hello", HelloWorldResource.class);
+
+		// POST
+		router.attach("/admin", AdminResource.class);
 
 		// POST
 		router.attach("/login", LoginResource.class);
