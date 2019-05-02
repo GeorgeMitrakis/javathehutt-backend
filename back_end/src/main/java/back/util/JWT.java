@@ -69,11 +69,14 @@ public class JWT {
                 .claim("user",u)
                 .setIssuedAt(new Date(nowMillis))
                 .setIssuer("Java the Hutt")
-                .setSubject("user_session_info");
+                .setSubject("user_session_info")
+                .signWith(signingKey,signatureAlgorithm);
         if(ttlMillis > 0){
             b.setExpiration(new Date(ttlMillis + nowMillis));
         }
         return b.compact();
     }
+
+
 
 }

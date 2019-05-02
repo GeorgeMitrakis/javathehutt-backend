@@ -1,5 +1,6 @@
 package back.data.jdbc;
 
+import back.model.Admin;
 import back.model.Provider;
 import back.model.Visitor;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -60,14 +61,14 @@ public class DataAccess {
         return jdbcTemplate.query("select * from \"user\" limit ? offset ?", params, new UserRowMapper());
     }
 
-    private User getUserByRole(String role, Object[] par, User u){
+    private User getUserByRole(String role, Object[] par, User u) throws EmptyResultDataAccessException, IncorrectResultSizeDataAccessException {
         switch (role) {
             case "visitor":
-                Visitor v = jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
-                return v;
+                return jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
             case "provider":
-                Provider p = jdbcTemplate.queryForObject("SELECT * FROM provider WHERE id = ?", par, new ProviderRowMapper(u));
-                return p;
+                return jdbcTemplate.queryForObject("SELECT * FROM provider WHERE id = ?", par, new ProviderRowMapper(u));
+            case "admin":
+                return jdbcTemplate.queryForObject("SELECT * FROM administrator WHERE id = ?", par, new AdminRowMapper(u));
             default:
                 return null;
         }
@@ -114,6 +115,70 @@ public class DataAccess {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean setUserBan(User user, boolean ban){
+        try {
+            jdbcTemplate.update("UPDATE \"user\" SET isBanned = ? WHERE id = ?", ban, user.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public boolean promoteUser(User user){
+        try {
+            switch (user.getRole()){
+                case "provider":
+                    jdbcTemplate.update("DELETE FROM provider WHERE id = ?", user.getId());
+                    jdbcTemplate.update("UPDATE \"user\" SET role = 'admin' WHERE id = ?", user.getId());
+                    jdbcTemplate.update("INSERT INTO administrator (id, name, surname) VALUES (?, ?, ?)",
+                                        user.getId(), "Guy from " + ((Provider) user).getProvidername(), "Guy from " + ((Provider) user).getProvidername());  // TODO what name to give?
+                    break;
+                case "visitor":
+                    jdbcTemplate.update("DELETE FROM visitor WHERE id = ?", user.getId());
+                    jdbcTemplate.update("UPDATE \"user\" SET role = 'admin' WHERE id = ?", user.getId());
+                    jdbcTemplate.update("INSERT INTO administrator (id, name, surname) VALUES (?, ?, ?)",
+                                         user.getId(), ((Visitor) user).getName(), ((Visitor) user).getSurname());
+                    break;
+                case "admin":
+                    System.out.println("Warning: Tried to promote user who is already an admin");
+                    return true;
+                default:
+                    System.err.println("Warning: wrong role in User object or in promoteUser() code!");
+                    return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public boolean deleteUser(User user){
+        try {
+            switch (user.getRole()){
+                case "provider":
+                    jdbcTemplate.update("DELETE FROM provider WHERE id = ?", user.getId());
+                    break;
+                case "visitor":
+                    jdbcTemplate.update("DELETE FROM visitor WHERE id = ?", user.getId());
+                    break;
+                case "admin":
+                    System.out.println("Warning: Deleting an administrator!");
+                    jdbcTemplate.update("DELETE FROM administrator WHERE id = ?", user.getId());
+                    break;
+                default:
+                    System.err.println("Warning: wrong role in User object or in deleteUser() code!");
+                    return false;
+            }
+            jdbcTemplate.update("DELETE FROM \"user\" WHERE id = ?", user.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     public boolean storeUser(Provider p, String hashedPassword) {
