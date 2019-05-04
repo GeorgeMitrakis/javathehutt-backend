@@ -1,0 +1,35 @@
+{
+	
+	"users":[
+		{
+            "id":1,
+            "email": "test@email.com",
+            "role": "visitor",
+            "banned": false
+        },
+        {
+            "id":2,
+            "email": "testem@ail1.com",
+            "role": "provider",
+            "banned": true
+        },
+        {
+            "id":3,
+            "email": "testem@ail2.com",
+            "role": "provider",
+            "banned": true
+        },
+        {
+            "id":4,
+            "email": "testem@ail3.com",
+            "role": "provider",
+            "banned": false
+        },
+        {
+            "id":5,
+            "email": "testem@ail4.com",
+            "role": "provider",
+            "banned": true
+        }
+	]
+}

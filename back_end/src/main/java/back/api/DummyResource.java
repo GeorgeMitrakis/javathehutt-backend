@@ -25,7 +25,7 @@ public class DummyResource extends ServerResource {
         JSONParser jsonParser = new JSONParser();
 
         String field = getQueryValue("field");
-        try (FileReader reader = new FileReader("/dummy.json"))
+        try (FileReader reader = new FileReader("./dummy.json"))
         {
             //Read JSON file
             Object obj = jsonParser.parse(reader);
