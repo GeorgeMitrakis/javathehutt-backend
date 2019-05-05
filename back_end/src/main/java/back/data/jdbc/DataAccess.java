@@ -117,6 +117,19 @@ public class DataAccess {
         return null;
     }
 
+    public boolean getUserBan(long id){
+        try {
+            Long[] par = new Long[]{id};
+            Boolean result = jdbcTemplate.queryForObject("select isbanned from \"user\" where id = ?", par, Boolean.class);
+            return (result != null) ? result.booleanValue() : true;
+        } catch (IncorrectResultSizeDataAccessException ignored){
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
     public boolean setUserBan(User user, boolean ban){
         try {
             jdbcTemplate.update("UPDATE \"user\" SET isBanned = ? WHERE id = ?", ban, user.getId());

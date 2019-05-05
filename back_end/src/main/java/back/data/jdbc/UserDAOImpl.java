@@ -19,6 +19,11 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public boolean getUserBan(long id){
+        return dataAccess.getUserBan(id);
+    }
+
+    @Override
     public boolean setUserBan(User user, boolean ban){
         return dataAccess.setUserBan(user, ban);
     }
