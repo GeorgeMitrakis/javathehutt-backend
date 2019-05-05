@@ -49,6 +49,10 @@ public class LoginResource extends ServerResource {
         // check authentication and take the claims with Claims claims = JWT.decodeJWT(jwt);
         try {
             User u = userDAO.getByCredentials(email, password);   // throws JWTAuthException if return value would be null
+            boolean isBanned = userDAO.getUserBan(u.getId());
+            if (isBanned){
+                return JsonMapRepresentation.forSimpleResult("Login error: user is banned");
+            }
             String jwt = JWT.createJWT(u, Configuration.getInstance().getLoginTTL());
             //String jwt = JWT.createJWT(u.get().getId(), u.get().getEmail(), "subject", 800000);
             return JsonMapRepresentation.forSimpleResult(jwt);

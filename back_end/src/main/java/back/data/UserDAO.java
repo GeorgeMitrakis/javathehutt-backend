@@ -21,6 +21,8 @@ public interface UserDAO {
 
     boolean storeUser(Visitor v, String password);
 
+    boolean getUserBan(long id);
+
     boolean setUserBan(User user, boolean ban);
 
     boolean promoteUserToAdmin(User user);
