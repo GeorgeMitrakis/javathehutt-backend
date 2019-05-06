@@ -1,5 +1,7 @@
 package back.model;
 
+import java.util.LinkedHashMap;
+
 public class Admin extends User {
 
     private final String name;
@@ -15,6 +17,16 @@ public class Admin extends User {
         super(id, email, "admin");
         name = _name;
         surname = _surname;
+    }
+
+    public Admin(LinkedHashMap M) {
+        super(
+                ((Integer)M.get("id")).intValue(),
+                (String) M.get("email"),
+                (String) M.get("role")
+        );
+        this.name = (String)M.get("name");
+        this.surname = (String)M.get("surname");
     }
 
     public String getName() {

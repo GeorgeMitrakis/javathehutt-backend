@@ -1,5 +1,9 @@
 package back.model;
 
+import back.data.JTHAuthException;
+
+import java.util.LinkedHashMap;
+
 public class User {
 
     private long id;
@@ -10,6 +14,21 @@ public class User {
         this.id = id;
         this.email = email;
         this.role = role;
+    }
+
+    public static User fromLinkedHashMap(LinkedHashMap M){
+        String role = (String)(M.get("role"));
+        switch (role){
+            case "visitor":
+                return new Visitor(M);
+            case "provider":
+                return new Provider(M);
+            case "admin":
+                return new Admin(M);
+            default:
+                return null;
+
+        }
     }
 
     public long getId() {

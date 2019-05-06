@@ -2,6 +2,8 @@ package back.model;
 
 import back.api.JTHInputException;
 
+import java.util.LinkedHashMap;
+
 
 public class Visitor extends User{
 
@@ -18,6 +20,16 @@ public class Visitor extends User{
         super(id, email, "visitor");
         name = _name;
         surname = _surname;
+    }
+
+    public Visitor(LinkedHashMap M){
+        super(
+                ((Integer)M.get("id")).intValue(),
+                (String) M.get("email"),
+                (String) M.get("role")
+        );
+        this.name = (String)M.get("name");
+        this.surname = (String)M.get("surname");
     }
 
     public String getName() {
