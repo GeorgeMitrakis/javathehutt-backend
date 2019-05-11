@@ -7,6 +7,7 @@ import back.util.Util;
 import org.restlet.data.Form;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
+import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import back.conf.Configuration;
@@ -16,6 +17,7 @@ import back.data.Limits;
 import back.model.User;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,11 +28,23 @@ public class UsersResource extends ServerResource {
     @Override
     protected Representation get() throws ResourceException {
         // TODO: return user profile info
+        String email = getQueryValue("email");
+        if(email != null){
+            User u = userDAO.getByEmail(email);
+            if(u == null){
+                return JsonMapRepresentation.forSimpleResult(false);
+            }else{
+                return JsonMapRepresentation.forSimpleResult(u);
+            }
+        }
         return null;
     }
 
+
+
     @Override
     protected Representation post(Representation entity) throws ResourceException {
+
         // Registers a new user
         try{
             Form form = new Form(entity);
