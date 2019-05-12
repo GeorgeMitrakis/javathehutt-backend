@@ -32,12 +32,17 @@ public class UsersResource extends ServerResource {
         if(email != null){
             User u = userDAO.getByEmail(email);
             if(u == null){
-                return JsonMapRepresentation.forSimpleResult(false);
+                Map<String, Object> m = new HashMap<>();
+                m.put("found",false);
+                return JsonMapRepresentation.result(true, null,m);
             }else{
-                return JsonMapRepresentation.forSimpleResult(u);
+                Map<String, Object> m = new HashMap<>();
+                m.put("found",true);
+                m.put("user",u);
+                return JsonMapRepresentation.result(true,null,m);
             }
         }
-        return null;
+        return JsonMapRepresentation.result(false,"no parameters given",null);
     }
 
 
@@ -87,9 +92,10 @@ public class UsersResource extends ServerResource {
                 throw new JTHInputException("database error");
             }
         } catch (JTHInputException e){
-            return JsonMapRepresentation.forSimpleResult("Sign up error: " + e.getErrorMsg());
+            return JsonMapRepresentation.result(false,"Sign up error: " + e.getErrorMsg(),null);
         }
-        return JsonMapRepresentation.forSimpleResult("Sign up successful");
+        return JsonMapRepresentation.result(true,null,null);
+
 
     }
 

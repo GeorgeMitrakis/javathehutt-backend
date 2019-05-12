@@ -61,9 +61,11 @@ public class AdminResource  extends ServerResource {
                 throw new JTHInputException("database error");
             }
         } catch (JTHInputException e){
-            return JsonMapRepresentation.forSimpleResult("Admin action error: " + e.getErrorMsg());
+            return JsonMapRepresentation.result(false,"Admin action error: " + e.getErrorMsg(),null);
+            //return JsonMapRepresentation.forSimpleResult("Admin action error: " + e.getErrorMsg());
         }
-        return JsonMapRepresentation.forSimpleResult(option + " successful");
+        return JsonMapRepresentation.result(true,option+"successful",null);
+        //return JsonMapRepresentation.forSimpleResult(option + " successful");
     }
 
 }

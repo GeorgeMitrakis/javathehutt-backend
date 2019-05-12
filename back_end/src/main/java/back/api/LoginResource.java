@@ -40,7 +40,7 @@ public class LoginResource extends ServerResource {
         String password = form.getFirstValue("password");
 
         if (email == null || password == null || email.equals("") || password.equals("")) {
-            return JsonMapRepresentation.forSimpleResult("Login error: missing or empty parameters");
+            return JsonMapRepresentation.result(false,"Login error: missing or empty parameters",null);
         }
 
         // hash password
@@ -51,14 +51,18 @@ public class LoginResource extends ServerResource {
             User u = userDAO.getByCredentials(email, password);   // throws JWTAuthException if return value would be null
             boolean isBanned = userDAO.getUserBan(u.getId());
             if (isBanned){
-                return JsonMapRepresentation.forSimpleResult("Login error: user is banned");
+                return JsonMapRepresentation.result(false,"Login error: user is banned",null);
             }
             String jwt = JWT.createJWT(u, Configuration.getInstance().getLoginTTL());
             //String jwt = JWT.createJWT(u.get().getId(), u.get().getEmail(), "subject", 800000);
-            return JsonMapRepresentation.forSimpleResult(jwt);
+            Map<String,Object> data = new HashMap<>();
+            data.put("token",jwt);
+            data.put("user",u);
+            return JsonMapRepresentation.result(true,null, data);
+
         } catch (Exception e) {
             e.printStackTrace();
-            return JsonMapRepresentation.forSimpleResult("Login error: incorrect credentials");
+            return JsonMapRepresentation.result(false,"Login error: incorrect credentials",null);
         }
     }
 

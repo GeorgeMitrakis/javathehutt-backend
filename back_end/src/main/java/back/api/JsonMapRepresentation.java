@@ -29,4 +29,12 @@ public class JsonMapRepresentation extends WriterRepresentation {
         map.put("result", o);
         return new JsonMapRepresentation(map);
     }
+
+    public static JsonMapRepresentation result(boolean success, String message, Map data){
+        HashMap<String,Object> res = new HashMap<>();
+        res.put("success",success);
+        res.put("message",message);
+        res.put("data",data);
+        return new JsonMapRepresentation(res);
+    }
 }
