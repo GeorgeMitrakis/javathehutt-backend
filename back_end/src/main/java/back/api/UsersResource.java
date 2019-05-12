@@ -1,8 +1,10 @@
 package back.api;
 
+import back.data.JTHAuthException;
 import back.model.Provider;
 import back.model.Visitor;
 import back.util.Hashing;
+import back.util.JWT;
 import back.util.Util;
 import org.restlet.data.Form;
 import org.restlet.data.Status;
@@ -46,7 +48,7 @@ public class UsersResource extends ServerResource {
 
     @Override
     protected Representation post(Representation entity) throws ResourceException {
-
+        User createdUser = null;
         // Registers a new user
         try{
             Form form = new Form(entity);
@@ -75,12 +77,14 @@ public class UsersResource extends ServerResource {
                     String name =  form.getFirstValue("name");
                     String surname =  form.getFirstValue("surname");
                     if (name == null || surname == null || name.equals("") || surname.equals("")) throw new JTHInputException("missing or empty parameters");
-                    success = userDAO.storeUser(new Visitor(0, email, name, surname), password);
+                    createdUser = new Visitor(0, email, name, surname);
+                    success = userDAO.storeUser((Visitor) createdUser, password);
                     break;
                 case "provider":
                     String providername =  form.getFirstValue("providername");
                     if (providername == null || providername.equals("")) throw new JTHInputException("missing or empty parameters");
-                    success = userDAO.storeUser(new Provider(0, email, providername), password);
+                    createdUser = new Provider(0, email, providername);
+                    success = userDAO.storeUser((Provider) createdUser, password);
                     break;
                 default:
                     throw new JTHInputException("unknown type");
@@ -90,6 +94,15 @@ public class UsersResource extends ServerResource {
             }
         } catch (JTHInputException e){
             return JsonMapRepresentation.result(false,"Sign up error: " + e.getErrorMsg(),null);
+        }
+        //auto login
+
+        if(getQueryValue("autologin") != null && createdUser != null){
+            String jwt = JWT.createJWT(createdUser,1000000);
+            Map<String, Object> data = new HashMap<>();
+            data.put("user", createdUser);
+            data.put("token", jwt);
+            return JsonMapRepresentation.result(true,"also logged in", data);
         }
         return JsonMapRepresentation.result(true,null,null);
 
