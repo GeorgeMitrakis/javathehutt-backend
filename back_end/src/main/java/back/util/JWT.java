@@ -4,10 +4,12 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 
+import back.data.JTHAuthException;
 import back.model.User;
 import io.jsonwebtoken.*;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
@@ -60,6 +62,12 @@ public class JWT {
                 .parseClaimsJws(jwt).getBody();
         return claims;
     }
+
+    public static User getUserJWT(String jwt) {
+        Claims c = decodeJWT(jwt);
+        return User.fromLinkedHashMap((LinkedHashMap)c.get("user"));
+    }
+
 
     public static String createJWT(User u, long ttlMillis){
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
