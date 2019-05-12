@@ -1,8 +1,6 @@
 package back.data.jdbc;
 
-import back.model.Admin;
-import back.model.Provider;
-import back.model.Visitor;
+import back.model.*;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -11,7 +9,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import back.data.Limits;
-import back.model.User;
 import org.springframework.jdbc.support.KeyHolder;
 
 import javax.sql.DataSource;
@@ -240,6 +237,49 @@ public class DataAccess {
             return false;
         }
         return true;
+    }
+
+    public Room getRoom(long id){
+        try {
+            Long[] par = new Long[]{id};
+            return jdbcTemplate.queryForObject("select * from \"room\" where id = ?", par, new RoomRowMapper());
+        } catch (EmptyResultDataAccessException e){
+            return null;
+        } catch (IncorrectResultSizeDataAccessException e){
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean insertTransaction(User user, Room room, String sqlStartDate, String sqlEndDate) {
+        try {
+            if(room.getCapacity() <= searchTransactions(room, sqlStartDate, sqlEndDate)){
+                System.err.println("Failed to make transaction, no available rooms");
+                return false;
+            }
+            jdbcTemplate.update("INSERT INTO transactions (visitor_id, room_id, cost, start_date, end_date) VALUES (?, ?, ?, ?, ?)", user.getId(), room.getId(), room.getPrice(), sqlStartDate, sqlEndDate);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Failed to make transaction");
+            e.printStackTrace();
+            System.out.println(e.getCause().getMessage());
+            return false;
+        }
+    }
+
+    public int searchTransactions(Room room, String sqlStartDate, String sqlEndDate){
+        try {
+            return jdbcTemplate.queryForObject("select count(*) from \"transactions\" where id = ? and start_date <= ? and end_date >= ?", new Object[]{room.getId(), sqlStartDate, sqlEndDate}, int.class);
+        } catch (EmptyResultDataAccessException e){
+            return -1;
+        } catch (IncorrectResultSizeDataAccessException e){
+            return -1;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  -1;
     }
 
 }

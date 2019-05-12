@@ -1,6 +1,7 @@
 package back.data.jdbc;
 
 import back.data.RoomsDAO;
+import back.model.Room;
 
 public class RoomsDAOImpl implements RoomsDAO {
 
@@ -10,6 +11,8 @@ public class RoomsDAOImpl implements RoomsDAO {
         this.dataAccess = dataAccess;
     }
 
-    // TODO
-
+    @Override
+    public Room getRoomById(int roomId) {
+        return dataAccess.getRoom(roomId);
+    }
 }

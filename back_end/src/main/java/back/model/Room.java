@@ -2,12 +2,19 @@ package back.model;
 
 public class Room {
 
-    private int id;
+    private long id;
     private long providerId;
     private double price;
-    // TODO more
+    private int capacity;
 
-    public int getId() {
+    public Room(long id, long providerId, double price, int capacity) {
+        this.id = id;
+        this.providerId = providerId;
+        this.price = price;
+        this.capacity = capacity;
+    }
+
+    public long getId() {
         return id;
     }
 
@@ -18,5 +25,7 @@ public class Room {
     public double getPrice() {
         return price;
     }
+
+    public int getCapacity(){ return capacity;}
 
 }

@@ -12,6 +12,9 @@ import java.util.Date;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
 
+import back.conf.Configuration;
+import back.data.UserDAO;
+
 public class JWT {
     // The secret key. This should be in a property file NOT under source
     // control and not hard coded in real life. We're putting it here for
@@ -64,7 +67,8 @@ public class JWT {
     public static User getUserJWT(String jwt) {
         Claims claims = decodeJWT(jwt);
         // TODO: @Petros return User object (Provider, Visitor or Admin)
-        return null;
+        UserDAO userDAO = Configuration.getInstance().getUserDAO();
+        return userDAO.getById(Integer.parseInt(claims.getId()));
     }
 
     public static String createJWT(User u, long ttlMillis){
@@ -84,6 +88,10 @@ public class JWT {
         return b.compact();
     }
 
+    public static boolean checkJWT(String jwt){
+        User u = getUserJWT(jwt);
+        return jwt.equals(createJWT(u, 800000));
+    }
 
 
 }

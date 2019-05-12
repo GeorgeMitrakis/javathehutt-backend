@@ -8,10 +8,17 @@ import back.model.Room;
 import back.model.User;
 import back.util.DateHandler;
 import back.util.JWT;
+import io.jsonwebtoken.Claims;
 import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static back.util.JWT.checkJWT;
+import static back.util.JWT.getUserJWT;
 
 
 public class BookingResource  extends ServerResource {
@@ -47,6 +54,10 @@ public class BookingResource  extends ServerResource {
         }
 
         // TODO: also check authentication from jasonWebToken, userId must be the id of the user making the request!
+        String jwt = form.getFirstValue("jwt");
+        if(!checkJWT(jwt)) {
+            return JsonMapRepresentation.result(false,"Booking error: incorrect credentials",null);
+        }
 
         // check that user exists
         User user = userDAO.getById(userId);
