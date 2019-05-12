@@ -23,11 +23,11 @@ import java.util.Set;
 public class RestfulApp extends Application {
 
 	public RestfulApp() {
+
 		CorsService corsService = new CorsService();
 		corsService.setAllowingAllRequestedHeaders(true);
 		corsService.setAllowedOrigins(new HashSet(Arrays.asList("*")));
 		corsService.setAllowedCredentials(true);
-
 		getServices().add(corsService);
 	}
 

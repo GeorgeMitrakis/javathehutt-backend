@@ -30,6 +30,7 @@ public class JsonMapRepresentation extends WriterRepresentation {
         return new JsonMapRepresentation(map);
     }
 
+
     public static JsonMapRepresentation result(boolean success, String message, Map data){
         HashMap<String,Object> res = new HashMap<>();
         res.put("success",success);
