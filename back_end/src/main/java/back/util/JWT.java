@@ -8,6 +8,7 @@ import back.model.User;
 import io.jsonwebtoken.*;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
@@ -66,10 +67,11 @@ public class JWT {
 
     public static User getUserJWT(String jwt) {
         Claims claims = decodeJWT(jwt);
-        // TODO: @Petros return User object (Provider, Visitor or Admin)
-        UserDAO userDAO = Configuration.getInstance().getUserDAO();
-        return userDAO.getById(Integer.parseInt(claims.getId()));
+//        UserDAO userDAO = Configuration.getInstance().getUserDAO();
+//        return userDAO.getById(Integer.parseInt(claims.getId()));
+        return User.fromLinkedHashMap((LinkedHashMap)claims.get("user"));
     }
+
 
     public static String createJWT(User u, long ttlMillis){
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
