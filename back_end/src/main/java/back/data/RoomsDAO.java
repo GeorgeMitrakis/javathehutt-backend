@@ -1,7 +1,11 @@
 package back.data;
 
+import back.model.Room;
+
 public interface RoomsDAO {
 
-    // TODO Interface for accessing Room's part of the database
+    // Interface for accessing Room's part of the database
+
+    Room getRoomById(int roomId);
 
 }

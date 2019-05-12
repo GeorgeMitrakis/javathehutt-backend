@@ -58,8 +58,8 @@ public class RestfulApp extends Application {
 		router.attach("/search", DummyResource.class);
 
 		// TODO: Book
-		router.attach("/book", DummyResource.class);
-
+		// POST /book (userId, roomId, startDate, endDate)
+		router.attach("/book", BookingResource.class);
 
 		return router;
 	}
