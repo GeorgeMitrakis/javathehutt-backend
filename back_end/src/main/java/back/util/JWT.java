@@ -61,6 +61,12 @@ public class JWT {
         return claims;
     }
 
+    public static User getUserJWT(String jwt) {
+        Claims claims = decodeJWT(jwt);
+        // TODO: @Petros return User object (Provider, Visitor or Admin)
+        return null;
+    }
+
     public static String createJWT(User u, long ttlMillis){
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(SECRET_KEY);
