@@ -51,6 +51,15 @@ public class RestfulApp extends Application {
 
 		router.attach("/dummy", DummyResource.class);
 
+		// TODO: For autocomplete GET /room_autocomplete?str=<input>
+		router.attach("/room_autocomplete", DummyResource.class);
+
+		// TODO: search room
+		router.attach("/search", DummyResource.class);
+
+		// TODO: Book
+		router.attach("/book", DummyResource.class);
+
 
 		return router;
 	}
