@@ -256,7 +256,7 @@ public class DataAccess {
         }
     }
 
-    public boolean insertTransaction(User user, Room room, String sqlStartDate, String sqlEndDate) {
+    public boolean insertTransaction(User user, Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
