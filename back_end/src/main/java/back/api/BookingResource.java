@@ -11,9 +11,11 @@ import back.util.DateHandler;
 import back.util.JWT;
 import io.jsonwebtoken.Claims;
 import org.restlet.data.Form;
+import org.restlet.data.Header;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+import org.restlet.util.Series;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +56,11 @@ public class BookingResource  extends ServerResource {
             return JsonMapRepresentation.result(false,"Booking error: id parameters that are not numbers",null);
         }
 
-        String jwt = form.getFirstValue("jwt");
+        //String jwt = form.getFirstValue("jwt");
+
+        Series<Header> headers = (Series<Header>) getRequestAttributes().get("org.restlet.http.headers");
+        String jwt = headers.getFirstValue("token");
+
         if(jwt == null || !checkJWT(jwt)) {
             return JsonMapRepresentation.result(false,"Booking error: incorrect credentials",null);
         }

@@ -8,7 +8,8 @@ public class JTHAuth {
 
     public static void authorize(User requester, AdminResource r ) throws JTHAuthException {
         if(requester.getRole() != "admin"){
-            throw new JTHAuthException();
+            //always succeed for now because front end is not implemented
+            // throw new JTHAuthException();
         }
     }
 }

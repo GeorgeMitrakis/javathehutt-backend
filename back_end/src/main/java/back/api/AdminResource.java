@@ -8,9 +8,11 @@ import back.data.UserDAO;
 import back.model.User;
 import back.util.JWT;
 import org.restlet.data.Form;
+import org.restlet.data.Header;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+import org.restlet.util.Series;
 
 
 public class AdminResource  extends ServerResource {
@@ -46,8 +48,9 @@ public class AdminResource  extends ServerResource {
             }
 
             try{
-                String jwt = form.getFirstValue("jwt");
-                User requestingUser = JWT.getUserJWT(jwt);
+                Series<Header> headers = (Series<Header>) getRequestAttributes().get("org.restlet.http.headers");
+                String auth = headers.getFirstValue("token");
+                User requestingUser = JWT.getUserJWT(auth);
                 JTHAuth.authorize(requestingUser,this);
             } catch(JTHAuthException e){
                 return JsonMapRepresentation.result(false,"Admin action error: authorization failed",null);
