@@ -2,6 +2,7 @@ package back.data.jdbc;
 
 import back.Exceptions.JTHDataBaseException;
 import back.model.*;
+import back.util.DateHandler;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -275,17 +276,21 @@ public class DataAccess {
             return false;
 
         }
-
-        transactionTemplate.execute(status -> {
-            jdbcTemplate.update("INSERT INTO transactions (visitor_id, room_id, cost, start_date, end_date) VALUES (?, ?, ?, ?, ?)", user.getId(), room.getId(), room.getPrice(), sqlStartDate, sqlEndDate);
-            return null;
-        });
+        try {
+            transactionTemplate.execute(status -> {
+                jdbcTemplate.update("INSERT INTO transactions (visitor_id, room_id, cost, start_date, end_date, closure_date) VALUES (?, ?, ?, ?::date, ?::date, ?::date)", user.getId(), room.getId(), room.getPrice(), sqlStartDate, sqlEndDate, DateHandler.getSQLDateTimeNow());
+                return null;
+            });
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
         return true;
     }
 
     public int countTransactions(Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException {
         try {
-            return jdbcTemplate.queryForObject("select count(*) from \"transactions\" where room_id = ? and start_date <= ? and end_date >= ?", new Object[]{room.getId(), sqlStartDate, sqlEndDate}, int.class);
+            return jdbcTemplate.queryForObject("select count(*) from \"transactions\" where room_id = ? and start_date <= ? ::date and end_date >= ? ::date", new Object[]{room.getId(), sqlStartDate, sqlEndDate}, int.class);
         } catch (EmptyResultDataAccessException e){
             return -1;
         } catch (IncorrectResultSizeDataAccessException e){
