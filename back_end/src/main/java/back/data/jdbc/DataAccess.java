@@ -285,7 +285,7 @@ public class DataAccess {
 
     public int countTransactions(Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException {
         try {
-            return jdbcTemplate.queryForObject("select count(*) from \"transactions\" where id = ? and start_date <= ? and end_date >= ?", new Object[]{room.getId(), sqlStartDate, sqlEndDate}, int.class);
+            return jdbcTemplate.queryForObject("select count(*) from \"transactions\" where room_id = ? and start_date <= ? and end_date >= ?", new Object[]{room.getId(), sqlStartDate, sqlEndDate}, int.class);
         } catch (EmptyResultDataAccessException e){
             return -1;
         } catch (IncorrectResultSizeDataAccessException e){
