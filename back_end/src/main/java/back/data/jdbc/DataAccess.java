@@ -3,11 +3,15 @@ package back.data.jdbc;
 import back.Exceptions.JTHDataBaseException;
 import back.model.*;
 import org.apache.commons.dbcp2.BasicDataSource;
+
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -21,6 +25,7 @@ public class DataAccess {
     
     private DataSource dataSource;
     private JdbcTemplate jdbcTemplate;
+    private TransactionTemplate transactionTemplate;
 
     public void setup(String driverClass, String url, String user, String pass) throws SQLException {
 
@@ -39,8 +44,14 @@ public class DataAccess {
         //check that everything works OK
         bds.getConnection().close();
 
+        //Transaction manager
+        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(bds);
+
         //initialize the jdbc template utility
         jdbcTemplate = new JdbcTemplate(bds);
+
+        //initialize the transaction template utility
+        transactionTemplate = new TransactionTemplate(transactionManager);
 
         //keep the dataSource for the low-level manual example to function (not actually required)
         dataSource = bds;
@@ -258,33 +269,18 @@ public class DataAccess {
     }
 
     public boolean insertTransaction(User user, Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException {
-        Connection conn;
-        try {
-            conn = dataSource.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new JTHDataBaseException();
+
+        if(room.getCapacity() <= countTransactions(room, sqlStartDate, sqlEndDate)){
+            System.err.println("Failed to make transaction, no available rooms");
+            return false;
+
         }
-        if (conn == null) throw new JTHDataBaseException();
-        try {
-            conn.setAutoCommit(false);
-            if(room.getCapacity() <= countTransactions(room, sqlStartDate, sqlEndDate)){
-                System.err.println("Failed to make transaction, no available rooms");
-                return false;
-            }
+
+        transactionTemplate.execute(status -> {
             jdbcTemplate.update("INSERT INTO transactions (visitor_id, room_id, cost, start_date, end_date) VALUES (?, ?, ?, ?, ?)", user.getId(), room.getId(), room.getPrice(), sqlStartDate, sqlEndDate);
-            return true;
-        } catch (Exception e) {
-            System.err.println("Failed to make transaction");
-            e.printStackTrace();
-            System.out.println(e.getCause().getMessage());
-            try {
-                conn.rollback();
-            } catch(SQLException ex){
-                System.out.println(ex.getErrorCode());
-            }
-            throw new JTHDataBaseException();
-        }
+            return null;
+        });
+        return true;
     }
 
     public int countTransactions(Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException {
