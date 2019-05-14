@@ -1,5 +1,6 @@
 package back.api;
 
+import back.Exceptions.JTHDataBaseException;
 import back.conf.Configuration;
 import back.data.BookingDAO;
 import back.data.RoomsDAO;
@@ -59,25 +60,27 @@ public class BookingResource  extends ServerResource {
             return JsonMapRepresentation.result(false,"Booking error: incorrect credentials",null);
         }
 
-        // check that user exists
-        User user = userDAO.getById(userId);
-        if (user == null){
-            return JsonMapRepresentation.result(false,"Booking error: user does not exist",null);
-        }
+        try {
+            // check that user exists
+            User user = userDAO.getById(userId);
+            if (user == null) {
+                return JsonMapRepresentation.result(false, "Booking error: user does not exist", null);
+            }
+            // check that room exists
+            Room room = roomsDAO.getRoomById(roomId);
+            if (room == null) {
+                return JsonMapRepresentation.result(false, "Booking error: room does not exist", null);
+            }
+            // book the room
+            boolean success = bookingDAO.bookRoomForVisitor(user, room, DateHandler.FrontDateToSQLDate(startDate), DateHandler.FrontDateToSQLDate(endDate));
+            if (!success) {
+                return JsonMapRepresentation.result(false, "Booking error: No room available", null);
+            } else {
+                return JsonMapRepresentation.result(true, "Booking of room successful", null);
+            }
 
-        // check that room exists
-        Room room = roomsDAO.getRoomById(roomId);
-        if (room == null){
-            return JsonMapRepresentation.result(false,"Booking error: room does not exist",null);
-        }
-
-        // book the room
-        boolean success = bookingDAO.bookRoomForVisitor(user, room, DateHandler.FrontDateToSQLDate(startDate), DateHandler.FrontDateToSQLDate(endDate));
-
-        if (!success){
-            return JsonMapRepresentation.result(false,"Booking error: database error",null);
-        } else {
-            return JsonMapRepresentation.result(true,"Booking of room successful",null);
+        } catch (JTHDataBaseException e) {
+            return JsonMapRepresentation.result(false, "Booking error: database error", null);
         }
     }
 

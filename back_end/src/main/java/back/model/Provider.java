@@ -1,7 +1,5 @@
 package back.model;
 
-import back.api.JTHInputException;
-
 import java.util.LinkedHashMap;
 
 

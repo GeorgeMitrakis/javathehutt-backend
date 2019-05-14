@@ -1,6 +1,6 @@
 package back.util;
 
-import back.api.JTHInputException;
+import back.Exceptions.JTHInputException;
 
 public class Util {
     public static void validateArgs(String ... args) throws JTHInputException {

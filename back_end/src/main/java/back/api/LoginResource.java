@@ -1,28 +1,20 @@
 package back.api;
 
+import back.Exceptions.JTHAuthException;
+import back.Exceptions.JTHDataBaseException;
 import back.conf.Configuration;
-import back.data.JTHAuthException;
 import back.data.UserDAO;
 import back.model.User;
 import back.util.Hashing;
 import back.util.JWT;
 
-import org.restlet.Context;
-import org.restlet.Request;
-import org.restlet.Response;
 import org.restlet.data.Form;
-import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import java.security.Key;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import io.jsonwebtoken.Claims;
 
 
 public class LoginResource extends ServerResource {
@@ -59,10 +51,10 @@ public class LoginResource extends ServerResource {
             data.put("token",jwt);
             data.put("user",u);
             return JsonMapRepresentation.result(true,null, data);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (JTHAuthException e) {
             return JsonMapRepresentation.result(false,"Login error: incorrect credentials",null);
+        } catch (JTHDataBaseException e){
+            return JsonMapRepresentation.result(false,"Login error: database error",null);
         }
     }
 
