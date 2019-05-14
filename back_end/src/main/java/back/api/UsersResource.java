@@ -35,7 +35,7 @@ public class UsersResource extends ServerResource {
             if (idStr != null) {
                 User u = userDAO.getById(Long.parseLong(idStr));
                 if (u == null) {
-                    return JsonMapRepresentation.result(false, "user does not exists", null);
+                    return JsonMapRepresentation.result(false, "user does not exist", null);
                 } else {
                     Map<String, Object> m = new HashMap<>();
                     m.put("user", u);
