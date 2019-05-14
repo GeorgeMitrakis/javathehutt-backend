@@ -2,6 +2,7 @@ package back.api;
 
 import back.Exceptions.JTHDataBaseException;
 import back.Exceptions.JTHInputException;
+import back.data.Limits;
 import back.model.Provider;
 import back.model.Visitor;
 import back.util.Hashing;
@@ -15,30 +16,45 @@ import back.data.UserDAO;
 import back.model.User;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class UsersResource extends ServerResource {
 
     private final UserDAO userDAO = Configuration.getInstance().getUserDAO();
 
+    // GET /users?id=...   -> returns user with that id
+    // GET /users          -> returns all users
+    // GET /users?role=... -> returns all users of that role
     @Override
     protected Representation get() throws ResourceException {
         try {
-            String email = getQueryValue("email");
-            if (email != null) {
-                User u = userDAO.getByEmail(email);
+            String idStr = getQueryValue("id");
+            String role = getQueryValue("role");
+            if (idStr != null) {
+                User u = userDAO.getById(Long.parseLong(idStr));
                 if (u == null) {
-                    return JsonMapRepresentation.result(false, null, null);
+                    return JsonMapRepresentation.result(false, "user does not exists", null);
                 } else {
                     Map<String, Object> m = new HashMap<>();
                     m.put("user", u);
                     return JsonMapRepresentation.result(true, null, m);
                 }
+            } else {  // return all users
+                List<User> allUsers = userDAO.getUsers(new Limits(0, (int) userDAO.countUsers()));
+                Map<String, Object> m = new HashMap<>();
+                for (User u : allUsers){
+                    if (role == null || role.equals(u.getRole())) {
+                        m.put(Long.toString(u.getId()), u);
+                    }
+                }
+                return JsonMapRepresentation.result(true, null, m);
             }
         } catch (JTHDataBaseException e){
             return JsonMapRepresentation.result(false,"database error", null);
+        } catch (ArithmeticException e){
+            return JsonMapRepresentation.result(false,"id given is not a number", null);
         }
-        return JsonMapRepresentation.result(false,"no parameters given",null);
     }
 
 

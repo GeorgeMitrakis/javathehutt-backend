@@ -11,6 +11,8 @@ import java.util.List;
 
 public interface UserDAO {
 
+    long countUsers() throws JTHDataBaseException;
+
     List<User> getUsers(Limits limits) throws JTHDataBaseException;
 
     User getById(long id) throws JTHDataBaseException;
