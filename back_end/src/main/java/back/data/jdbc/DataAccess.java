@@ -1,24 +1,20 @@
 package back.data.jdbc;
 
+import back.Exceptions.JTHDataBaseException;
 import back.model.*;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
+
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
+
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import back.data.Limits;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -61,13 +57,23 @@ public class DataAccess {
         dataSource = bds;
     }
 
-    public long countUsers() {
-        return jdbcTemplate.queryForObject("select count(*) from user", Long.class);
+    public long countUsers() throws JTHDataBaseException {
+        try {
+            return jdbcTemplate.queryForObject("select count(*) from user", Long.class);
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
     }
 
-    public List<User> getUsers(long start, long count) {
-        Long[] params = new Long[]{count, start};
-        return jdbcTemplate.query("select * from \"user\" limit ? offset ?", params, new UserRowMapper());
+    public List<User> getUsers(long start, long count) throws JTHDataBaseException {
+        try {
+            Long[] params = new Long[]{count, start};
+            return jdbcTemplate.query("select * from \"user\" limit ? offset ?", params, new UserRowMapper());
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
     }
 
     private User getUserByRole(String role, Object[] par, User u) throws EmptyResultDataAccessException, IncorrectResultSizeDataAccessException {
@@ -83,7 +89,7 @@ public class DataAccess {
         }
     }
 
-    public User getUser(Long id) {
+    public User getUser(Long id) throws JTHDataBaseException {
         try {
             Long[] par = new Long[]{id};
             User u = jdbcTemplate.queryForObject("select * from \"user\" where id = ?", par, new UserRowMapper());
@@ -94,11 +100,11 @@ public class DataAccess {
             return null;
         } catch (Exception e) {
             e.printStackTrace();
+            throw new JTHDataBaseException();
         }
-        return null;
     }
 
-    public User getUser(String email) {
+    public User getUser(String email) throws JTHDataBaseException {
         try {
             User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ?", new String[]{email}, new UserRowMapper());
             return (u != null) ? getUserByRole(u.getRole(), new Long[]{u.getId()}, u) : null;
@@ -108,11 +114,11 @@ public class DataAccess {
             return null;
         } catch (Exception e) {
             e.printStackTrace();
+            throw new JTHDataBaseException();
         }
-        return null;
     }
 
-    public User getUser(String email, String hashedPassword) {
+    public User getUser(String email, String hashedPassword) throws JTHDataBaseException {
         try {
             User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ? and password = ?", new String[]{email, hashedPassword}, new UserRowMapper());
             return (u != null) ? getUserByRole(u.getRole(), new Long[]{u.getId()}, u) : null;
@@ -122,11 +128,11 @@ public class DataAccess {
             return null;
         } catch (Exception e) {
             e.printStackTrace();
+            throw new JTHDataBaseException();
         }
-        return null;
     }
 
-    public boolean getUserBan(long id){
+    public boolean getUserBan(long id) throws JTHDataBaseException {
         try {
             Long[] par = new Long[]{id};
             Boolean result = jdbcTemplate.queryForObject("select isbanned from \"user\" where id = ?", par, Boolean.class);
@@ -134,22 +140,21 @@ public class DataAccess {
         } catch (IncorrectResultSizeDataAccessException ignored){
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            throw new JTHDataBaseException();
         }
         return false;
     }
 
-    public boolean setUserBan(User user, boolean ban){
+    public void setUserBan(User user, boolean ban) throws JTHDataBaseException {
         try {
             jdbcTemplate.update("UPDATE \"user\" SET isBanned = ? WHERE id = ?", ban, user.getId());
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            throw new JTHDataBaseException();
         }
-        return true;
     }
 
-    public boolean promoteUser(User user){
+    public boolean promoteUser(User user) throws JTHDataBaseException  {
         try {
             switch (user.getRole()){
                 case "provider":
@@ -173,12 +178,12 @@ public class DataAccess {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            throw new JTHDataBaseException();
         }
         return true;
     }
 
-    public boolean deleteUser(User user){
+    public boolean deleteUser(User user) throws JTHDataBaseException {
         try {
             switch (user.getRole()){
                 case "provider":
@@ -198,12 +203,12 @@ public class DataAccess {
             jdbcTemplate.update("DELETE FROM \"user\" WHERE id = ?", user.getId());
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            throw new JTHDataBaseException();
         }
         return true;
     }
 
-    public boolean storeUser(Provider p, String hashedPassword) {
+    public void storeUser(Provider p, String hashedPassword) throws JTHDataBaseException {
         try {
             // insert into user and keep id
             KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -218,16 +223,14 @@ public class DataAccess {
             // use the same id to insert to provider
             jdbcTemplate.update("INSERT INTO provider (id, providername) VALUES (?, ?)", id, p.getProvidername());
             p.setId(id);
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("Failed to store provider user");
             e.printStackTrace();
-            System.out.println(e.getCause().getMessage());
-            return false;
+            throw new JTHDataBaseException();
         }
-        return true;
     }
 
-    public boolean storeUser(Visitor v, String hashedPassword) {
+    public void storeUser(Visitor v, String hashedPassword) throws JTHDataBaseException {
         try {
             // insert into user and keep id
             KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -246,12 +249,11 @@ public class DataAccess {
         }catch (Exception e) {
             System.err.println("Failed to store visitor user");
             e.printStackTrace();
-            return false;
+            throw new JTHDataBaseException();
         }
-        return true;
     }
 
-    public Room getRoom(long id){
+    public Room getRoom(long id) throws JTHDataBaseException {
         try {
             Long[] par = new Long[]{id};
             return jdbcTemplate.queryForObject("select * from \"room\" where id = ?", par, new RoomRowMapper());
@@ -261,15 +263,16 @@ public class DataAccess {
             return null;
         } catch (Exception e) {
             e.printStackTrace();
+            throw new JTHDataBaseException();
         }
-        return null;
     }
 
-    public boolean insertTransaction(User user, Room room, String sqlStartDate, String sqlEndDate) {
+    public boolean insertTransaction(User user, Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException {
 
-        if(room.getCapacity() <= searchTransactions(room, sqlStartDate, sqlEndDate)){
+        if(room.getCapacity() <= countTransactions(room, sqlStartDate, sqlEndDate)){
             System.err.println("Failed to make transaction, no available rooms");
             return false;
+
         }
 
         transactionTemplate.execute(status -> {
@@ -279,7 +282,7 @@ public class DataAccess {
         return true;
     }
 
-    public int searchTransactions(Room room, String sqlStartDate, String sqlEndDate){
+    public int countTransactions(Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException {
         try {
             return jdbcTemplate.queryForObject("select count(*) from \"transactions\" where id = ? and start_date <= ? and end_date >= ?", new Object[]{room.getId(), sqlStartDate, sqlEndDate}, int.class);
         } catch (EmptyResultDataAccessException e){
@@ -288,8 +291,8 @@ public class DataAccess {
             return -1;
         } catch (Exception e) {
             e.printStackTrace();
+            throw new JTHDataBaseException();
         }
-        return  -1;
     }
 
 }

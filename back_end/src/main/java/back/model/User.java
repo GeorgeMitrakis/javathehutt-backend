@@ -1,7 +1,5 @@
 package back.model;
 
-import back.data.JTHAuthException;
-
 import java.util.LinkedHashMap;
 
 public class User {

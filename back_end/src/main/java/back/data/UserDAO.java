@@ -1,5 +1,7 @@
 package back.data;
 
+import back.Exceptions.JTHAuthException;
+import back.Exceptions.JTHDataBaseException;
 import back.model.Provider;
 import back.model.User;
 import back.model.Visitor;
@@ -9,24 +11,24 @@ import java.util.List;
 
 public interface UserDAO {
 
-    List<User> getUsers(Limits limits);
+    List<User> getUsers(Limits limits) throws JTHDataBaseException;
 
-    User getById(long id);
+    User getById(long id) throws JTHDataBaseException;
 
-    User getByEmail(String email);
+    User getByEmail(String email) throws JTHDataBaseException;
 
-    User getByCredentials(String email, String hashedPassword) throws JTHAuthException;
+    User getByCredentials(String email, String hashedPassword) throws JTHAuthException, JTHDataBaseException;
 
-    boolean storeUser(Provider p, String password);
+    void storeUser(Provider p, String password) throws JTHDataBaseException;
 
-    boolean storeUser(Visitor v, String password);
+    void storeUser(Visitor v, String password) throws JTHDataBaseException;
 
-    boolean getUserBan(long id);
+    boolean getUserBan(long id) throws JTHDataBaseException;
 
-    boolean setUserBan(User user, boolean ban);
+    void setUserBan(User user, boolean ban) throws JTHDataBaseException;
 
-    boolean promoteUserToAdmin(User user);
+    boolean promoteUserToAdmin(User user) throws JTHDataBaseException;
 
-    boolean deleteUser(User user);
+    boolean deleteUser(User user) throws JTHDataBaseException;
 
 }

@@ -1,5 +1,7 @@
 package back.api;
 
+import back.Exceptions.JTHDataBaseException;
+import back.Exceptions.JTHInputException;
 import back.conf.Configuration;
 import back.data.UserDAO;
 import back.model.User;
@@ -23,7 +25,7 @@ public class AdminResource  extends ServerResource {
         try {
             Form form = new Form(entity);
             String uidStr = form.getFirstValue("id");
-            if (uidStr == null || uidStr.equals("")){
+            if (uidStr == null || uidStr.equals("")) {
                 throw new JTHInputException("user id parameter missing or empty");
             }
             long userId;
@@ -33,39 +35,35 @@ public class AdminResource  extends ServerResource {
                 throw new JTHInputException("user id given is not a number");
             }
             option = form.getFirstValue("option");
-            if (option == null || option.equals("")){
+            if (option == null || option.equals("")) {
                 throw new JTHInputException("option parameter missing or empty");
             }
             User user = userDAO.getById(userId);
-            if (user == null){
+            if (user == null) {
                 throw new JTHInputException("user id does not exist");
             }
-            boolean success;
-            switch (option){
+            switch (option) {
                 case "ban":
-                    success = userDAO.setUserBan(user, true);
+                    userDAO.setUserBan(user, true);
                     break;
                 case "unban":
-                    success = userDAO.setUserBan(user, false);
+                    userDAO.setUserBan(user, false);
                     break;
                 case "promote":
-                    success = userDAO.promoteUserToAdmin(user);
+                    userDAO.promoteUserToAdmin(user);
                     break;
                 case "delete":
-                    success = userDAO.deleteUser(user);
+                    userDAO.deleteUser(user);
                     break;
                 default:
                     throw new JTHInputException("invalid admin option");
             }
-            if (!success){
-                throw new JTHInputException("database error");
-            }
+        } catch (JTHDataBaseException e){
+            return JsonMapRepresentation.result(false,"Admin action error: database error",null);
         } catch (JTHInputException e){
             return JsonMapRepresentation.result(false,"Admin action error: " + e.getErrorMsg(),null);
-            //return JsonMapRepresentation.forSimpleResult("Admin action error: " + e.getErrorMsg());
         }
-        return JsonMapRepresentation.result(true,option+"successful",null);
-        //return JsonMapRepresentation.forSimpleResult(option + " successful");
+        return JsonMapRepresentation.result(true,option + " successful",null);
     }
 
 }

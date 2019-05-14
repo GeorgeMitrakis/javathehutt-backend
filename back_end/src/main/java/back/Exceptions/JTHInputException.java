@@ -1,6 +1,6 @@
-package back.api;
+package back.Exceptions;
 
-public class JTHInputException extends Throwable {
+public class JTHInputException extends JTHException {
 
     final private String msg;
 
@@ -8,6 +8,7 @@ public class JTHInputException extends Throwable {
         super();
         msg = "Unknown";
     }
+
     public JTHInputException(String _msg){
         super();
         msg = _msg;
