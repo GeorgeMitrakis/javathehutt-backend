@@ -55,7 +55,7 @@ public class BookingResource  extends ServerResource {
         }
 
         String jwt = form.getFirstValue("jwt");
-        if(!checkJWT(jwt)) {
+        if(jwt == null || !checkJWT(jwt)) {
             return JsonMapRepresentation.result(false,"Booking error: incorrect credentials",null);
         }
 

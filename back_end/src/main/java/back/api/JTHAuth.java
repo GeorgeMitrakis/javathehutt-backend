@@ -1,9 +1,8 @@
 package back.api;
 
-import back.data.JTHAuthException;
-import back.model.Admin;
+import back.Exceptions.JTHAuthException;
 import back.model.User;
-import org.restlet.resource.ServerResource;
+
 
 public class JTHAuth {
 

@@ -1,17 +1,14 @@
 package back.model;
 
-import back.api.JTHAuth;
-import back.data.JTHAuthException;
 
 import java.util.LinkedHashMap;
 
-abstract public class User {
+
+public class User {
 
     private long id;
     private final String email;
     private final String role;
-
-
 
     public User(long id, String email, String role) {
         this.id = id;
@@ -37,7 +34,6 @@ abstract public class User {
     public long getId() {
         return id;
     }
-
 
     public void setId(long id) { this.id = id; }
 

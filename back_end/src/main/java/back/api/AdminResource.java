@@ -1,7 +1,9 @@
 package back.api;
 
+import back.Exceptions.JTHAuthException;
+import back.Exceptions.JTHDataBaseException;
+import back.Exceptions.JTHInputException;
 import back.conf.Configuration;
-import back.data.JTHAuthException;
 import back.data.UserDAO;
 import back.model.User;
 import back.util.JWT;
@@ -47,36 +49,32 @@ public class AdminResource  extends ServerResource {
                 String jwt = form.getFirstValue("jwt");
                 User requestingUser = JWT.getUserJWT(jwt);
                 JTHAuth.authorize(requestingUser,this);
-            }catch(Exception e){
-
+            } catch(JTHAuthException e){
+                return JsonMapRepresentation.result(false,"Admin action error: authorization failed",null);
             }
 
-            boolean success;
             switch (option){
                 case "ban":
-                    success = userDAO.setUserBan(user, true);
+                    userDAO.setUserBan(user, true);
                     break;
                 case "unban":
-                    success = userDAO.setUserBan(user, false);
+                    userDAO.setUserBan(user, false);
                     break;
                 case "promote":
-                    success = userDAO.promoteUserToAdmin(user);
+                    userDAO.promoteUserToAdmin(user);
                     break;
                 case "delete":
-                    success = userDAO.deleteUser(user);
+                    userDAO.deleteUser(user);
                     break;
                 default:
                     throw new JTHInputException("invalid admin option");
             }
-            if (!success){
-                throw new JTHInputException("database error");
-            }
         } catch (JTHInputException e){
             return JsonMapRepresentation.result(false,"Admin action error: " + e.getErrorMsg(),null);
-            //return JsonMapRepresentation.forSimpleResult("Admin action error: " + e.getErrorMsg());
+        } catch (JTHDataBaseException e){
+            return JsonMapRepresentation.result(false,"Admin action error: database error",null);
         }
-        return JsonMapRepresentation.result(true,option+"successful",null);
-        //return JsonMapRepresentation.forSimpleResult(option + " successful");
+        return JsonMapRepresentation.result(true,option + " successful",null);
     }
 
 }
