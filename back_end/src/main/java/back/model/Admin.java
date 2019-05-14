@@ -1,5 +1,7 @@
 package back.model;
 
+import back.api.JTHAuth;
+
 import java.util.LinkedHashMap;
 
 public class Admin extends User {
@@ -36,5 +38,6 @@ public class Admin extends User {
     public String getSurname() {
         return surname;
     }
+
 
 }

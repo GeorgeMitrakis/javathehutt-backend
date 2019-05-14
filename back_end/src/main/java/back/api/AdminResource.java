@@ -1,10 +1,10 @@
 package back.api;
 
-import back.Exceptions.JTHDataBaseException;
-import back.Exceptions.JTHInputException;
 import back.conf.Configuration;
+import back.data.JTHAuthException;
 import back.data.UserDAO;
 import back.model.User;
+import back.util.JWT;
 import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
@@ -25,7 +25,7 @@ public class AdminResource  extends ServerResource {
         try {
             Form form = new Form(entity);
             String uidStr = form.getFirstValue("id");
-            if (uidStr == null || uidStr.equals("")) {
+            if (uidStr == null || uidStr.equals("")){
                 throw new JTHInputException("user id parameter missing or empty");
             }
             long userId;
@@ -35,35 +35,48 @@ public class AdminResource  extends ServerResource {
                 throw new JTHInputException("user id given is not a number");
             }
             option = form.getFirstValue("option");
-            if (option == null || option.equals("")) {
+            if (option == null || option.equals("")){
                 throw new JTHInputException("option parameter missing or empty");
             }
             User user = userDAO.getById(userId);
-            if (user == null) {
+            if (user == null){
                 throw new JTHInputException("user id does not exist");
             }
-            switch (option) {
+
+            try{
+                String jwt = form.getFirstValue("jwt");
+                User requestingUser = JWT.getUserJWT(jwt);
+                JTHAuth.authorize(requestingUser,this);
+            }catch(Exception e){
+
+            }
+
+            boolean success;
+            switch (option){
                 case "ban":
-                    userDAO.setUserBan(user, true);
+                    success = userDAO.setUserBan(user, true);
                     break;
                 case "unban":
-                    userDAO.setUserBan(user, false);
+                    success = userDAO.setUserBan(user, false);
                     break;
                 case "promote":
-                    userDAO.promoteUserToAdmin(user);
+                    success = userDAO.promoteUserToAdmin(user);
                     break;
                 case "delete":
-                    userDAO.deleteUser(user);
+                    success = userDAO.deleteUser(user);
                     break;
                 default:
                     throw new JTHInputException("invalid admin option");
             }
-        } catch (JTHDataBaseException e){
-            return JsonMapRepresentation.result(false,"Admin action error: database error",null);
+            if (!success){
+                throw new JTHInputException("database error");
+            }
         } catch (JTHInputException e){
             return JsonMapRepresentation.result(false,"Admin action error: " + e.getErrorMsg(),null);
+            //return JsonMapRepresentation.forSimpleResult("Admin action error: " + e.getErrorMsg());
         }
-        return JsonMapRepresentation.result(true,option + " successful",null);
+        return JsonMapRepresentation.result(true,option+"successful",null);
+        //return JsonMapRepresentation.forSimpleResult(option + " successful");
     }
 
 }

@@ -20,6 +20,11 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public long countUsers() throws JTHDataBaseException {
+        return dataAccess.countUsers();
+    }
+
+    @Override
     public boolean getUserBan(long id) throws JTHDataBaseException {
         return dataAccess.getUserBan(id);
     }

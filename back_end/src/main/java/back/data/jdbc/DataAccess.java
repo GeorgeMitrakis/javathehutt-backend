@@ -59,7 +59,7 @@ public class DataAccess {
 
     public long countUsers() throws JTHDataBaseException {
         try {
-            return jdbcTemplate.queryForObject("select count(*) from user", Long.class);
+            return jdbcTemplate.queryForObject("select count(*) from \"user\"", Long.class);
         } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -67,6 +67,7 @@ public class DataAccess {
     }
 
     public List<User> getUsers(long start, long count) throws JTHDataBaseException {
+        // TODO return extended objects: ex Visitor?
         try {
             Long[] params = new Long[]{count, start};
             return jdbcTemplate.query("select * from \"user\" limit ? offset ?", params, new UserRowMapper());

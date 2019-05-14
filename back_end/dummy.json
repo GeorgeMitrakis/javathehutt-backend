@@ -30,9 +30,15 @@
             "email": "testem@ail4.com",
             "role": "provider",
             "banned": true
+        },
+        {
+            "id": 31,
+            "email": "petros@test.com",
+            "role": "visitor",
+            "banned": false
         }
     ],
-    
+
     "rooms":[
         {
             "id":1,
@@ -56,5 +62,5 @@
             "capacity": "30"
         }
     ]
-    
+
 }
