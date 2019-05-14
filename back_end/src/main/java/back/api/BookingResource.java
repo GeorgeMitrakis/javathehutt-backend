@@ -54,7 +54,6 @@ public class BookingResource  extends ServerResource {
             return JsonMapRepresentation.result(false,"Booking error: id parameters that are not numbers",null);
         }
 
-        // TODO: also check authentication from jasonWebToken, userId must be the id of the user making the request!
         String jwt = form.getFirstValue("jwt");
         if(!checkJWT(jwt)) {
             return JsonMapRepresentation.result(false,"Booking error: incorrect credentials",null);
