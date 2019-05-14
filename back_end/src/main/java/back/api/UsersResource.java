@@ -30,6 +30,7 @@ public class UsersResource extends ServerResource {
     protected Representation get() throws ResourceException {
         try {
             String idStr = getQueryValue("id");
+            String email = getQueryValue("email");
             String role = getQueryValue("role");
             if (idStr != null) {
                 User u = userDAO.getById(Long.parseLong(idStr));
@@ -39,6 +40,15 @@ public class UsersResource extends ServerResource {
                     Map<String, Object> m = new HashMap<>();
                     m.put("user", u);
                     return JsonMapRepresentation.result(true, null, m);
+                }
+            } else if (email != null){
+                User u = userDAO.getByEmail(email);
+                if (u == null){
+                    return JsonMapRepresentation.result(false, null,null);
+                } else{
+                    Map<String, Object> m = new HashMap<>();
+                    m.put("user",u);
+                    return JsonMapRepresentation.result(true,null,m);
                 }
             } else {  // return all users
                 List<User> allUsers = userDAO.getUsers(new Limits(0, (int) userDAO.countUsers()));
