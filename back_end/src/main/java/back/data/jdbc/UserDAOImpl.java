@@ -15,7 +15,7 @@ public class UserDAOImpl implements UserDAO {
 
     private final DataAccess dataAccess;
 
-    public UserDAOImpl(DataAccess dataAccess) throws JTHDataBaseException {
+    public UserDAOImpl(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
 
