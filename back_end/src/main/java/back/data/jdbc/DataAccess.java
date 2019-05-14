@@ -257,16 +257,16 @@ public class DataAccess {
     }
 
     public boolean insertTransaction(User user, Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException {
-        Connection conn = null;
+        Connection conn;
         try {
             conn = dataSource.getConnection();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new JTHDataBaseException();
         }
+        if (conn == null) throw new JTHDataBaseException();
         try {
-            if (conn != null) {
-                conn.setAutoCommit(false);
-            }
+            conn.setAutoCommit(false);
             if(room.getCapacity() <= countTransactions(room, sqlStartDate, sqlEndDate)){
                 System.err.println("Failed to make transaction, no available rooms");
                 return false;
@@ -278,9 +278,7 @@ public class DataAccess {
             e.printStackTrace();
             System.out.println(e.getCause().getMessage());
             try {
-                if (conn != null) {
-                    conn.rollback();
-                }
+                conn.rollback();
             } catch(SQLException ex){
                 System.out.println(ex.getErrorCode());
             }
