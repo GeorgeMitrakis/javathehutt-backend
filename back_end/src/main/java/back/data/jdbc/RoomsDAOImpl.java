@@ -8,7 +8,7 @@ public class RoomsDAOImpl implements RoomsDAO {
 
     private final DataAccess dataAccess;
 
-    public RoomsDAOImpl(DataAccess dataAccess) throws JTHDataBaseException {
+    public RoomsDAOImpl(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
 

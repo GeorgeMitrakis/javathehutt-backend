@@ -9,7 +9,7 @@ public class BookingDAOImpl implements BookingDAO {
 
     private final DataAccess dataAccess;
 
-    public BookingDAOImpl(DataAccess dataAccess) throws JTHDataBaseException {
+    public BookingDAOImpl(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
 
