@@ -15,6 +15,7 @@ import back.conf.Configuration;
 import back.data.UserDAO;
 import back.model.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,11 +54,13 @@ public class UsersResource extends ServerResource {
             } else {  // return all users
                 List<User> allUsers = userDAO.getUsers(new Limits(0, (int) userDAO.countUsers()));
                 Map<String, Object> m = new HashMap<>();
-                for (User u : allUsers){
+
+                /*for (User u : allUsers){
                     if (role == null || role.equals(u.getRole())) {
                         m.put(Long.toString(u.getId()), u);
                     }
-                }
+                }*/
+                m.put("users",allUsers);
                 return JsonMapRepresentation.result(true, null, m);
             }
         } catch (JTHDataBaseException e){

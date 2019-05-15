@@ -1,5 +1,6 @@
 package back.api;
 
+import back.Exceptions.JTHAuthException;
 import back.Exceptions.JTHDataBaseException;
 import back.conf.Configuration;
 import back.data.BookingDAO;
@@ -58,12 +59,18 @@ public class BookingResource  extends ServerResource {
 
         //String jwt = form.getFirstValue("jwt");
 
-        Series<Header> headers = (Series<Header>) getRequestAttributes().get("org.restlet.http.headers");
-        String jwt = headers.getFirstValue("token");
 
-        if(jwt == null || !checkJWT(jwt)) {
-            return JsonMapRepresentation.result(false,"Booking error: incorrect credentials",null);
+        try{
+            Series<Header> headers = (Series<Header>) getRequestAttributes().get("org.restlet.http.headers");
+            String jwt = headers.getFirstValue("token");
+            User requestingUser = JWT.getUserJWT(jwt);
+            if(requestingUser.getId() != userId){
+                throw new JTHAuthException();
+            }
+        }catch (Exception e){
+            return JsonMapRepresentation.result(false, "Could not validate user",null);
         }
+
 
         try {
             // check that user exists

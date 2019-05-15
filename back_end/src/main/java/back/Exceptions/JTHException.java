@@ -1,5 +1,5 @@
 package back.Exceptions;
 
-public class JTHException extends Throwable {
+public class JTHException extends Exception {
 
 }
