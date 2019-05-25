@@ -37,14 +37,15 @@ public class RoomSearhResource extends ServerResource {
         String hasPool = form.getFirstValue("hasPool");
         String hasWifi = form.getFirstValue("hasWifi");
         String hasShauna = form.getFirstValue("hasShauna");
+//        todo:readlocation
 
         constraints.setMaxCost(Integer.getInteger(maxPriceStr));
         constraints.setMinCost(Integer.getInteger(minPriceStr));
         constraints.setShauna();
-        constraints.setLocation();
         constraints.setPool();
         constraints.setWifi();
         constraints.setRange(Integer.getInteger(maxDist));
+//        todo: setlocation
 
         // search based on those constraints
         List<Room> results;
