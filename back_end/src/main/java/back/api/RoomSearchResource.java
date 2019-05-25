@@ -6,7 +6,6 @@ import back.data.RoomsDAO;
 import back.data.UserDAO;
 import back.model.Room;
 import back.model.SearchConstraints;
-import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
@@ -16,36 +15,37 @@ import java.util.List;
 import java.util.Map;
 
 
-public class RoomSearhResource extends ServerResource {
+public class RoomSearchResource extends ServerResource {
 
     private final UserDAO userDAO = Configuration.getInstance().getUserDAO();
     private final RoomsDAO roomsDAO = Configuration.getInstance().getRoomsDAO();
 
 
     @Override
-    protected Representation post(Representation entity) throws ResourceException {
+    protected Representation get() throws ResourceException {
 
         SearchConstraints constraints = new SearchConstraints();
 
-        //Create a new restlet form
-        Form form = new Form(entity);
-
         //Read the parameters
-        String minPriceStr = form.getFirstValue("minPrice");
-        String maxPriceStr = form.getFirstValue("maxPrice");
-        String maxDist = form.getFirstValue("maxDist");
-        String hasPool = form.getFirstValue("hasPool");
-        String hasWifi = form.getFirstValue("hasWifi");
-        String hasShauna = form.getFirstValue("hasShauna");
-//        todo:readlocation
+        String minPriceStr = getQueryValue("minPrice");
+        String maxPriceStr = getQueryValue("maxPrice");
+        String maxDist = getQueryValue("maxDist");
+        String hasPool = getQueryValue("hasPool");
+        String hasWifi = getQueryValue("hasWifi");
+        String hasShauna = getQueryValue("hasShauna");
+        // todo:readlocation
 
-        constraints.setMaxCost(Integer.getInteger(maxPriceStr));
-        constraints.setMinCost(Integer.getInteger(minPriceStr));
-        constraints.setShauna();
-        constraints.setPool();
-        constraints.setWifi();
-        constraints.setRange(Integer.getInteger(maxDist));
-//        todo: setlocation
+        try {
+            constraints.setMaxCost(Integer.parseInt(maxPriceStr));
+            constraints.setMinCost(Integer.parseInt(minPriceStr));
+            constraints.setShauna(hasPool.equals("true"));
+            constraints.setPool(hasWifi.equals("true"));
+            constraints.setWifi(hasShauna.equals("true"));
+            constraints.setRange(Integer.parseInt(maxDist));
+        } catch (NumberFormatException e){
+            return JsonMapRepresentation.result(false, "Search error: non number sent for a number parameter", null);
+        }
+        // todo: setlocation
 
         // search based on those constraints
         List<Room> results;

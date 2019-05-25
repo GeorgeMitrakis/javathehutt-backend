@@ -1,20 +1,12 @@
 package back.api;
 
-import back.model.Room;
 import org.restlet.Application;
 import org.restlet.Restlet;
-import org.restlet.data.Reference;
-import org.restlet.resource.Directory;
-import org.restlet.resource.Finder;
-import org.restlet.resource.ServerResource;
 import org.restlet.routing.Router;
-import org.restlet.routing.Template;
 import org.restlet.service.CorsService;
 
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * The Restlet App, mapping URL patterns to ServerSideResources.
@@ -56,7 +48,7 @@ public class RestfulApp extends Application {
 		router.attach("/room_autocomplete", AutocompleteResource.class);
 
 		// TODO: search room
-		router.attach("/search", RoomSearhResource.class);
+		router.attach("/search", RoomSearchResource.class);
 
 		// TODO: Book
 		// POST /book (userId, roomId, startDate, endDate)

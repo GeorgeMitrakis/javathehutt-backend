@@ -299,7 +299,8 @@ public class DataAccess {
 
     public int countTransactions(Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException {
         try {
-            return jdbcTemplate.queryForObject("select count(*) from \"transactions\" where room_id = ? and start_date <= ? ::date and end_date >= ? ::date", new Object[]{room.getId(), sqlStartDate, sqlEndDate}, int.class);
+            Integer count = jdbcTemplate.queryForObject("select count(*) from \"transactions\" where room_id = ? and start_date <= ? ::date and end_date >= ? ::date", new Object[]{room.getId(), sqlStartDate, sqlEndDate}, Integer.class);
+            return (count != null) ? count : -1;
         } catch (EmptyResultDataAccessException e) {
             return -1;
         } catch (IncorrectResultSizeDataAccessException e) {
@@ -311,27 +312,27 @@ public class DataAccess {
     }
 
     public List<Room> searchRooms(SearchConstraints constraints) throws JTHDataBaseException {
-        List<Room> results = null;
+        List<Room> results;
         try {
             String query = "select * from room where ";
 
-//            check for range
-            if(constraints.getRange() > -1) query.concat("ST_DWithin( geom, "+ constraints.getLocation().getCoords() +" "+ constraints.getRange() +") and ");
+            // check for range
+            if(constraints.getRange() != -1) query += "ST_DWithin(geom, " + constraints.getLocation().getCoords() + " " + constraints.getRange() + ") and ";
 
-//            check for price range
-            if(constraints.getMaxCost() > -1) query.concat("price <= "+ constraints.getMaxCost() +" and ");
-            if(constraints.getMinCost() > -1) query.concat("price >= "+ constraints.getMinCost() +" and ");
+            // check for price range
+            if(constraints.getMaxCost() != -1) query += "price <= "+ constraints.getMaxCost() +" and ";
+            if(constraints.getMinCost() != -1) query += "price >= "+ constraints.getMinCost() +" and ";
 
-//            check for wifi
-            if(constraints.getWifi()) query.concat("wifi = true and ");
+            // check for wifi
+            if(constraints.getWifi()) query += "wifi = true and ";
 
-//            check for pool
-            if(constraints.getPool()) query.concat("pool = true and ");
+            // check for pool
+            if(constraints.getPool()) query += "pool = true and ";
 
-//            check for shauna
-            if(constraints.getShauna()) query.concat("shauna = true and ");
+            // check for shauna
+            if(constraints.getShauna()) query += "shauna = true and ";
 
-            query.concat("1=1");
+            query += "1=1";
 
             results = jdbcTemplate.query(query, new RoomRowMapper());
         } catch (Exception e) {
