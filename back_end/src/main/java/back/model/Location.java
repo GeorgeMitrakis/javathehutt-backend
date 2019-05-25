@@ -4,7 +4,7 @@ package back.model;
 public class Location {
 
     private String cityname;
-    private double cordX, cordY;   //TODO: make them compatible with GIS
+    private double cordX, cordY;
 
     public void setCityname(String cityname) {
         this.cityname = cityname;
@@ -29,5 +29,9 @@ public class Location {
 
     public String getCityname() {
         return cityname;
+    }
+
+    public String getCoords(){
+        return "POINT(".concat(Double.toString(cordX)).concat(" ").concat(Double.toString(cordY)).concat(")");
     }
 }

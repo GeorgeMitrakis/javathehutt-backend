@@ -316,7 +316,7 @@ public class DataAccess {
             String query = "select * from room where ";
 
 //            check for range
-            if(constraints.getRange() > -1) query.concat("ST_DWithin( geom, "+ constraints.getLocation() +" "+ constraints.getRange() +") and ");
+            if(constraints.getRange() > -1) query.concat("ST_DWithin( geom, "+ constraints.getLocation().getCoords() +" "+ constraints.getRange() +") and ");
 
 //            check for price range
             if(constraints.getMaxCost() > -1) query.concat("price <= "+ constraints.getMaxCost() +" and ");
@@ -332,7 +332,7 @@ public class DataAccess {
             if(constraints.getShauna()) query.concat("shauna = true and ");
 
             query.concat("1=1");
-            
+
             results = jdbcTemplate.query(query, new RoomRowMapper());
         } catch (Exception e) {
             e.printStackTrace();
