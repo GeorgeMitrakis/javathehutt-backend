@@ -1,5 +1,6 @@
 package back.api;
 
+import back.model.Room;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.data.Reference;
@@ -52,10 +53,10 @@ public class RestfulApp extends Application {
 		router.attach("/dummy", DummyResource.class);
 
 		// TODO: For autocomplete GET /room_autocomplete?str=<input>
-		router.attach("/room_autocomplete", DummyResource.class);
+		router.attach("/room_autocomplete", AutocompleteResource.class);
 
 		// TODO: search room
-		router.attach("/search", DummyResource.class);
+		router.attach("/search", RoomSearhResource.class);
 
 		// TODO: Book
 		// POST /book (userId, roomId, startDate, endDate)

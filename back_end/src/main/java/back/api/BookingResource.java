@@ -57,20 +57,16 @@ public class BookingResource  extends ServerResource {
             return JsonMapRepresentation.result(false,"Booking error: id parameters that are not numbers",null);
         }
 
-        //String jwt = form.getFirstValue("jwt");
-
-
-//        try{
-//            Series<Header> headers = (Series<Header>) getRequestAttributes().get("org.restlet.http.headers");
-//            String jwt = headers.getFirstValue("token");
-//            User requestingUser = JWT.getUserJWT(jwt);
-//            if(requestingUser.getId() != userId){
-//                throw new JTHAuthException();
-//            }
-//        }catch (Exception e){
-//            return JsonMapRepresentation.result(false, "Could not validate user",null);
-//        }
-
+        try{
+            Series<Header> headers = (Series<Header>) getRequestAttributes().get("org.restlet.http.headers");
+            String jwt = headers.getFirstValue("token");
+            User requestingUser = JWT.getUserJWT(jwt);
+            if(requestingUser.getId() != userId){
+                throw new JTHAuthException();
+            }
+        }catch (Exception e){
+            return JsonMapRepresentation.result(false, "Could not validate user",null);
+        }
 
         try {
             // check that user exists

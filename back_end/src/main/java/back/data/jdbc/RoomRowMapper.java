@@ -18,9 +18,3 @@ public class RoomRowMapper implements RowMapper<Room> {
         return new Room(id, provider_id, price, capacity);
     }
 }
-
-
-//        long id = rs.getLong("id");
-//        String email = rs.getString("email");
-//        String role = rs.getString("role");
-//        return new User(id, email, role);
