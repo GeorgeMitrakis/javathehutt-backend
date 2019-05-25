@@ -6,6 +6,7 @@ import back.data.RoomsDAO;
 import back.data.UserDAO;
 import back.model.Room;
 import back.model.SearchConstraints;
+import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
@@ -22,9 +23,28 @@ public class RoomSearhResource extends ServerResource {
 
 
     @Override
-    protected Representation get() throws ResourceException {
-        // TODO: calculate constraints (empty for now)
+    protected Representation post(Representation entity) throws ResourceException {
+
         SearchConstraints constraints = new SearchConstraints();
+
+        //Create a new restlet form
+        Form form = new Form(entity);
+
+        //Read the parameters
+        String minPriceStr = form.getFirstValue("minPrice");
+        String maxPriceStr = form.getFirstValue("maxPrice");
+        String maxDist = form.getFirstValue("maxDist");
+        String hasPool = form.getFirstValue("hasPool");
+        String hasWifi = form.getFirstValue("hasWifi");
+        String hasShauna = form.getFirstValue("hasShauna");
+
+        constraints.setMaxCost(Integer.getInteger(maxPriceStr));
+        constraints.setMinCost(Integer.getInteger(minPriceStr));
+        constraints.setShauna();
+        constraints.setLocation();
+        constraints.setPool();
+        constraints.setWifi();
+        constraints.setRange(Integer.getInteger(maxDist));
 
         // search based on those constraints
         List<Room> results;

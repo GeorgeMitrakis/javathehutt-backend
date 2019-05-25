@@ -7,6 +7,8 @@ public class SearchConstraints {
     private int minCost = -1, maxCost = -1;
     private boolean wifi = false;
     private boolean pool = false;
+    private boolean shauna = false;
+    private double range = -1.0;          // in kms
 
     public boolean getWifi() {
         return wifi;
@@ -31,9 +33,6 @@ public class SearchConstraints {
     public void setShauna(boolean shauna) {
         this.shauna = shauna;
     }
-
-    private boolean shauna = false;
-    private double range = -1.0;          // in kms
 
     // Getters and Setters
     public Location getLocation() {
