@@ -313,8 +313,27 @@ public class DataAccess {
     public List<Room> searchRooms(SearchConstraints constraints) throws JTHDataBaseException {
         List<Room> results = null;
         try {
-            // for now ignore constraints and return everything: TODO
-            results = jdbcTemplate.query("select * from room", new RoomRowMapper());
+            String query = "select * from room where ";
+
+//            check for range
+            if(constraints.getRange() > -1) query.concat("ST_DWithin( geom, "+ constraints.getLocation() +" "+ constraints.getRange() +") and ");
+
+//            check for price range
+            if(constraints.getMaxCost() > -1) query.concat("price <= "+ constraints.getMaxCost() +" and ");
+            if(constraints.getMinCost() > -1) query.concat("price >= "+ constraints.getMinCost() +" and ");
+
+//            check for wifi
+            if(constraints.getWifi()) query.concat("wifi = true and ");
+
+//            check for pool
+            if(constraints.getPool()) query.concat("pool = true and ");
+
+//            check for shauna
+            if(constraints.getShauna()) query.concat("shauna = true and ");
+
+            query.concat("1=1");
+            
+            results = jdbcTemplate.query(query, new RoomRowMapper());
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
