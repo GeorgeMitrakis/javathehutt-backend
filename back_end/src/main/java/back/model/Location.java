@@ -6,6 +6,12 @@ public class Location {
     private String cityname;
     private double cordX, cordY;
 
+    public Location(String cityname, double cordX, double cordY){
+        this.setCityname(cityname);
+        this.cordX = cordX;
+        this.cordY = cordY;
+    }
+
     public void setCityname(String cityname) {
         this.cityname = cityname;
     }

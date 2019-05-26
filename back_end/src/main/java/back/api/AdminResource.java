@@ -7,6 +7,7 @@ import back.conf.Configuration;
 import back.data.UserDAO;
 import back.model.User;
 import back.util.JWT;
+import back.util.JsonMapRepresentation;
 import org.restlet.data.Form;
 import org.restlet.data.Header;
 import org.restlet.representation.Representation;
@@ -50,8 +51,7 @@ public class AdminResource  extends ServerResource {
             try{
                 Series<Header> headers = (Series<Header>) getRequestAttributes().get("org.restlet.http.headers");
                 String auth = headers.getFirstValue("token");
-                User requestingUser = JWT.getUserJWT(auth);
-                JTHAuth.authorize(requestingUser,this);
+                JWT.getUserJWT(auth).isAdmin();
             } catch(JTHAuthException e){
                 return JsonMapRepresentation.result(false,"Admin action error: authorization failed",null);
             }

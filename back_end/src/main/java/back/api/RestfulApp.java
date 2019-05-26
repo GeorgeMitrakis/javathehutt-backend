@@ -28,9 +28,6 @@ public class RestfulApp extends Application {
 	public synchronized Restlet createInboundRoot() {
 
 		Router router = new Router(getContext());
-
-		router.attach("/hello", HelloWorldResource.class);
-
 		// POST
 		router.attach("/admin", AdminResource.class);
 
@@ -47,10 +44,9 @@ public class RestfulApp extends Application {
 		// TODO: For autocomplete GET /room_autocomplete?str=<input>
 		router.attach("/room_autocomplete", AutocompleteResource.class);
 
-		// TODO: search room
+		// GET /search (minPrice, maxPrice, maxDist, hasPool, hasWifi, hasShauna, cityName, pointX, pointY)
 		router.attach("/search", RoomSearchResource.class);
 
-		// TODO: Book
 		// POST /book (userId, roomId, startDate, endDate)
 		router.attach("/book", BookingResource.class);
 

@@ -10,19 +10,13 @@ import back.model.Room;
 import back.model.User;
 import back.util.DateHandler;
 import back.util.JWT;
-import io.jsonwebtoken.Claims;
+import back.util.JsonMapRepresentation;
 import org.restlet.data.Form;
 import org.restlet.data.Header;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import org.restlet.util.Series;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static back.util.JWT.checkJWT;
-import static back.util.JWT.getUserJWT;
 
 
 public class BookingResource  extends ServerResource {

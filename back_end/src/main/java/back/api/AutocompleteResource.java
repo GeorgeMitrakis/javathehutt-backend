@@ -3,6 +3,7 @@ package back.api;
 import back.conf.Configuration;
 import back.data.RoomsDAO;
 import back.data.UserDAO;
+import back.util.JsonMapRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;

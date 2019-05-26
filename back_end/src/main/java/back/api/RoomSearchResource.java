@@ -6,6 +6,7 @@ import back.data.RoomsDAO;
 import back.data.UserDAO;
 import back.model.Room;
 import back.model.SearchConstraints;
+import back.util.JsonMapRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
@@ -33,15 +34,18 @@ public class RoomSearchResource extends ServerResource {
         String hasPool = getQueryValue("hasPool");
         String hasWifi = getQueryValue("hasWifi");
         String hasShauna = getQueryValue("hasShauna");
-        // todo:readlocation
+        String cityName = getQueryValue("hasShauna");
+        String pointX = getQueryValue("pointX");
+        String pointY = getQueryValue("pointY");
 
         try {
             constraints.setMaxCost(Integer.parseInt(maxPriceStr));
             constraints.setMinCost(Integer.parseInt(minPriceStr));
-            constraints.setShauna(hasPool.equals("true"));
-            constraints.setPool(hasWifi.equals("true"));
-            constraints.setWifi(hasShauna.equals("true"));
+            constraints.setShauna(hasShauna.equals("true"));
+            constraints.setPool(hasPool.equals("true"));
+            constraints.setWifi(hasWifi.equals("true"));
             constraints.setRange(Integer.parseInt(maxDist));
+            constraints.setLocation(cityName, Double.parseDouble(pointX), Double.parseDouble(pointY));
         } catch (NumberFormatException e){
             return JsonMapRepresentation.result(false, "Search error: non number sent for a number parameter", null);
         }

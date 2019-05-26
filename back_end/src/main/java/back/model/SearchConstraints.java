@@ -39,8 +39,8 @@ public class SearchConstraints {
         return location;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setLocation(String cityname, double cordX, double cordY) {
+        this.location = new Location(cityname, cordX, cordY);
     }
 
     public int getMinCost() {

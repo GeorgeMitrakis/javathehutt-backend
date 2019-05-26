@@ -8,6 +8,7 @@ import back.model.User;
 import back.util.Hashing;
 import back.util.JWT;
 
+import back.util.JsonMapRepresentation;
 import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;

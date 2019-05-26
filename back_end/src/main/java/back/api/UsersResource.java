@@ -7,6 +7,7 @@ import back.model.Provider;
 import back.model.Visitor;
 import back.util.Hashing;
 import back.util.JWT;
+import back.util.JsonMapRepresentation;
 import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
@@ -15,7 +16,6 @@ import back.conf.Configuration;
 import back.data.UserDAO;
 import back.model.User;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

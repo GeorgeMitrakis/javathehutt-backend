@@ -22,7 +22,7 @@ public class Visitor extends User{
 
     public Visitor(LinkedHashMap M){
         super(
-                ((Integer)M.get("id")).intValue(),
+                (Integer) M.get("id"),
                 (String) M.get("email"),
                 (String) M.get("role")
         );

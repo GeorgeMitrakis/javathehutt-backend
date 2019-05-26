@@ -1,4 +1,4 @@
-package back.api;
+package back.util;
 
 import com.google.gson.Gson;
 import org.restlet.data.MediaType;
@@ -24,7 +24,7 @@ public class JsonMapRepresentation extends WriterRepresentation {
         writer.write(gson.toJson(map));
     }
 
-    static JsonMapRepresentation forSimpleResult(Object o) {
+    public static JsonMapRepresentation forSimpleResult(Object o) {
         Map<String, Object> map = new HashMap<>();
         map.put("result", o);
         return new JsonMapRepresentation(map);

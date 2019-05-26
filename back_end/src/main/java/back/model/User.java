@@ -1,6 +1,8 @@
 package back.model;
 
 
+import back.Exceptions.JTHAuthException;
+
 import java.util.LinkedHashMap;
 
 
@@ -40,4 +42,11 @@ public class User {
     public String getEmail() { return email; }
 
     public String getRole() { return role;}
+
+    public void isAdmin() throws JTHAuthException {
+        if(!this.role.equals("admin")){
+            //always succeed for now because front end is not implemented
+            // throw new JTHAuthException();
+        }
+    }
 }
