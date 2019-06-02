@@ -7,6 +7,7 @@ import back.data.UserDAO;
 import back.model.Room;
 import back.model.SearchConstraints;
 import back.util.JsonMapRepresentation;
+import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
@@ -23,20 +24,21 @@ public class RoomSearchResource extends ServerResource {
 
 
     @Override
-    protected Representation get() throws ResourceException {
+    protected Representation post(Representation entity) throws ResourceException {
 
         SearchConstraints constraints = new SearchConstraints();
+        Form form = new Form(entity);
 
         //Read the parameters
-        String minPriceStr = getQueryValue("minPrice");
-        String maxPriceStr = getQueryValue("maxPrice");
-        String maxDist = getQueryValue("maxDist");
-        String hasPool = getQueryValue("hasPool");
-        String hasWifi = getQueryValue("hasWifi");
-        String hasShauna = getQueryValue("hasShauna");
-        String cityName = getQueryValue("hasShauna");
-        String pointX = getQueryValue("pointX");
-        String pointY = getQueryValue("pointY");
+        String minPriceStr = form.getFirstValue("minPrice");
+        String maxPriceStr = form.getFirstValue("maxPrice");
+        String maxDist = form.getFirstValue("maxDist");
+        String hasPool = form.getFirstValue("hasPool");
+        String hasWifi = form.getFirstValue("hasWifi");
+        String hasShauna = form.getFirstValue("hasShauna");
+        String cityName = form.getFirstValue("Name");
+        String pointX = form.getFirstValue("pointX");
+        String pointY = form.getFirstValue("pointY");
 
         try {
             constraints.setMaxCost(Integer.parseInt(maxPriceStr));
@@ -47,6 +49,7 @@ public class RoomSearchResource extends ServerResource {
             constraints.setRange(Integer.parseInt(maxDist));
             constraints.setLocation(cityName, Double.parseDouble(pointX), Double.parseDouble(pointY));
         } catch (NumberFormatException e){
+            e.printStackTrace();
             return JsonMapRepresentation.result(false, "Search error: non number sent for a number parameter", null);
         }
         // todo: setlocation
