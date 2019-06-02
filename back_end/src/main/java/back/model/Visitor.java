@@ -1,12 +1,14 @@
 package back.model;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 
 public class Visitor extends User{
 
     private final String name;
     private final String surname;
+    private List<Room> favouriteRooms = null;
 
     public Visitor(User usr, String _name, String _surname){
         super(usr.getId(), usr.getEmail(), "visitor");
@@ -36,6 +38,14 @@ public class Visitor extends User{
 
     public String getSurname() {
         return surname;
+    }
+
+    public List<Room> fetchFavouriteRooms(){
+        if (favouriteRooms != null){
+            // TODO: fetch favourite rooms from DB
+            favouriteRooms = /* TODO */ null;
+        }
+        return favouriteRooms;
     }
 
 }

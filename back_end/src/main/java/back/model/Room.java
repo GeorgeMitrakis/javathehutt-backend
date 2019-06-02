@@ -6,6 +6,7 @@ public class Room {
     private long providerId;
     private double price;
     private int capacity;
+    private Provider provider = null;
 
     public Room(long id, long providerId, double price, int capacity) {
         this.id = id;
@@ -27,5 +28,13 @@ public class Room {
     }
 
     public int getCapacity(){ return capacity;}
+
+    public Provider fetchProvider(){
+        if (provider == null) {
+            // TODO: fetch provider with providerId from db
+            provider = /* TODO */ null;
+        }
+        return provider;
+    }
 
 }
