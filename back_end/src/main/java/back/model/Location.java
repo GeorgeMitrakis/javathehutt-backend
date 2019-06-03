@@ -17,7 +17,6 @@ public class Location {
     }
 
     public void setCordX(String cords) {
-
         this.cordX = Integer.getInteger(cords.replace("POINT(", "").replace(")", "").split(" ")[0]);
     }
 

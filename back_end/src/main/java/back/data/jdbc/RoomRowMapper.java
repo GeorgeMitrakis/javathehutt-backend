@@ -1,5 +1,6 @@
 package back.data.jdbc;
 
+import back.Exceptions.JTHException;
 import back.model.Location;
 import back.model.Room;
 
@@ -19,8 +20,12 @@ public class RoomRowMapper implements RowMapper<Room> {
         boolean wifi = rs.getBoolean("wifi");
         boolean pool = rs.getBoolean("pool");
         boolean shauna = rs.getBoolean("shauna");
-        //TODO: also add description to db
-        Location location = new Location(rs.getString("city.name"), rs.getDouble("coordinate_X"), rs.getDouble("coordinate_Y"));
-        return new Room(id, provider_id, price, capacity, wifi, pool, shauna, location);
+        //TODO: also add description to db + fix location
+//        String geom = rs.getString("geom");
+//        if (geom == null) System.err.println("NU:::LL");
+//        Location location = new Location(rs.getString("name"), -1, -1);
+//        location.setCordX(geom);
+//        location.setCordY(geom);
+        return new Room(id, provider_id, price, capacity, wifi, pool, shauna, null);
     }
 }

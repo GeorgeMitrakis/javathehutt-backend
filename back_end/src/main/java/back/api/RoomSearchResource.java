@@ -41,13 +41,13 @@ public class RoomSearchResource extends ServerResource {
         String pointY = form.getFirstValue("pointY");
 
         try {
-            constraints.setMaxCost(Integer.parseInt(maxPriceStr));
-            constraints.setMinCost(Integer.parseInt(minPriceStr));
-            constraints.setShauna(hasShauna.equals("true"));
-            constraints.setPool(hasPool.equals("true"));
-            constraints.setWifi(hasWifi.equals("true"));
-            constraints.setRange(Integer.parseInt(maxDist));
-            constraints.setLocation(cityName, Double.parseDouble(pointX), Double.parseDouble(pointY));
+            if (maxPriceStr != null) constraints.setMaxCost(Integer.parseInt(maxPriceStr));
+            if (minPriceStr != null) constraints.setMinCost(Integer.parseInt(minPriceStr));
+            if (hasWifi != null) constraints.setWifi(hasWifi.equals("true"));
+            if (hasPool != null) constraints.setPool(hasPool.equals("true"));
+            if (hasShauna != null) constraints.setShauna(hasShauna.equals("true"));
+            if (maxDist != null) constraints.setRange(Integer.parseInt(maxDist));
+            if (pointX != null && pointY != null && cityName != null) constraints.setLocation(cityName, Double.parseDouble(pointX), Double.parseDouble(pointY));
         } catch (NumberFormatException e){
             e.printStackTrace();
             return JsonMapRepresentation.result(false, "Search error: non number sent for a number parameter", null);

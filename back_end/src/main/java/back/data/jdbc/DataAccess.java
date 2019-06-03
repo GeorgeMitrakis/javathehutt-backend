@@ -216,7 +216,7 @@ public class DataAccess {
             // insert into user and keep id
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO \"user\"(email, password, role) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO \"user\"(id, email, password, role) VALUES (default, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, p.getEmail());
                 ps.setString(2, hashedPassword);
                 ps.setString(3, "provider");
@@ -238,7 +238,7 @@ public class DataAccess {
             // insert into user and keep id
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO \"user\"(email, password, role) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO \"user\"(id, email, password, role) VALUES (default, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, v.getEmail());
                 ps.setString(2, hashedPassword);
                 ps.setString(3, "visitor");
