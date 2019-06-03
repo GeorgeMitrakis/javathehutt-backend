@@ -28,24 +28,25 @@ public class RoomsDAOImpl implements RoomsDAO {
     }
 
     @Override
-    public void addRatingToRoom(Visitor visitor, Room room, int stars, String comment) throws JTHDataBaseException {
-        //TODO
+    public boolean addRatingToRoom(Visitor visitor, Room room, int stars, String comment) throws JTHDataBaseException {
+        if (stars < 0 || stars > 5) return false;
+        dataAccess.addRatingToRoom(visitor, room, stars, comment);
+        return true;
     }
 
     @Override
     public void removeRatingFromRoom(int ratingId) throws JTHDataBaseException {
-        //TODO
+        dataAccess.removeRatingFromRoom(ratingId);
     }
 
     @Override
     public boolean submitNewRoom(Provider provider, Room room) throws JTHDataBaseException {
-        //TODO
-        return false;
+        return dataAccess.submitNewRoom(provider, room);
     }
 
     @Override
     public void removeRoom(Room room) throws JTHDataBaseException {
-        //TODO
+        dataAccess.removeRoom(room);
     }
 
 }
