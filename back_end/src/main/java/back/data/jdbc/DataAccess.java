@@ -426,4 +426,27 @@ public class DataAccess {
         }
     }
 
+    public boolean addRoomToFavourites(Visitor visitor, Room room) throws JTHDataBaseException{
+        //TODO: NOT TESTED
+        try {
+            jdbcTemplate.update("INSERT INTO favorites (visitor_id, room_id) VALUES (?, ?)", visitor.getId(), room.getId());
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+        return true;
+    }
+
+    public boolean removeRoomFromFavourites(Visitor visitor, int roomId) throws JTHDataBaseException {
+        //TODO: NOT TESTED
+        try {
+            jdbcTemplate.update("DELETE FROM favorites WHERE visitor_id = ? and room_id = ?", visitor.getId(), roomId);
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+        return true;
+    }
+
+
 }
