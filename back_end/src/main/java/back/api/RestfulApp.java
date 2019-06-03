@@ -50,6 +50,7 @@ public class RestfulApp extends Application {
 		// POST /book (userId, roomId, startDate, endDate)
 		router.attach("/book", BookingResource.class);
 
+		router.attach("/img", ImageResource.class);
 		return router;
 	}
 
