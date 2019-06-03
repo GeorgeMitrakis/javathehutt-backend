@@ -45,6 +45,8 @@ public class RestfulApp extends Application {
 		router.attach("/room_autocomplete", AutocompleteResource.class);
 
 		// GET /search (minPrice, maxPrice, maxDist, hasPool, hasWifi, hasShauna, cityName, pointX, pointY)
+		//--data 'minPrice=-1&maxPrice=-1&maxDist=-1&hasPool=false&hasWifi=false&hasShauna=false&Name=Athens&pointX=-1&pointY=-1'
+		//--data 'minPrice=-1&maxPrice=-1&maxDist=100&hasPool=false&hasWifi=false&hasShauna=false&Name=Athens&pointX=37.983810&pointY=23.727539'
 		router.attach("/search", RoomSearchResource.class);
 
 		// POST /book (userId, roomId, startDate, endDate)

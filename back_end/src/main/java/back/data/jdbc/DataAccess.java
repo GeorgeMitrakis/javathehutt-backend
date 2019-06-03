@@ -216,7 +216,7 @@ public class DataAccess {
             // insert into user and keep id
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO \"user\"(email, password, role) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO \"user\"(id, email, password, role) VALUES (default, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, p.getEmail());
                 ps.setString(2, hashedPassword);
                 ps.setString(3, "provider");
@@ -238,14 +238,13 @@ public class DataAccess {
             // insert into user and keep id
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO \"user\"(email, password, role) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO \"user\"(id, email, password, role) VALUES (default, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, v.getEmail());
                 ps.setString(2, hashedPassword);
                 ps.setString(3, "visitor");
                 return ps;
             }, keyHolder);
             long id = (long) keyHolder.getKeys().get("id");
-            System.out.println(id);
             // use the same id to insert to visitor
             jdbcTemplate.update("INSERT INTO visitor (id, \"name\", surname) VALUES (?, ?, ?)", id, v.getName(), v.getSurname());
             v.setId(id);
@@ -259,7 +258,7 @@ public class DataAccess {
     public Room getRoom(long id) throws JTHDataBaseException {
         try {
             Long[] par = new Long[]{id};
-            return jdbcTemplate.queryForObject("select * from \"room\" where id = ?", par, new RoomRowMapper());
+            return jdbcTemplate.queryForObject("select room.*, location.*, city.name from room, location, city where room.id = ? and room.location_id = location.id and location.city_id = city.id", par, new RoomRowMapper());
         } catch (EmptyResultDataAccessException e) {
             return null;
         } catch (IncorrectResultSizeDataAccessException e) {
@@ -314,10 +313,10 @@ public class DataAccess {
     public List<Room> searchRooms(SearchConstraints constraints) throws JTHDataBaseException {
         List<Room> results;
         try {
-            String query = "select * from room where ";
+            String query = "select room.*, location.*, city.name from room, location, city where location.city_id = city.id and ";
 
             // check for range
-            if(constraints.getRange() != -1) query += "ST_DWithin(geom, " + constraints.getLocation().getCoords() + " " + constraints.getRange() + ") and ";
+            if(constraints.getRange() != -1) query += "location.id = room.location_id and ST_DWithin(location.geom, ST_GeomFromText('" + constraints.getLocation().getCoords() + "'), " + constraints.getRange() + ") and ";
 
             // check for price range
             if(constraints.getMaxCost() != -1) query += "price <= "+ constraints.getMaxCost() +" and ";
@@ -341,5 +340,113 @@ public class DataAccess {
         }
         return results;
     }
+
+    public void addRatingToRoom(Visitor visitor, Room room, int stars, String comment) throws JTHDataBaseException {
+        //TODO: NOT TESTED
+        try {
+            jdbcTemplate.update("INSERT INTO rating (id, comment, stars, room_id, visitor_id) VALUES (default, ?, ?, ?, ?)",
+                    comment, stars, room.getId(), visitor.getId());
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public void removeRatingFromRoom(int ratingId) throws JTHDataBaseException {
+        //TODO: NOT TESTED
+        try {
+            jdbcTemplate.update("DELETE FROM rating WHERE id = ?", ratingId);
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public boolean submitNewRoom(Provider provider, Room room) throws JTHDataBaseException {
+        //TODO: NOT TESTED
+        Location location = room.getLocation();
+        try {
+            transactionTemplate.execute(status -> {
+                // if the city name does not exists already then insert it and keep id
+                int cityid = -1;
+                try {
+                    if (!jdbcTemplate.queryForObject("SELECT true FROM city WHERE name = ?", new Object[]{location.getCityname()}, Boolean.class)) {
+                        KeyHolder keyHolder = new GeneratedKeyHolder();
+                        jdbcTemplate.update(connection -> {
+                            PreparedStatement ps = connection.prepareStatement("INSERT INTO city (id, name) VALUES (default, ?)", Statement.RETURN_GENERATED_KEYS);
+                            ps.setString(1, location.getCityname());
+                            return ps;
+                        }, keyHolder);
+                        cityid = (int) keyHolder.getKeys().get("id");
+                    }
+                } catch (NullPointerException | IncorrectResultSizeDataAccessException e){
+                    KeyHolder keyHolder = new GeneratedKeyHolder();
+                    jdbcTemplate.update(connection -> {
+                        PreparedStatement ps = connection.prepareStatement("INSERT INTO city (id, name) VALUES (default, ?)", Statement.RETURN_GENERATED_KEYS);
+                        ps.setString(1, location.getCityname());
+                        return ps;
+                    }, keyHolder);
+                    cityid = (int) keyHolder.getKeys().get("id");
+                }
+
+                // then insert location
+                int location_id = -1;
+                KeyHolder keyHolder = new GeneratedKeyHolder();
+                int finalCityid = cityid;   // dunno why this was needed
+                jdbcTemplate.update(connection -> {
+                    PreparedStatement ps = connection.prepareStatement("INSERT INTO location (id, coordiante_x, coordiante_y, city_id) VALUES (default, ?, ? ,?)", Statement.RETURN_GENERATED_KEYS);
+                    ps.setDouble(1, location.getCordX());
+                    ps.setDouble(2, location.getCordY());
+                    ps.setInt(3, finalCityid);
+                    return ps;
+                }, keyHolder);
+                location_id = (int) keyHolder.getKeys().get("id");
+
+                // finally the room
+                jdbcTemplate.update("INSERT INTO room (id, provider_id, location_id, capacity, provider_id, wifi, pool, shauna) " +
+                                        "VALUES (default, ?, ?, ?, ?, ?, ?, ?)",
+                                     provider.getId(), location_id, room.getCapacity(), room.getPrice(), room.getWifi(), room.getPool(), room.getShauna());
+                return true;
+            });
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+        return true;
+    }
+
+    public void removeRoom(Room room) throws JTHDataBaseException {
+        //TODO: NOT TESTED
+        try {
+            // CASCADE option should take care of all the necessary deletes on other tables like location and city (TODO: check)
+            jdbcTemplate.update("DELETE FROM room WHERE id = ?", room.getId());
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public boolean addRoomToFavourites(Visitor visitor, Room room) throws JTHDataBaseException{
+        //TODO: NOT TESTED
+        try {
+            jdbcTemplate.update("INSERT INTO favorites (visitor_id, room_id) VALUES (?, ?)", visitor.getId(), room.getId());
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+        return true;
+    }
+
+    public boolean removeRoomFromFavourites(Visitor visitor, int roomId) throws JTHDataBaseException {
+        //TODO: NOT TESTED
+        try {
+            jdbcTemplate.update("DELETE FROM favorites WHERE visitor_id = ? and room_id = ?", visitor.getId(), roomId);
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+        return true;
+    }
+
 
 }

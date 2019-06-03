@@ -45,7 +45,7 @@ public class User {
 
     public void isAdmin() throws JTHAuthException {
         if(!this.role.equals("admin")){
-            //always succeed for now because front end is not implemented
+            //TODO: always succeed for now because front end is not implemented
             // throw new JTHAuthException();
         }
     }

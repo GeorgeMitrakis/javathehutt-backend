@@ -7,6 +7,7 @@ import back.data.UserDAO;
 import back.model.Room;
 import back.model.SearchConstraints;
 import back.util.JsonMapRepresentation;
+import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
@@ -23,30 +24,32 @@ public class RoomSearchResource extends ServerResource {
 
 
     @Override
-    protected Representation get() throws ResourceException {
+    protected Representation post(Representation entity) throws ResourceException {
 
         SearchConstraints constraints = new SearchConstraints();
+        Form form = new Form(entity);
 
         //Read the parameters
-        String minPriceStr = getQueryValue("minPrice");
-        String maxPriceStr = getQueryValue("maxPrice");
-        String maxDist = getQueryValue("maxDist");
-        String hasPool = getQueryValue("hasPool");
-        String hasWifi = getQueryValue("hasWifi");
-        String hasShauna = getQueryValue("hasShauna");
-        String cityName = getQueryValue("hasShauna");
-        String pointX = getQueryValue("pointX");
-        String pointY = getQueryValue("pointY");
+        String minPriceStr = form.getFirstValue("minPrice");
+        String maxPriceStr = form.getFirstValue("maxPrice");
+        String maxDist = form.getFirstValue("maxDist");
+        String hasPool = form.getFirstValue("hasPool");
+        String hasWifi = form.getFirstValue("hasWifi");
+        String hasShauna = form.getFirstValue("hasShauna");
+        String cityName = form.getFirstValue("Name");
+        String pointX = form.getFirstValue("pointX");
+        String pointY = form.getFirstValue("pointY");
 
         try {
-            constraints.setMaxCost(Integer.parseInt(maxPriceStr));
-            constraints.setMinCost(Integer.parseInt(minPriceStr));
-            constraints.setShauna(hasShauna.equals("true"));
-            constraints.setPool(hasPool.equals("true"));
-            constraints.setWifi(hasWifi.equals("true"));
-            constraints.setRange(Integer.parseInt(maxDist));
-            constraints.setLocation(cityName, Double.parseDouble(pointX), Double.parseDouble(pointY));
+            if (maxPriceStr != null) constraints.setMaxCost(Integer.parseInt(maxPriceStr));
+            if (minPriceStr != null) constraints.setMinCost(Integer.parseInt(minPriceStr));
+            if (hasWifi != null) constraints.setWifi(hasWifi.equals("true"));
+            if (hasPool != null) constraints.setPool(hasPool.equals("true"));
+            if (hasShauna != null) constraints.setShauna(hasShauna.equals("true"));
+            if (maxDist != null) constraints.setRange(Integer.parseInt(maxDist));
+            if (pointX != null && pointY != null && cityName != null) constraints.setLocation(cityName, Double.parseDouble(pointX), Double.parseDouble(pointY));
         } catch (NumberFormatException e){
+            e.printStackTrace();
             return JsonMapRepresentation.result(false, "Search error: non number sent for a number parameter", null);
         }
         // todo: setlocation
