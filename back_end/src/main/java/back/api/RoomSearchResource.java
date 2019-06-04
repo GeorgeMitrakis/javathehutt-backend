@@ -19,26 +19,24 @@ import java.util.Map;
 
 public class RoomSearchResource extends ServerResource {
 
-    private final UserDAO userDAO = Configuration.getInstance().getUserDAO();
     private final RoomsDAO roomsDAO = Configuration.getInstance().getRoomsDAO();
 
 
     @Override
-    protected Representation post(Representation entity) throws ResourceException {
+    protected Representation get() throws ResourceException {
 
         SearchConstraints constraints = new SearchConstraints();
-        Form form = new Form(entity);
 
         //Read the parameters
-        String minPriceStr = form.getFirstValue("minPrice");
-        String maxPriceStr = form.getFirstValue("maxPrice");
-        String maxDist = form.getFirstValue("maxDist");
-        String hasPool = form.getFirstValue("hasPool");
-        String hasWifi = form.getFirstValue("hasWifi");
-        String hasShauna = form.getFirstValue("hasShauna");
-        String cityName = form.getFirstValue("Name");
-        String pointX = form.getFirstValue("pointX");
-        String pointY = form.getFirstValue("pointY");
+        String minPriceStr = getQueryValue("minPrice");
+        String maxPriceStr = getQueryValue("maxPrice");
+        String maxDist = getQueryValue("maxDist");
+        String hasPool = getQueryValue("hasPool");
+        String hasWifi = getQueryValue("hasWifi");
+        String hasShauna = getQueryValue("hasShauna");
+        String cityName = getQueryValue("Name");
+        String pointX = getQueryValue("pointX");
+        String pointY = getQueryValue("pointY");
 
         try {
             if (maxPriceStr != null) constraints.setMaxCost(Integer.parseInt(maxPriceStr));
