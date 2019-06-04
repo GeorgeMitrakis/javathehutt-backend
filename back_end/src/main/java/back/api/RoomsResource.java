@@ -64,6 +64,8 @@ public class RoomsResource extends ServerResource  {
         String cordXStr = form.getFirstValue("cordX");
         String cordYStr = form.getFirstValue("cordY");
         String cityName = form.getFirstValue("cityName");
+        String description = form.getFirstValue("description");
+        if (description == null) description = "";
 
         if (providerIdStr == null || providerIdStr.equals("") ||
             priceStr == null || priceStr.equals("") ||
@@ -88,7 +90,7 @@ public class RoomsResource extends ServerResource  {
         }
 
         Location location = new Location(cityName, cordX, cordY);
-        Room room = new Room(-1, providerId, price, capacity, "true".equals(wifi), "true".equals(pool), "true".equals(shauna), location);
+        Room room = new Room(-1, providerId, price, capacity, "true".equals(wifi), "true".equals(pool), "true".equals(shauna), location, description);
 
         try {
             roomsDAO.submitNewRoom(room);

@@ -303,10 +303,10 @@ public class DataAccess {
     public List<Room> searchRooms(SearchConstraints constraints) throws JTHDataBaseException {
         List<Room> results;
         try {
-            String query = "select room.*, location.*, city.name from room, location, city where location.city_id = city.id and ";
+            String query = "select room.*, location.*, city.name from room, location, city where location.city_id = city.id and location.id = room.location_id and ";
 
             // check for range
-            if(constraints.getRange() != -1) query += "location.id = room.location_id and ST_DWithin(location.geom, ST_GeomFromText('" + constraints.getLocation().getCoords() + "'), " + constraints.getRange() + ") and ";
+            if(constraints.getRange() != -1) query += "ST_DWithin(location.geom, ST_GeomFromText('" + constraints.getLocation().getCoords() + "'), " + constraints.getRange() + ") and ";
 
             // check for price range
             if(constraints.getMaxCost() != -1) query += "price <= "+ constraints.getMaxCost() +" and ";

@@ -18,7 +18,7 @@ public class Room {
     private Provider provider = null;
     private List<Rating> ratings = null;
 
-    public Room(int id, long providerId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, Location location) {
+    public Room(int id, long providerId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, Location location, String description) {
         this.id = id;
         this.providerId = providerId;
         this.price = price;
@@ -27,6 +27,7 @@ public class Room {
         this.pool = pool;
         this.shauna = shauna;
         this.location = location;
+        this.description = description;
     }
 
     public long getId() {
