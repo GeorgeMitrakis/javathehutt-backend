@@ -25,4 +25,6 @@ public interface RoomsDAO {
 
     void removeRoom(Room room) throws JTHDataBaseException;
 
+    List<String> autocompletePrefix(String prefix) throws JTHDataBaseException;
+
 }

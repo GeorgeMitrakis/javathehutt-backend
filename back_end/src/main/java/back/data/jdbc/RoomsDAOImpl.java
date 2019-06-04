@@ -49,4 +49,9 @@ public class RoomsDAOImpl implements RoomsDAO {
         dataAccess.removeRoom(room);
     }
 
+    @Override
+    public List<String> autocompletePrefix(String prefix) throws JTHDataBaseException {
+        return dataAccess.autocompletePrefix(prefix);
+    }
+
 }

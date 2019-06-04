@@ -41,8 +41,8 @@ public class RestfulApp extends Application {
 
 		router.attach("/dummy", DummyResource.class);
 
-		// TODO: For autocomplete GET /room_autocomplete?str=<input>
-		router.attach("/room_autocomplete", AutocompleteResource.class);
+		// GET /autocomplete?str=<input>
+		router.attach("/autocomplete", AutocompleteResource.class);
 
 		// GET /search (minPrice, maxPrice, maxDist, hasPool, hasWifi, hasShauna, cityName, pointX, pointY)
 		//--data 'minPrice=-1&maxPrice=-1&maxDist=-1&hasPool=false&hasWifi=false&hasShauna=false&Name=Athens&pointX=-1&pointY=-1'

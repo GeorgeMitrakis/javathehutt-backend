@@ -448,5 +448,15 @@ public class DataAccess {
         return true;
     }
 
+    public List<String> autocompletePrefix(String prefix) throws JTHDataBaseException {
+        List<String> results;
+        try {
+            results = jdbcTemplate.queryForList("SELECT name FROM city WHERE name LIKE ?", new Object[]{prefix + "%"}, String.class);
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+        return results;
+    }
 
 }
