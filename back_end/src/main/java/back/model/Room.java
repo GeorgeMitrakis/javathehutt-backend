@@ -12,14 +12,16 @@ public class Room {
     private double price;
     private int capacity;
     private boolean wifi, pool, shauna;
+    private String roomName;
     private String description = "";   // TODO: add to db and here
     private Location location;
 
     private Provider provider = null;
     private List<Rating> ratings = null;
 
-    public Room(int id, long providerId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, Location location, String description) {
+    public Room(int id, String roomName, long providerId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, Location location, String description) {
         this.id = id;
+        this.roomName = roomName;
         this.providerId = providerId;
         this.price = price;
         this.capacity = capacity;

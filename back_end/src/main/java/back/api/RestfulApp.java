@@ -55,7 +55,7 @@ public class RestfulApp extends Application {
 		// GET /rooms (roomId)    -> get room info
 		// DELETE /rooms (roomId) -> delete room
 		// POST /rooms            -> submit new room
-		//      (providerId, price, capacity, cordX, cordY, cityName [, wifi, pool, shauna])
+		//      (providerId, roomName, price, capacity, cordX, cordY, cityName [, wifi, pool, shauna])
 		router.attach("/rooms", RoomsResource.class);
 
 		// POST (visitorId, roomId)   -> add to favorites

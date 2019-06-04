@@ -303,25 +303,23 @@ public class DataAccess {
     public List<Room> searchRooms(SearchConstraints constraints) throws JTHDataBaseException {
         List<Room> results;
         try {
-            String query = "select room.*, location.*, city.name from room, location, city where location.city_id = city.id and location.id = room.location_id and ";
+            String query = "select room.*, location.*, city.name from room, location, city where location.city_id = city.id and location.id = room.location_id";
 
             // check for range
-            if(constraints.getRange() != -1) query += "ST_DWithin(location.geom, ST_GeomFromText('" + constraints.getLocation().getCoords() + "'), " + constraints.getRange() + ") and ";
+            if(constraints.getRange() != -1) query += " and ST_DWithin(location.geom, ST_GeomFromText('" + constraints.getLocation().getCoords() + "'), " + constraints.getRange() + ")";
 
             // check for price range
-            if(constraints.getMaxCost() != -1) query += "price <= "+ constraints.getMaxCost() +" and ";
-            if(constraints.getMinCost() != -1) query += "price >= "+ constraints.getMinCost() +" and ";
+            if(constraints.getMaxCost() != -1) query += " and price <= "+ constraints.getMaxCost();
+            if(constraints.getMinCost() != -1) query += " and price >= "+ constraints.getMinCost();
 
             // check for wifi
-            if(constraints.getWifi()) query += "wifi = true and ";
+            if(constraints.getWifi()) query += " and wifi = true";
 
             // check for pool
-            if(constraints.getPool()) query += "pool = true and ";
+            if(constraints.getPool()) query += " and pool = true";
 
             // check for shauna
-            if(constraints.getShauna()) query += "shauna = true and ";
-
-            query += "1=1";
+            if(constraints.getShauna()) query += " and shauna = true";
 
             results = jdbcTemplate.query(query, new RoomRowMapper());
         } catch (Exception e) {

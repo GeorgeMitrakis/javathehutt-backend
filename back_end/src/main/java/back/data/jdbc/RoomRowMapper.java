@@ -18,6 +18,7 @@ public class RoomRowMapper implements RowMapper<Room> {
         boolean wifi = rs.getBoolean("wifi");
         boolean pool = rs.getBoolean("pool");
         boolean shauna = rs.getBoolean("shauna");
+        String roomName = rs.getString("room_name");
         //TODO: also add description to db + fix location
         Location location = null;
 //        String geom = rs.getString("geom");
@@ -27,6 +28,6 @@ public class RoomRowMapper implements RowMapper<Room> {
 //            location.setCordY(geom);
 //        }
         String description = rs.getString("description");
-        return new Room(id, provider_id, price, capacity, wifi, pool, shauna, location, description);
+        return new Room(id, roomName, provider_id, price, capacity, wifi, pool, shauna, location, description);
     }
 }
