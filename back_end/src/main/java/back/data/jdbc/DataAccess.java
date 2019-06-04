@@ -362,23 +362,15 @@ public class DataAccess {
         }
     }
 
-    public boolean submitNewRoom(Provider provider, Room room) throws JTHDataBaseException {
-        //TODO: NOT TESTED
+    public boolean submitNewRoom(Room room) throws JTHDataBaseException {
         Location location = room.getLocation();
         try {
             transactionTemplate.execute(status -> {
                 // if the city name does not exists already then insert it and keep id
-                int cityid = -1;
+                int cityid;
                 try {
-                    if (!jdbcTemplate.queryForObject("SELECT true FROM city WHERE name = ?", new Object[]{location.getCityname()}, Boolean.class)) {
-                        KeyHolder keyHolder = new GeneratedKeyHolder();
-                        jdbcTemplate.update(connection -> {
-                            PreparedStatement ps = connection.prepareStatement("INSERT INTO city (id, name) VALUES (default, ?)", Statement.RETURN_GENERATED_KEYS);
-                            ps.setString(1, location.getCityname());
-                            return ps;
-                        }, keyHolder);
-                        cityid = (int) keyHolder.getKeys().get("id");
-                    }
+                    // try querying for object to see if it exists
+                    cityid = jdbcTemplate.queryForObject("SELECT id FROM city WHERE name = ?", new Object[]{location.getCityname()}, Integer.class);
                 } catch (NullPointerException | IncorrectResultSizeDataAccessException e){
                     KeyHolder keyHolder = new GeneratedKeyHolder();
                     jdbcTemplate.update(connection -> {
@@ -390,22 +382,21 @@ public class DataAccess {
                 }
 
                 // then insert location
-                int location_id = -1;
+                int location_id;
                 KeyHolder keyHolder = new GeneratedKeyHolder();
                 int finalCityid = cityid;   // dunno why this was needed
                 jdbcTemplate.update(connection -> {
-                    PreparedStatement ps = connection.prepareStatement("INSERT INTO location (id, coordiante_x, coordiante_y, city_id) VALUES (default, ?, ? ,?)", Statement.RETURN_GENERATED_KEYS);
-                    ps.setDouble(1, location.getCordX());
-                    ps.setDouble(2, location.getCordY());
-                    ps.setInt(3, finalCityid);
+                    PreparedStatement ps = connection.prepareStatement("INSERT INTO location (id, geom, city_id) VALUES (default, ST_GeomFromText(?), ?)", Statement.RETURN_GENERATED_KEYS);
+                    ps.setString(1, location.getCoords());
+                    ps.setInt(2, finalCityid);
                     return ps;
                 }, keyHolder);
                 location_id = (int) keyHolder.getKeys().get("id");
 
                 // finally the room
-                jdbcTemplate.update("INSERT INTO room (id, provider_id, location_id, capacity, provider_id, wifi, pool, shauna) " +
-                                        "VALUES (default, ?, ?, ?, ?, ?, ?, ?)",
-                                     provider.getId(), location_id, room.getCapacity(), room.getPrice(), room.getWifi(), room.getPool(), room.getShauna());
+                jdbcTemplate.update("INSERT INTO room (id, provider_id, location_id, capacity, price, wifi, pool, shauna) " +
+                                     "VALUES (default, ?, ?, ?, ?, ?, ?, ?)",
+                                     room.getProviderId(), location_id, room.getCapacity(), room.getPrice(), room.getWifi(), room.getPool(), room.getShauna());
                 return true;
             });
         } catch (Exception e){
@@ -415,11 +406,11 @@ public class DataAccess {
         return true;
     }
 
-    public void removeRoom(Room room) throws JTHDataBaseException {
+    public void removeRoom(int roomId) throws JTHDataBaseException {
         //TODO: NOT TESTED
         try {
             // CASCADE option should take care of all the necessary deletes on other tables like location and city (TODO: check)
-            jdbcTemplate.update("DELETE FROM room WHERE id = ?", room.getId());
+            jdbcTemplate.update("DELETE FROM room WHERE id = ?", roomId);
         } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();

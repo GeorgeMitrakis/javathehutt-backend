@@ -2,7 +2,6 @@ package back.data.jdbc;
 
 import back.Exceptions.JTHDataBaseException;
 import back.data.RoomsDAO;
-import back.model.Provider;
 import back.model.Room;
 import back.model.SearchConstraints;
 import back.model.Visitor;
@@ -40,13 +39,13 @@ public class RoomsDAOImpl implements RoomsDAO {
     }
 
     @Override
-    public boolean submitNewRoom(Provider provider, Room room) throws JTHDataBaseException {
-        return dataAccess.submitNewRoom(provider, room);
+    public boolean submitNewRoom(Room room) throws JTHDataBaseException {
+        return dataAccess.submitNewRoom(room);
     }
 
     @Override
-    public void removeRoom(Room room) throws JTHDataBaseException {
-        dataAccess.removeRoom(room);
+    public void removeRoom(int roomId) throws JTHDataBaseException {
+        dataAccess.removeRoom(roomId);
     }
 
     @Override
