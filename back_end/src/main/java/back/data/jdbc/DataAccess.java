@@ -99,8 +99,6 @@ public class DataAccess {
             return (u != null) ? getUserByRole(u.getRole(), par, u) : null;
         } catch (EmptyResultDataAccessException e) {
             return null;
-        } catch (IncorrectResultSizeDataAccessException e) {
-            return null;
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -113,8 +111,6 @@ public class DataAccess {
             return (u != null) ? getUserByRole(u.getRole(), new Long[]{u.getId()}, u) : null;
         } catch (EmptyResultDataAccessException e) {
             return null;
-        } catch (IncorrectResultSizeDataAccessException e) {
-            return null;
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -126,8 +122,6 @@ public class DataAccess {
             User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ? and password = ?", new String[]{email, hashedPassword}, new UserRowMapper());
             return (u != null) ? getUserByRole(u.getRole(), new Long[]{u.getId()}, u) : null;
         } catch (EmptyResultDataAccessException e) {
-            return null;
-        } catch (IncorrectResultSizeDataAccessException e) {
             return null;
         } catch (Exception e) {
             e.printStackTrace();
@@ -261,8 +255,6 @@ public class DataAccess {
             return jdbcTemplate.queryForObject("select room.*, location.*, city.name from room, location, city where room.id = ? and room.location_id = location.id and location.city_id = city.id", par, new RoomRowMapper());
         } catch (EmptyResultDataAccessException e) {
             return null;
-        } catch (IncorrectResultSizeDataAccessException e) {
-            return null;
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -300,8 +292,6 @@ public class DataAccess {
         try {
             Integer count = jdbcTemplate.queryForObject("select count(*) from \"transactions\" where room_id = ? and start_date <= ? ::date and end_date >= ? ::date", new Object[]{room.getId(), sqlStartDate, sqlEndDate}, Integer.class);
             return (count != null) ? count : -1;
-        } catch (EmptyResultDataAccessException e) {
-            return -1;
         } catch (IncorrectResultSizeDataAccessException e) {
             return -1;
         } catch (Exception e) {
@@ -361,13 +351,8 @@ public class DataAccess {
     }
 
     public List<Rating> getRatingsForRoom(int roomId) throws JTHDataBaseException {
-
         try {
             return jdbcTemplate.query("select * from rating where room_id = ?", new Object[]{roomId}, new RatingRowMapper());
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        } catch (IncorrectResultSizeDataAccessException e) {
-            return null;
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -446,6 +431,29 @@ public class DataAccess {
             throw new JTHDataBaseException();
         }
         return true;
+    }
+
+    public List<Room> getFavouriteRoomIdsForVisitor(long visitorId) throws JTHDataBaseException {
+        try {
+            return jdbcTemplate.query("select room.* from room, favorites, visitor " +
+                                          "where room.id = favorites.room_id and favorites.visitor_id = visitor.id and visitor.id = ?", new Object[]{visitorId}, new RoomRowMapper());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public Provider getProviderForRoom(int roomId) throws JTHDataBaseException {
+        try {
+            User user = jdbcTemplate.queryForObject("select \"user\".* from \"user\", provider, room where \"user\".id = provider.id and room.provider_id = provider.id and room.id = ?", new Object[]{roomId}, new UserRowMapper());
+            if (user == null) return null;
+            return jdbcTemplate.queryForObject("select * from provider where id = ?", new Object[]{user.getId()}, new ProviderRowMapper(user));
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
     }
 
     public List<String> autocompletePrefix(String prefix) throws JTHDataBaseException {

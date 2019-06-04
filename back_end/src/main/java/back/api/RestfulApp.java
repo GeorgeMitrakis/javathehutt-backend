@@ -1,6 +1,5 @@
 package back.api;
 
-import back.model.Rating;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
@@ -63,6 +62,7 @@ public class RestfulApp extends Application {
 		// DELETE (visitorId, roomId) -> remove from favorites
         router.attach("/favourite_rooms", FavouriteRoomsResource.class);
 
+        // GET (roomId)                              -> get ratings for room
         // POST (visitorId, roomId, stars, comment)  -> add rating
         // DELETE (ratingId)                         -> remove rating
 		router.attach("/ratings", RatingResource.class);

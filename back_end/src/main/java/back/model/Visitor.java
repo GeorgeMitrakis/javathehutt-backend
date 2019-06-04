@@ -1,10 +1,13 @@
 package back.model;
 
+import back.Exceptions.JTHDataBaseException;
+import back.conf.Configuration;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 
 
-public class Visitor extends User{
+public class Visitor extends User {
 
     private final String name;
     private final String surname;
@@ -23,11 +26,7 @@ public class Visitor extends User{
     }
 
     public Visitor(LinkedHashMap M){
-        super(
-                (Integer) M.get("id"),
-                (String) M.get("email"),
-                (String) M.get("role")
-        );
+        super((Integer) M.get("id"), (String) M.get("email"), (String) M.get("role"));
         this.name = (String)M.get("name");
         this.surname = (String)M.get("surname");
     }
@@ -42,8 +41,11 @@ public class Visitor extends User{
 
     public List<Room> fetchFavouriteRooms(){
         if (favouriteRooms != null){
-            // TODO: fetch favourite rooms from DB
-            favouriteRooms = /* TODO */ null;
+            try {
+                favouriteRooms = Configuration.getInstance().getBookingDAO().getFavouriteRoomIdsForVisitor(this.getId());
+            } catch(JTHDataBaseException e){
+                favouriteRooms = null;
+            }
         }
         return favouriteRooms;
     }

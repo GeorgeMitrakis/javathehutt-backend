@@ -1,6 +1,7 @@
 package back.data;
 
 import back.Exceptions.JTHDataBaseException;
+import back.model.Provider;
 import back.model.Rating;
 import back.model.Room;
 import back.model.SearchConstraints;
@@ -25,6 +26,8 @@ public interface RoomsDAO {
     boolean submitNewRoom(Room room) throws JTHDataBaseException;
 
     void removeRoom(int roomId) throws JTHDataBaseException;
+
+    Provider getProviderForRoom(int roomId) throws JTHDataBaseException;
 
     List<String> autocompletePrefix(String prefix) throws JTHDataBaseException;
 

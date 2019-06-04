@@ -9,6 +9,16 @@ public class SearchConstraints {
     private boolean pool = false;
     private boolean shauna = false;
     private double range = -1.0;          // in kms
+    private int people = 1;               // 1 is the default
+
+    // Setters and Getters
+    public int getPeople() {
+        return people;
+    }
+
+    public void setPeople(int people) {
+        this.people = people;
+    }
 
     public boolean getWifi() {
         return wifi;
@@ -34,7 +44,6 @@ public class SearchConstraints {
         this.shauna = shauna;
     }
 
-    // Getters and Setters
     public Location getLocation() {
         return location;
     }

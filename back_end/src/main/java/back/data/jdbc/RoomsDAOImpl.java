@@ -2,6 +2,7 @@ package back.data.jdbc;
 
 import back.Exceptions.JTHDataBaseException;
 import back.data.RoomsDAO;
+import back.model.Provider;
 import back.model.Rating;
 import back.model.Room;
 import back.model.SearchConstraints;
@@ -56,6 +57,11 @@ public class RoomsDAOImpl implements RoomsDAO {
     @Override
     public List<String> autocompletePrefix(String prefix) throws JTHDataBaseException {
         return dataAccess.autocompletePrefix(prefix);
+    }
+
+    @Override
+    public Provider getProviderForRoom(int roomId) throws JTHDataBaseException {
+        return dataAccess.getProviderForRoom(roomId);
     }
 
 }

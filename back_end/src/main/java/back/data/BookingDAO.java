@@ -4,6 +4,8 @@ import back.Exceptions.JTHDataBaseException;
 import back.model.Room;
 import back.model.User;
 
+import java.util.List;
+
 
 public interface BookingDAO {
 
@@ -14,5 +16,7 @@ public interface BookingDAO {
     boolean addRoomToFavourites(long visitorId, int roomId) throws JTHDataBaseException;
 
     boolean removeRoomFromFavourites(long visitorId, int roomId) throws JTHDataBaseException;
+
+    List<Room> getFavouriteRoomIdsForVisitor(long visitorId) throws JTHDataBaseException;
 
 }

@@ -5,6 +5,8 @@ import back.data.BookingDAO;
 import back.model.Room;
 import back.model.User;
 
+import java.util.List;
+
 public class BookingDAOImpl implements BookingDAO {
 
     private final DataAccess dataAccess;
@@ -26,6 +28,11 @@ public class BookingDAOImpl implements BookingDAO {
     @Override
     public boolean removeRoomFromFavourites(long visitorId, int roomId) throws JTHDataBaseException {
         return dataAccess.removeRoomFromFavourites(visitorId, roomId);
+    }
+
+    @Override
+    public List<Room> getFavouriteRoomIdsForVisitor(long visitorId) throws JTHDataBaseException {
+        return dataAccess.getFavouriteRoomIdsForVisitor(visitorId);
     }
 
 }
