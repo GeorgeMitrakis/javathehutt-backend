@@ -11,8 +11,8 @@ public interface BookingDAO {
 
     boolean bookRoomForVisitor(User user, Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException;
 
-    boolean addRoomToFavourites(int visitorId, int roomId) throws JTHDataBaseException;
+    boolean addRoomToFavourites(long visitorId, int roomId) throws JTHDataBaseException;
 
-    boolean removeRoomFromFavourites(int visitorId, int roomId) throws JTHDataBaseException;
+    boolean removeRoomFromFavourites(long visitorId, int roomId) throws JTHDataBaseException;
 
 }

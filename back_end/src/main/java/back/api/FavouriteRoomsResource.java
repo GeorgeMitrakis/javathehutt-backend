@@ -25,9 +25,10 @@ public class FavouriteRoomsResource extends ServerResource {
             return JsonMapRepresentation.result(false, "Post favourite room: Missing or empty parameter(s)", null);
         }
 
-        int visitorId, roomId;
+        long visitorId;
+        int roomId;
         try {
-            visitorId = Integer.parseInt(visitorIdStr);
+            visitorId = Long.parseLong(visitorIdStr);
             roomId = Integer.parseInt(roomIdStr);
         } catch (ArithmeticException e){
             return JsonMapRepresentation.result(false, "Post favourite room: parameter(s) given is not a number", null);
@@ -52,9 +53,10 @@ public class FavouriteRoomsResource extends ServerResource {
             return JsonMapRepresentation.result(false, "Delete favourite room: Missing or empty parameter(s)", null);
         }
 
-        int visitorId, roomId;
+        long visitorId;
+        int roomId;
         try {
-            visitorId = Integer.parseInt(visitorIdStr);
+            visitorId = Long.parseLong(visitorIdStr);
             roomId = Integer.parseInt(roomIdStr);
         } catch (ArithmeticException e){
             return JsonMapRepresentation.result(false, "Delete favourite room: parameter(s) given is not a number", null);

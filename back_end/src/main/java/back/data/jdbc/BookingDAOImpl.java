@@ -19,12 +19,12 @@ public class BookingDAOImpl implements BookingDAO {
     }
 
     @Override
-    public boolean addRoomToFavourites(int visitorId, int roomId) throws JTHDataBaseException{
+    public boolean addRoomToFavourites(long visitorId, int roomId) throws JTHDataBaseException{
         return dataAccess.addRoomToFavourites(visitorId, roomId);
     }
 
     @Override
-    public boolean removeRoomFromFavourites(int visitorId, int roomId) throws JTHDataBaseException {
+    public boolean removeRoomFromFavourites(long visitorId, int roomId) throws JTHDataBaseException {
         return dataAccess.removeRoomFromFavourites(visitorId, roomId);
     }
 

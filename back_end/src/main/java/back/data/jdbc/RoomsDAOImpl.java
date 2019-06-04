@@ -2,9 +2,9 @@ package back.data.jdbc;
 
 import back.Exceptions.JTHDataBaseException;
 import back.data.RoomsDAO;
+import back.model.Rating;
 import back.model.Room;
 import back.model.SearchConstraints;
-import back.model.Visitor;
 
 import java.util.List;
 
@@ -27,15 +27,20 @@ public class RoomsDAOImpl implements RoomsDAO {
     }
 
     @Override
-    public boolean addRatingToRoom(Visitor visitor, Room room, int stars, String comment) throws JTHDataBaseException {
+    public boolean addRatingToRoom(long visitorId, int roomId, int stars, String comment) throws JTHDataBaseException {
         if (stars < 0 || stars > 5) return false;
-        dataAccess.addRatingToRoom(visitor, room, stars, comment);
+        dataAccess.addRatingToRoom(visitorId, roomId, stars, comment);
         return true;
     }
 
     @Override
     public void removeRatingFromRoom(int ratingId) throws JTHDataBaseException {
         dataAccess.removeRatingFromRoom(ratingId);
+    }
+
+    @Override
+    public List<Rating> getRatingsForRoom(int roomId) throws JTHDataBaseException {
+        return dataAccess.getRatingsForRoom(roomId);
     }
 
     @Override

@@ -341,11 +341,10 @@ public class DataAccess {
         return results;
     }
 
-    public void addRatingToRoom(Visitor visitor, Room room, int stars, String comment) throws JTHDataBaseException {
-        //TODO: NOT TESTED
+    public void addRatingToRoom(long visitorId, int roomId, int stars, String comment) throws JTHDataBaseException {
         try {
             jdbcTemplate.update("INSERT INTO rating (id, comment, stars, room_id, visitor_id) VALUES (default, ?, ?, ?, ?)",
-                    comment, stars, room.getId(), visitor.getId());
+                                     comment, stars, roomId, visitorId);
         } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -353,10 +352,23 @@ public class DataAccess {
     }
 
     public void removeRatingFromRoom(int ratingId) throws JTHDataBaseException {
-        //TODO: NOT TESTED
         try {
             jdbcTemplate.update("DELETE FROM rating WHERE id = ?", ratingId);
         } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public List<Rating> getRatingsForRoom(int roomId) throws JTHDataBaseException {
+
+        try {
+            return jdbcTemplate.query("select * from rating where room_id = ?", new Object[]{roomId}, new RatingRowMapper());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return null;
+        } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
@@ -407,7 +419,6 @@ public class DataAccess {
     }
 
     public void removeRoom(int roomId) throws JTHDataBaseException {
-        //TODO: NOT TESTED
         try {
             // CASCADE option should take care of all the necessary deletes on other tables like location and city (TODO: check)
             jdbcTemplate.update("DELETE FROM room WHERE id = ?", roomId);
@@ -417,8 +428,7 @@ public class DataAccess {
         }
     }
 
-    public boolean addRoomToFavourites(int visitorId, int roomId) throws JTHDataBaseException{
-        //TODO: NOT TESTED
+    public boolean addRoomToFavourites(long visitorId, int roomId) throws JTHDataBaseException{
         try {
             jdbcTemplate.update("INSERT INTO favorites (visitor_id, room_id) VALUES (?, ?)", visitorId, roomId);
         } catch (Exception e){
@@ -428,8 +438,7 @@ public class DataAccess {
         return true;
     }
 
-    public boolean removeRoomFromFavourites(int visitorId, int roomId) throws JTHDataBaseException {
-        //TODO: NOT TESTED
+    public boolean removeRoomFromFavourites(long visitorId, int roomId) throws JTHDataBaseException {
         try {
             jdbcTemplate.update("DELETE FROM favorites WHERE visitor_id = ? and room_id = ?", visitorId, roomId);
         } catch (Exception e){
