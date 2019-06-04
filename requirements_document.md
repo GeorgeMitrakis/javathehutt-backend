@@ -62,8 +62,7 @@
 
 Οι ίδιες απαιτήσεις φαίνονται από το παρακάτω UML use-case diagram:
 
-    *TODO: insert finished diagram here*
-
+![Alt text](./UML/UseCaseDiagram.jpg "UseCaseDiagram")
 
 Οι **Μη Λειτουργικές Απαιτήσεις** του συστήματος δύναται να είναι οι εξής:
 * Το authentication των συνδεδεμένων χρηστών πρέπει να είναι ασφαλές
