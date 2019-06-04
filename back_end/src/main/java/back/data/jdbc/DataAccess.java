@@ -417,10 +417,10 @@ public class DataAccess {
         }
     }
 
-    public boolean addRoomToFavourites(Visitor visitor, Room room) throws JTHDataBaseException{
+    public boolean addRoomToFavourites(int visitorId, int roomId) throws JTHDataBaseException{
         //TODO: NOT TESTED
         try {
-            jdbcTemplate.update("INSERT INTO favorites (visitor_id, room_id) VALUES (?, ?)", visitor.getId(), room.getId());
+            jdbcTemplate.update("INSERT INTO favorites (visitor_id, room_id) VALUES (?, ?)", visitorId, roomId);
         } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -428,10 +428,10 @@ public class DataAccess {
         return true;
     }
 
-    public boolean removeRoomFromFavourites(Visitor visitor, int roomId) throws JTHDataBaseException {
+    public boolean removeRoomFromFavourites(int visitorId, int roomId) throws JTHDataBaseException {
         //TODO: NOT TESTED
         try {
-            jdbcTemplate.update("DELETE FROM favorites WHERE visitor_id = ? and room_id = ?", visitor.getId(), roomId);
+            jdbcTemplate.update("DELETE FROM favorites WHERE visitor_id = ? and room_id = ?", visitorId, roomId);
         } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();

@@ -3,7 +3,6 @@ package back.data;
 import back.Exceptions.JTHDataBaseException;
 import back.model.Room;
 import back.model.User;
-import back.model.Visitor;
 
 
 public interface BookingDAO {
@@ -12,8 +11,8 @@ public interface BookingDAO {
 
     boolean bookRoomForVisitor(User user, Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException;
 
-    boolean addRoomToFavourites(Visitor visitor, Room room) throws JTHDataBaseException;
+    boolean addRoomToFavourites(int visitorId, int roomId) throws JTHDataBaseException;
 
-    boolean removeRoomFromFavourites(Visitor visitor, int roomId) throws JTHDataBaseException;
+    boolean removeRoomFromFavourites(int visitorId, int roomId) throws JTHDataBaseException;
 
 }

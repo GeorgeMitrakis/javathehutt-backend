@@ -4,7 +4,6 @@ import back.Exceptions.JTHDataBaseException;
 import back.data.BookingDAO;
 import back.model.Room;
 import back.model.User;
-import back.model.Visitor;
 
 public class BookingDAOImpl implements BookingDAO {
 
@@ -20,13 +19,13 @@ public class BookingDAOImpl implements BookingDAO {
     }
 
     @Override
-    public boolean addRoomToFavourites(Visitor visitor, Room room) throws JTHDataBaseException{
-        return dataAccess.addRoomToFavourites(visitor, room);
+    public boolean addRoomToFavourites(int visitorId, int roomId) throws JTHDataBaseException{
+        return dataAccess.addRoomToFavourites(visitorId, roomId);
     }
 
     @Override
-    public boolean removeRoomFromFavourites(Visitor visitor, int roomId) throws JTHDataBaseException {
-        return dataAccess.removeRoomFromFavourites(visitor, roomId);
+    public boolean removeRoomFromFavourites(int visitorId, int roomId) throws JTHDataBaseException {
+        return dataAccess.removeRoomFromFavourites(visitorId, roomId);
     }
 
 }

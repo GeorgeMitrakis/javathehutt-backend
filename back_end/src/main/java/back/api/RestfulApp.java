@@ -58,11 +58,13 @@ public class RestfulApp extends Application {
 		//      (providerId, price, capacity, cordX, cordY, cityName [, wifi, pool, shauna])
 		router.attach("/rooms", RoomsResource.class);
 
-		router.attach("/img", ImageResource.class);
+		// POST (visitorId, roomId)   -> add to favorites
+		// DELETE (visitorId, roomId) -> remove from favorites
+        router.attach("/favourite_rooms", FavouriteRoomsResource.class);
+
+        router.attach("/img", ImageResource.class);
+
 		return router;
 	}
-
-
-
 
 }
