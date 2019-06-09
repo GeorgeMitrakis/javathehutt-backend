@@ -34,9 +34,10 @@ public class RoomSearchResource extends ServerResource {
         String hasPool = getQueryValue("hasPool");
         String hasWifi = getQueryValue("hasWifi");
         String hasShauna = getQueryValue("hasShauna");
-        String cityName = getQueryValue("Name");
+        String cityName = getQueryValue("cityName");
         String pointX = getQueryValue("pointX");
         String pointY = getQueryValue("pointY");
+        // TODO: add "people" parameter: number of people for whom to book
 
         try {
             if (maxPriceStr != null) constraints.setMaxCost(Integer.parseInt(maxPriceStr));

@@ -73,11 +73,11 @@ public class AdminResource  extends ServerResource {
                     throw new JTHInputException("invalid admin option");
             }
         } catch (JTHInputException e){
-            return JsonMapRepresentation.result(false,"Admin action error: " + e.getErrorMsg(),null);
+            return JsonMapRepresentation.result(false, "Admin action error: " + e.getErrorMsg(), null);
         } catch (JTHDataBaseException e){
-            return JsonMapRepresentation.result(false,"Admin action error: database error",null);
+            return JsonMapRepresentation.result(false, "Admin action error: database error", null);
         }
-        return JsonMapRepresentation.result(true,option + " successful",null);
+        return JsonMapRepresentation.result(true, option + " successful", null);
     }
 
 }

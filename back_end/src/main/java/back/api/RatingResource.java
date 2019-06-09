@@ -86,6 +86,8 @@ public class RatingResource extends ServerResource {
     @Override
     protected Representation delete() throws ResourceException {
 
+        //TODO: add check that this is admin (only he can delete ratings)
+
         String ratingIdStr = getQueryValue("ratingId");
         if (ratingIdStr == null || ratingIdStr.equals("")){
             return JsonMapRepresentation.result(false, "Delete rating: Missing or empty parameter", null);

@@ -15,6 +15,12 @@ public class FavouriteRoomsResource extends ServerResource {
 
 
     @Override
+    protected Representation get() throws ResourceException {
+        //TODO
+        return null;
+    }
+
+    @Override
     protected Representation post(Representation entity) throws ResourceException {
 
         Form form = new Form(entity);
