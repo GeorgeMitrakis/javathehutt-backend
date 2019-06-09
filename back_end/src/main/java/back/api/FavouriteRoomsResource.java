@@ -3,11 +3,17 @@ package back.api;
 import back.Exceptions.JTHDataBaseException;
 import back.conf.Configuration;
 import back.data.BookingDAO;
+import back.model.Rating;
+import back.model.Room;
 import back.util.JsonMapRepresentation;
 import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FavouriteRoomsResource extends ServerResource {
 
@@ -16,8 +22,28 @@ public class FavouriteRoomsResource extends ServerResource {
 
     @Override
     protected Representation get() throws ResourceException {
-        //TODO
-        return null;
+        String visitorIdStr = getQueryValue("visitorId");
+        if (visitorIdStr == null || visitorIdStr.equals("")){
+            return JsonMapRepresentation.result(false, "Get ratings: Missing or empty parameter (room id)", null);
+        }
+
+        long visitorId;
+        try {
+            visitorId = Long.parseLong(visitorIdStr);
+        } catch (ArithmeticException e){
+            return JsonMapRepresentation.result(false, "Get ratings: room id given is not a number", null);
+        }
+
+        List<Room> rooms;
+        try {
+            rooms = bookingDAO.getFavouriteRoomIdsForVisitor(visitorId);
+        } catch (JTHDataBaseException e){
+            return JsonMapRepresentation.result(false, "Get ratings: DataBase error (or invalid room id given)", null);
+        }
+
+        Map<String, Object> m = new HashMap<>();
+        m.put("favourite_rooms", rooms);
+        return JsonMapRepresentation.result(true, "success", m);
     }
 
     @Override

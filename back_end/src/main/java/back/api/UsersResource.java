@@ -24,9 +24,10 @@ public class UsersResource extends ServerResource {
 
     private final UserDAO userDAO = Configuration.getInstance().getUserDAO();
 
-    // GET /users?id=...   -> returns user with that id
-    // GET /users          -> returns all users
-    // GET /users?role=... -> returns all users of that role
+    // GET /users?id=...    -> returns user with that id
+    // GET /users?email=... -> returns user with that email
+    // GET /users           -> returns all users
+    // GET /users?role=...  -> returns all users of that role
     @Override
     protected Representation get() throws ResourceException {
         try {
@@ -55,12 +56,14 @@ public class UsersResource extends ServerResource {
                 List<User> allUsers = userDAO.getUsers(new Limits(0, (int) userDAO.countUsers()));
                 Map<String, Object> m = new HashMap<>();
 
-                /*for (User u : allUsers){
-                    if (role == null || role.equals(u.getRole())) {
-                        m.put(Long.toString(u.getId()), u);
+                // remove unwanted
+                if (role != null && (role.equals("visitor") || role.equals("provider") || role.equals("admin"))){
+                    for (User u : allUsers){
+                        if (u.getRole().equals(role)) allUsers.remove(u);
                     }
-                }*/
-                m.put("users",allUsers);
+                }
+
+                m.put("users", allUsers);
                 return JsonMapRepresentation.result(true, null, m);
             }
         } catch (JTHDataBaseException e){
@@ -69,7 +72,6 @@ public class UsersResource extends ServerResource {
             return JsonMapRepresentation.result(false,"id given is not a number", null);
         }
     }
-
 
 
     @Override
