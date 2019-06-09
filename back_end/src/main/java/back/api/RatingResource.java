@@ -109,22 +109,22 @@ public class RatingResource extends ServerResource {
             return JsonMapRepresentation.result(false, "Delete rating: parameter given is not a number", null);
         }
 
+        Rating rating;
+        try {
+            rating = roomsDAO.getRatingById(ratingId);
+        } catch (JTHDataBaseException e) {
+            return JsonMapRepresentation.result(false, "Delete rating: DataBase error", null);
+        }
+        if (rating == null) {
+            return JsonMapRepresentation.result(false, "Delete rating: rating does not exist", null);
+        }
+
         // only the visitor who wrote it or an admin should be allowed to delete a rating
         if (Configuration.CHECK_AUTHORISATION) {
             String jwt = getQueryValue("token");
             User user = JWT.getUserJWT(jwt);
-            if (!JWT.assertRole(jwt, "admin") ){
-                Rating rating;
-                try {
-                    rating = roomsDAO.getRatingById(ratingId);
-                } catch (JTHDataBaseException e) {
-                    return JsonMapRepresentation.result(false, "Delete rating: DataBase error", null);
-                }
-                if (rating == null) {
-                    return JsonMapRepresentation.result(false, "Delete rating: rating does not exist", null);
-                } else if (user == null || rating.getVisitorId() != user.getId()){
-                    return JsonMapRepresentation.result(false, "Delete rating: forbidden (not allowed to delete another visitor's rating unless admin)", null);
-                }
+            if (!JWT.assertRole(jwt, "admin") && (user == null || rating.getVisitorId() != user.getId()) ){
+                return JsonMapRepresentation.result(false, "Delete rating: forbidden (not allowed to delete another visitor's rating unless admin)", null);
             }
         }
 

@@ -132,20 +132,22 @@ public class RoomsResource extends ServerResource  {
             return JsonMapRepresentation.result(false, "Delete room: \"roomId\" parameter given is not a number", null);
         }
 
+        Room room;
+        try {
+            room = roomsDAO.getRoomById(roomId);
+        } catch (JTHDataBaseException e) {
+            return JsonMapRepresentation.result(false, "Delete room: DataBase error", null);
+        }
+        if (room == null){
+            return JsonMapRepresentation.result(false, "Delete room: room does not exist", null);
+        }
+
         // only a owner-provider and an admin should be allowed to delete a room
         if (Configuration.CHECK_AUTHORISATION) {
             String jwt = getQueryValue("token");
             User user = JWT.getUserJWT(jwt);
-            if (!JWT.assertRole(jwt, "admin")) {
-                Room room;
-                try {
-                    room = roomsDAO.getRoomById(roomId);
-                } catch (JTHDataBaseException e) {
-                    return JsonMapRepresentation.result(false, "Delete room: DataBase error", null);
-                }
-                if (room != null && user != null && room.getProviderId() != user.getId() ) {
-                    return JsonMapRepresentation.result(false, "Delete room: forbidden (now allowed to delete a room for another provider unless admin)", null);
-                }
+            if (!JWT.assertRole(jwt, "admin") && (user == null || room.getProviderId() != user.getId())) {
+                return JsonMapRepresentation.result(false, "Delete room: forbidden (now allowed to delete a room for another provider unless admin)", null);
             }
         }
 

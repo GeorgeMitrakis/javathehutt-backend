@@ -64,6 +64,7 @@ public class JWT {
     }
 
     public static User getUserJWT(String jwt) {
+        if (jwt == null) return null;
         Claims claims = decodeJWT(jwt);
         return User.fromLinkedHashMap((LinkedHashMap)claims.get("user"));
     }
