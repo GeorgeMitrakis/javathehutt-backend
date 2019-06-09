@@ -1,6 +1,5 @@
 package back.api;
 
-import back.Exceptions.JTHAuthException;
 import back.Exceptions.JTHDataBaseException;
 import back.Exceptions.JTHInputException;
 import back.conf.Configuration;
@@ -9,11 +8,9 @@ import back.model.User;
 import back.util.JWT;
 import back.util.JsonMapRepresentation;
 import org.restlet.data.Form;
-import org.restlet.data.Header;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
-import org.restlet.util.Series;
 
 
 public class AdminResource  extends ServerResource {
@@ -48,12 +45,11 @@ public class AdminResource  extends ServerResource {
                 throw new JTHInputException("user id does not exist");
             }
 
-            try{
-                Series<Header> headers = (Series<Header>) getRequestAttributes().get("org.restlet.http.headers");
-                String auth = headers.getFirstValue("token");
-                JWT.getUserJWT(auth).isAdmin();
-            } catch(JTHAuthException e){
-                return JsonMapRepresentation.result(false,"Admin action error: authorization failed",null);
+            if (Configuration.CHECK_AUTHORISATION) {
+                String jwt = form.getFirstValue("token");
+                if (!JWT.assertRole(jwt, "admin")){
+                    return JsonMapRepresentation.result(false,"Admin action error: forbidden (not an admin)",null);
+                }
             }
 
             switch (option){

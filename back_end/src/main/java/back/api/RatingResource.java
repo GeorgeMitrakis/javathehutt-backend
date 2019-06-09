@@ -4,6 +4,8 @@ import back.Exceptions.JTHDataBaseException;
 import back.conf.Configuration;
 import back.data.RoomsDAO;
 import back.model.Rating;
+import back.model.User;
+import back.util.JWT;
 import back.util.JsonMapRepresentation;
 import org.restlet.data.Form;
 import org.restlet.representation.Representation;
@@ -70,6 +72,15 @@ public class RatingResource extends ServerResource {
             return JsonMapRepresentation.result(false, "Post rating: parameter(s) given is not a number", null);
         }
 
+        if (Configuration.CHECK_AUTHORISATION) {
+            String jwt = getQueryValue("token");
+            if (!JWT.assertRole(jwt, "visitor")){
+                return JsonMapRepresentation.result(false,"Post rating: forbidden (not a visitor)",null);
+            } else if (!JWT.assertUser(jwt, visitorId)){
+                return JsonMapRepresentation.result(false,"Post rating: forbidden (not allowed to post a rating for another user)",null);
+            }
+        }
+
         try {
             boolean res = roomsDAO.addRatingToRoom(visitorId, roomId, stars, comment);
             if (!res){
@@ -86,8 +97,6 @@ public class RatingResource extends ServerResource {
     @Override
     protected Representation delete() throws ResourceException {
 
-        //TODO: add check that this is admin (only he can delete ratings)
-
         String ratingIdStr = getQueryValue("ratingId");
         if (ratingIdStr == null || ratingIdStr.equals("")){
             return JsonMapRepresentation.result(false, "Delete rating: Missing or empty parameter", null);
@@ -100,10 +109,29 @@ public class RatingResource extends ServerResource {
             return JsonMapRepresentation.result(false, "Delete rating: parameter given is not a number", null);
         }
 
+        // only the visitor who wrote it or an admin should be allowed to delete a rating
+        if (Configuration.CHECK_AUTHORISATION) {
+            String jwt = getQueryValue("token");
+            User user = JWT.getUserJWT(jwt);
+            if (!JWT.assertRole(jwt, "admin") ){
+                Rating rating;
+                try {
+                    rating = roomsDAO.getRatingById(ratingId);
+                } catch (JTHDataBaseException e) {
+                    return JsonMapRepresentation.result(false, "Delete rating: DataBase error", null);
+                }
+                if (rating == null) {
+                    return JsonMapRepresentation.result(false, "Delete rating: rating does not exist", null);
+                } else if (user == null || rating.getVisitorId() != user.getId()){
+                    return JsonMapRepresentation.result(false, "Delete rating: forbidden (not allowed to delete another visitor's rating unless admin)", null);
+                }
+            }
+        }
+
         try {
             roomsDAO.removeRatingFromRoom(ratingId);
         } catch (JTHDataBaseException e){
-            return JsonMapRepresentation.result(false, "Delete rating: DataBase error (or invalid id given)", null);
+            return JsonMapRepresentation.result(false, "Delete rating: DataBase error", null);
         }
 
         return JsonMapRepresentation.result(true, "success", null);

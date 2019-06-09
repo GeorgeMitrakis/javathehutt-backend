@@ -51,15 +51,11 @@ public class BookingResource  extends ServerResource {
             return JsonMapRepresentation.result(false,"Booking error: id parameters that are not numbers",null);
         }
 
-        try{
-            Series<Header> headers = (Series<Header>) getRequestAttributes().get("org.restlet.http.headers");
-            String jwt = headers.getFirstValue("token");
-            User requestingUser = JWT.getUserJWT(jwt);
-            if(requestingUser.getId() != userId){
-                throw new JTHAuthException();
+        if (Configuration.CHECK_AUTHORISATION) {
+            String jwt = form.getFirstValue("token");
+            if (!JWT.assertUser(jwt, userId)){
+                return JsonMapRepresentation.result(false,"Booking error: forbidden (invalid user, not allowed to book room for other user)",null);
             }
-        }catch (Exception e){
-            return JsonMapRepresentation.result(false, "Could not validate user",null);
         }
 
         try {

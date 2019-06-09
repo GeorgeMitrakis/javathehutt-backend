@@ -45,6 +45,11 @@ public class RoomsDAOImpl implements RoomsDAO {
     }
 
     @Override
+    public Rating getRatingById(int ratingId) throws JTHDataBaseException {
+        return dataAccess.getRatingById(ratingId);
+    }
+
+    @Override
     public boolean submitNewRoom(Room room) throws JTHDataBaseException {
         return dataAccess.submitNewRoom(room);
     }

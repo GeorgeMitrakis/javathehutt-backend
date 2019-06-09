@@ -5,6 +5,8 @@ import back.conf.Configuration;
 import back.data.RoomsDAO;
 import back.model.Location;
 import back.model.Room;
+import back.model.User;
+import back.util.JWT;
 import back.util.JsonMapRepresentation;
 import org.restlet.data.Form;
 import org.restlet.representation.Representation;
@@ -79,16 +81,26 @@ public class RoomsResource extends ServerResource  {
             return JsonMapRepresentation.result(false, "Post room: Missing or empty parameter(s)", null);
         }
 
-        int providerId, capacity;
+        long providerId;
+        int capacity;
         double price, cordX, cordY;
         try {
-            providerId = Integer.parseInt(providerIdStr);
+            providerId = Long.parseLong(providerIdStr);
             price = Double.parseDouble(priceStr);
             cordX = Double.parseDouble(cordXStr);
             cordY = Double.parseDouble(cordYStr);
             capacity = Integer.parseInt(capacityStr);
         } catch (ArithmeticException e){
             return JsonMapRepresentation.result(false, "Post room: arithmetic parameter(s) given not a number", null);
+        }
+
+        if (Configuration.CHECK_AUTHORISATION) {
+            String jwt = form.getFirstValue("token");
+            if (!JWT.assertRole(jwt, "provider")){
+                return JsonMapRepresentation.result(false,"Post room: forbidden (not a provider)",null);
+            } else if (!JWT.assertUser(jwt, providerId)) {
+                return JsonMapRepresentation.result(false,"Post room: forbidden (now allowed to submit a room for another provider)",null);
+            }
         }
 
         Location location = new Location(cityName, cordX, cordY);
@@ -118,6 +130,23 @@ public class RoomsResource extends ServerResource  {
             roomId = Integer.parseInt(roomIdStr);
         } catch (ArithmeticException e){
             return JsonMapRepresentation.result(false, "Delete room: \"roomId\" parameter given is not a number", null);
+        }
+
+        // only a owner-provider and an admin should be allowed to delete a room
+        if (Configuration.CHECK_AUTHORISATION) {
+            String jwt = getQueryValue("token");
+            User user = JWT.getUserJWT(jwt);
+            if (!JWT.assertRole(jwt, "admin")) {
+                Room room;
+                try {
+                    room = roomsDAO.getRoomById(roomId);
+                } catch (JTHDataBaseException e) {
+                    return JsonMapRepresentation.result(false, "Delete room: DataBase error", null);
+                }
+                if (room != null && user != null && room.getProviderId() != user.getId() ) {
+                    return JsonMapRepresentation.result(false, "Delete room: forbidden (now allowed to delete a room for another provider unless admin)", null);
+                }
+            }
         }
 
         try {

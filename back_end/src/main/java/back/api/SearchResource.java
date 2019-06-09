@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class RoomSearchResource extends ServerResource {
+public class SearchResource extends ServerResource {
 
     private final RoomsDAO roomsDAO = Configuration.getInstance().getRoomsDAO();
 

@@ -5,6 +5,7 @@ import back.conf.Configuration;
 import back.data.BookingDAO;
 import back.model.Rating;
 import back.model.Room;
+import back.util.JWT;
 import back.util.JsonMapRepresentation;
 import org.restlet.data.Form;
 import org.restlet.representation.Representation;
@@ -32,6 +33,13 @@ public class FavouriteRoomsResource extends ServerResource {
             visitorId = Long.parseLong(visitorIdStr);
         } catch (ArithmeticException e){
             return JsonMapRepresentation.result(false, "Get ratings: room id given is not a number", null);
+        }
+
+        if (Configuration.CHECK_AUTHORISATION) {
+            String jwt = getQueryValue("token");
+            if (!JWT.assertRole(jwt, "admin") && !JWT.assertUser(jwt, visitorId)){
+                return JsonMapRepresentation.result(false,"Post favourite room: forbidden (not allowed to see favourite rooms for another user unless admin)",null);
+            }
         }
 
         List<Room> rooms;
@@ -66,6 +74,15 @@ public class FavouriteRoomsResource extends ServerResource {
             return JsonMapRepresentation.result(false, "Post favourite room: parameter(s) given is not a number", null);
         }
 
+        if (Configuration.CHECK_AUTHORISATION) {
+            String jwt = form.getFirstValue("token");
+            if (!JWT.assertRole(jwt, "visitor")){
+                return JsonMapRepresentation.result(false,"Post favourite room: forbidden (not a visitor)",null);
+            } else if (!JWT.assertUser(jwt, visitorId)){
+                return JsonMapRepresentation.result(false,"Post favourite room: forbidden (not allowed to add room to favourites for another user)",null);
+            }
+        }
+
         try {
             bookingDAO.addRoomToFavourites(visitorId, roomId);
         } catch (JTHDataBaseException e){
@@ -92,6 +109,13 @@ public class FavouriteRoomsResource extends ServerResource {
             roomId = Integer.parseInt(roomIdStr);
         } catch (ArithmeticException e){
             return JsonMapRepresentation.result(false, "Delete favourite room: parameter(s) given is not a number", null);
+        }
+
+        if (Configuration.CHECK_AUTHORISATION) {
+            String jwt = getQueryValue("token");
+            if (!JWT.assertRole(jwt, "admin") && !JWT.assertUser(jwt, visitorId)){
+                return JsonMapRepresentation.result(false,"Delete favourite room: forbidden (not allowed to remove room from favourites for another user unless admin)",null);
+            }
         }
 
         try {

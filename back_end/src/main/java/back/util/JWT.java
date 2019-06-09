@@ -13,8 +13,6 @@ import java.util.LinkedHashMap;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
 
-import back.conf.Configuration;
-import back.data.UserDAO;
 
 public class JWT {
     // The secret key. This should be in a property file NOT under source
@@ -67,8 +65,6 @@ public class JWT {
 
     public static User getUserJWT(String jwt) {
         Claims claims = decodeJWT(jwt);
-//        UserDAO userDAO = Configuration.getInstance().getUserDAO();
-//        return userDAO.getById(Integer.parseInt(claims.getId()));
         return User.fromLinkedHashMap((LinkedHashMap)claims.get("user"));
     }
 
@@ -90,10 +86,16 @@ public class JWT {
         return b.compact();
     }
 
-    public static boolean checkJWT(String jwt){
-        User u = getUserJWT(jwt);
-        return jwt.equals(createJWT(u, 800000));
+    public static boolean assertUser(String jwt, long id){
+        if (jwt == null || id < 0) return false;
+        User user = JWT.getUserJWT(jwt);
+        return user != null && user.getId() == id;
     }
 
+    public static boolean assertRole(String jwt, String role){
+        if (jwt == null || role == null) return false;
+        User user = JWT.getUserJWT(jwt);
+        return user != null && role.equals(user.getRole());
+    }
 
 }

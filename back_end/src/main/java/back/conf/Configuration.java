@@ -13,6 +13,9 @@ import java.util.Set;
 
 public class Configuration {
 
+    // set this to false for easier API testing without needing to login
+    public static boolean CHECK_AUTHORISATION;
+
     public static final String[] CONFIG_KEYS = new String[]{"x", "y"};
     private static final Configuration self = new Configuration();
 
@@ -31,6 +34,9 @@ public class Configuration {
     void setup(String contextPath, Properties props) throws ConfigurationException {
         this.contextPath = contextPath;
         this.props = props;
+
+        // true if not specified
+        CHECK_AUTHORISATION = !("false".equals(getProperty("check_authorisation")));
 
         try {
             dataAccess.setup(

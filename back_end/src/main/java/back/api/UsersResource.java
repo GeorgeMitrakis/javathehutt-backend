@@ -56,6 +56,14 @@ public class UsersResource extends ServerResource {
                 List<User> allUsers = userDAO.getUsers(new Limits(0, (int) userDAO.countUsers()));
                 Map<String, Object> m = new HashMap<>();
 
+                //TODO: should we make this check?
+                if (Configuration.CHECK_AUTHORISATION) {
+                    String jwt = getQueryValue("token");
+                    if (!JWT.assertRole(jwt, "admin")){
+                        return JsonMapRepresentation.result(false,"forbidden (only an admin can request all users)",null);
+                    }
+                }
+
                 // remove unwanted
                 if (role != null && (role.equals("visitor") || role.equals("provider") || role.equals("admin"))){
                     for (User u : allUsers){

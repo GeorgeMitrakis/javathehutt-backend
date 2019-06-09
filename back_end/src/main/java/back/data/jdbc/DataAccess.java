@@ -357,6 +357,17 @@ public class DataAccess {
         }
     }
 
+    public Rating getRatingById(int ratingId) throws JTHDataBaseException {
+        try {
+            return jdbcTemplate.queryForObject("select * from rating where id = ?", new Object[]{ratingId}, new RatingRowMapper());
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
     public boolean submitNewRoom(Room room) throws JTHDataBaseException {
         Location location = room.getLocation();
         try {
