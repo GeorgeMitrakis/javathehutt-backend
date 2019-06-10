@@ -1,6 +1,5 @@
 package back.api;
 
-import back.Exceptions.JTHAuthException;
 import back.Exceptions.JTHDataBaseException;
 import back.conf.Configuration;
 import back.data.BookingDAO;
@@ -12,11 +11,9 @@ import back.util.DateHandler;
 import back.util.JWT;
 import back.util.JsonMapRepresentation;
 import org.restlet.data.Form;
-import org.restlet.data.Header;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
-import org.restlet.util.Series;
 
 
 public class BookingResource  extends ServerResource {
@@ -53,8 +50,10 @@ public class BookingResource  extends ServerResource {
 
         if (Configuration.CHECK_AUTHORISATION) {
             String jwt = form.getFirstValue("token");
-            if (!JWT.assertUser(jwt, userId)){
-                return JsonMapRepresentation.result(false,"Booking error: forbidden (invalid user, not allowed to book room for other user)",null);
+            if (!JWT.assertRole(jwt, "visitor")){
+                return JsonMapRepresentation.result(false,"Booking error: forbidden (not a visitor)",null);
+            } else if (!JWT.assertUser(jwt, userId)){
+                return JsonMapRepresentation.result(false,"Booking error: forbidden (not allowed to book room for other user)",null);
             }
         }
 
