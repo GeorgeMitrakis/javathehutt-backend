@@ -476,4 +476,24 @@ public class DataAccess {
         return results;
     }
 
+    public Image getImageById(long imgId) throws JTHDataBaseException {
+        try{
+            Image img = jdbcTemplate.queryForObject("SELECT * FROM img where id = ?", new Long[]{imgId}, new ImageRowMapper());
+            return img;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public List<Long> getRoomImageIds(long roomId) throws JTHDataBaseException {
+        List<Long> results;
+        try {
+            results = jdbcTemplate.queryForList("SELECT id FROM img WHERE room_id = ?", new Long[]{roomId}, Long.class);
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+        return results;
+    }
 }

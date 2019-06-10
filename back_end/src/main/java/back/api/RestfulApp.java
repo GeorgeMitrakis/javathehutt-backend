@@ -67,7 +67,11 @@ public class RestfulApp extends Application {
         // DELETE (ratingId)                         -> remove rating
 		router.attach("/ratings", RatingResource.class);
 
+		//GET (imgId) -> stream image
         router.attach("/img", ImageResource.class);
+
+        //GET (roomId) -> get list of image ids associated with to roomId
+        router.attach("/roomImages", RoomImagesResource.class);
 
 		return router;
 	}
