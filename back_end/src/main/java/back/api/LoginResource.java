@@ -41,19 +41,21 @@ public class LoginResource extends ServerResource {
 
         // check authentication and take the claims with Claims claims = JWT.decodeJWT(jwt);
         try {
-            User u = userDAO.getByCredentials(email, password);   // throws JWTAuthException if return value would be null
+            User u = userDAO.getByCredentials(email, password);   // throws JWTAuthException if password is wrong, null if email is wrong
+            if (u == null){
+                return JsonMapRepresentation.result(false,"Login error: wrong email",null);
+            }
             boolean isBanned = userDAO.getUserBan(u.getId());
             if (isBanned){
                 return JsonMapRepresentation.result(false,"Login error: user is banned",null);
             }
             String jwt = JWT.createJWT(u, Configuration.getInstance().getLoginTTL());
-            //String jwt = JWT.createJWT(u.get().getId(), u.get().getEmail(), "subject", 800000);
             Map<String,Object> data = new HashMap<>();
             data.put("token",jwt);
             data.put("user",u);
             return JsonMapRepresentation.result(true,null, data);
         } catch (JTHAuthException e) {
-            return JsonMapRepresentation.result(false,"Login error: incorrect credentials",null);
+            return JsonMapRepresentation.result(false,"Login error: wrong password",null);
         } catch (JTHDataBaseException e){
             return JsonMapRepresentation.result(false,"Login error: database error",null);
         }

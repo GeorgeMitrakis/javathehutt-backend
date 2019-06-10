@@ -99,7 +99,7 @@ public class RoomsResource extends ServerResource  {
             if (!JWT.assertRole(jwt, "provider")){
                 return JsonMapRepresentation.result(false,"Post room: forbidden (not a provider)",null);
             } else if (!JWT.assertUser(jwt, providerId)) {
-                return JsonMapRepresentation.result(false,"Post room: forbidden (now allowed to submit a room for another provider)",null);
+                return JsonMapRepresentation.result(false,"Post room: forbidden (not allowed to submit a room for another provider)",null);
             }
         }
 
@@ -147,7 +147,7 @@ public class RoomsResource extends ServerResource  {
             String jwt = getQueryValue("token");
             User user = JWT.getUserJWT(jwt);
             if (!JWT.assertRole(jwt, "admin") && (user == null || room.getProviderId() != user.getId())) {
-                return JsonMapRepresentation.result(false, "Delete room: forbidden (now allowed to delete a room for another provider unless admin)", null);
+                return JsonMapRepresentation.result(false, "Delete room: forbidden (not allowed to delete a room for another provider unless admin)", null);
             }
         }
 
