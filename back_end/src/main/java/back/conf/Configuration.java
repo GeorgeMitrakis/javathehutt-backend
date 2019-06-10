@@ -1,12 +1,10 @@
 package back.conf;
 
 import back.data.BookingDAO;
+import back.data.ImageDAO;
 import back.data.RoomsDAO;
 import back.data.UserDAO;
-import back.data.jdbc.BookingDAOImpl;
-import back.data.jdbc.DataAccess;
-import back.data.jdbc.RoomsDAOImpl;
-import back.data.jdbc.UserDAOImpl;
+import back.data.jdbc.*;
 
 import java.util.Properties;
 import java.util.Set;
@@ -77,6 +75,8 @@ public class Configuration {
     public BookingDAO getBookingDAO() {
         return new BookingDAOImpl(dataAccess);
     }
+
+    public ImageDAO getImageDAO() {return new ImageDAOImpl(dataAccess);}
 
     public long getLoginTTL() {
         return 800000;
