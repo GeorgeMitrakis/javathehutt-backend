@@ -62,6 +62,11 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public List<User> getUsersByEmailPrefix(String emailPrefix) throws JTHDataBaseException {
+        return dataAccess.getUsersByEmailPrefix(emailPrefix);
+    }
+
+    @Override
     public User getByCredentials(String email, String hashedPassword) throws JTHAuthException, JTHDataBaseException {
         if ( dataAccess.getUser(email) != null ){                 // if email exists..
             User u = dataAccess.getUser(email, hashedPassword);

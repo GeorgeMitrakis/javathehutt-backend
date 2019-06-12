@@ -117,6 +117,16 @@ public class DataAccess {
         }
     }
 
+    public List<User> getUsersByEmailPrefix(String emailPrefix) throws JTHDataBaseException {
+        // TODO return extended objects: ex Visitor?
+        try {
+            return jdbcTemplate.query("SELECT * FROM \"user\" WHERE email LIKE ?", new Object[]{emailPrefix + "%"}, new UserRowMapper());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
     public User getUser(String email, String hashedPassword) throws JTHDataBaseException {
         try {
             User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ? and password = ?", new String[]{email, hashedPassword}, new UserRowMapper());
