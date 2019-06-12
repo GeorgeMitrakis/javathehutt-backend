@@ -71,7 +71,7 @@ public class RestfulApp extends Application {
         router.attach("/img", ImageResource.class);
 
         //GET (roomId) -> get list of image ids associated with to roomId
-		// router.attach("/roomImages", RoomImagesResource.class);
+        router.attach("/roomImages", RoomImagesResource.class);
 
 		return router;
 	}

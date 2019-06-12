@@ -44,25 +44,19 @@ public class UsersResource extends ServerResource {
                     return JsonMapRepresentation.result(true, null, m);
                 }
             } else if (email != null){
-                List<User> matchingUsers = userDAO.getUsersByEmail(email);
-
-                if (Configuration.CHECK_AUTHORISATION) {
-                    String jwt = getQueryValue("token");
-                    if (!JWT.assertRole(jwt, "admin")){
-                        return JsonMapRepresentation.result(false,"forbidden (only an admin can request all users by email)",null);
-                    }
-                }
-
-                if (matchingUsers == null){
-                    return JsonMapRepresentation.result(false, "database error",null);
+                User u = userDAO.getByEmail(email);
+                if (u == null){
+                    return JsonMapRepresentation.result(false, null,null);
                 } else{
                     Map<String, Object> m = new HashMap<>();
-                    m.put("users", matchingUsers);
-                    return JsonMapRepresentation.result(true, null, m);
+                    m.put("user",u);
+                    return JsonMapRepresentation.result(true,null,m);
                 }
             } else {  // return all users
                 List<User> allUsers = userDAO.getUsers(new Limits(0, (int) userDAO.countUsers()));
+                Map<String, Object> m = new HashMap<>();
 
+                //TODO: should we make this check?
                 if (Configuration.CHECK_AUTHORISATION) {
                     String jwt = getQueryValue("token");
                     if (!JWT.assertRole(jwt, "admin")){
@@ -77,7 +71,6 @@ public class UsersResource extends ServerResource {
                     }
                 }
 
-                Map<String, Object> m = new HashMap<>();
                 m.put("users", allUsers);
                 return JsonMapRepresentation.result(true, null, m);
             }
@@ -107,7 +100,7 @@ public class UsersResource extends ServerResource {
             else if ( !password.equals(password1) ){
                 throw new JTHInputException("mismatching password");
             }
-            else if (userDAO.getUsersByEmail(email) != null){
+            else if (userDAO.getByEmail(email) != null){
                 throw new JTHInputException("email is already taken");
             }
 

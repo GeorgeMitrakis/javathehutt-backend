@@ -45,5 +45,5 @@ gretty {
     httpsEnabled = false
     httpPort = 8765
     contextPath = 'app'
-    //servletContainer = 'tomcat8' // CONFIG: use tomcat or the default (jetty) ?
+    servletContainer = 'tomcat8' // CONFIG: use tomcat or the default (jetty) ?
 }

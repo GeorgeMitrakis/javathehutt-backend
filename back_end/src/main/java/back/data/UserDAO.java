@@ -17,7 +17,7 @@ public interface UserDAO {
 
     User getById(long id) throws JTHDataBaseException;
 
-    List<User> getUsersByEmail(String email) throws JTHDataBaseException;
+    User getByEmail(String email) throws JTHDataBaseException;
 
     User getByCredentials(String email, String hashedPassword) throws JTHAuthException, JTHDataBaseException;
 
