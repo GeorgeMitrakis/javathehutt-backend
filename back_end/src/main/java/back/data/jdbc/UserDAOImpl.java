@@ -57,8 +57,8 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public User getByEmail(String email) throws JTHDataBaseException {
-        return dataAccess.getUser(email);
+    public List<User> getUsersByEmail(String email) throws JTHDataBaseException {
+        return dataAccess.getUsersByEmail(email);
     }
 
     @Override

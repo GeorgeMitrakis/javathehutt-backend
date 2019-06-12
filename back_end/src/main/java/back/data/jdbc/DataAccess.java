@@ -129,6 +129,16 @@ public class DataAccess {
         }
     }
 
+    public List<User> getUsersByEmail(String email) throws JTHDataBaseException {
+        // TODO return extended objects: ex Visitor?
+        try {
+            return jdbcTemplate.query("SELECT * FROM \"user\" WHERE email LIKE ?", new Object[]{email + "%"}, new UserRowMapper());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
     public boolean getUserBan(long id) throws JTHDataBaseException {
         try {
             Long[] par = new Long[]{id};

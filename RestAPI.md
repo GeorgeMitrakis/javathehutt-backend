@@ -24,7 +24,7 @@
 | ------ | ----- | ------ | ------ |
 | GET    | -     | users: JSon array of all User Objects | returns all users |
 | GET    | id    | user: User object with given id (if it exists) | returns user with given id (if it exists) |
-| GET    | email | user: User object with given email (if it exists) | returns user with given email (if it exists) |
+| GET    | email | users: JSon array of all User Objects with given email as prefix | returns users with given email as prefix |
 | GET    | role ∈ {"visitor", "provider", "admin"} | users: JSon array of all User Objects with given role | returns all users for given role
 | POST   | email, password, password1, type ∈ {"visitor", "provider"}, [name, surname : if visitor], [providername : if provider], [autologin] | token: login token and user: User object if autologin given, otherwise success/error message | registers a new user
 | PUT    | [email], [name, surname : if visitor], [providername : if provider] | success/error message | updates account info for user (password should reset seperatelly)
