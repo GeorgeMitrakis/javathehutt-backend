@@ -506,4 +506,24 @@ public class DataAccess {
         }
         return results;
     }
+
+    public List<Transaction> getTransactions() throws JTHDataBaseException {
+        List<Transaction> results;
+        try {
+            results = jdbcTemplate.query("SELECT * FROM transactions ", new TransactionRowMapper());
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+        return results;
+    }
+
+    public double sumTransactionCosts() throws JTHDataBaseException {
+        try{
+            double sum = jdbcTemplate.queryForObject("SELECT SUM(cost) FROM transactions", Double.class);
+            return sum;
+        }catch (Exception e){
+            throw new JTHDataBaseException();
+        }
+    }
 }

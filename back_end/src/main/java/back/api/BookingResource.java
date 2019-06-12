@@ -1,19 +1,27 @@
 package back.api;
 
+import back.Exceptions.JTHAuthException;
 import back.Exceptions.JTHDataBaseException;
+import back.Exceptions.JTHException;
 import back.conf.Configuration;
 import back.data.BookingDAO;
 import back.data.RoomsDAO;
 import back.data.UserDAO;
 import back.model.Room;
+import back.model.Transaction;
 import back.model.User;
 import back.util.DateHandler;
 import back.util.JWT;
 import back.util.JsonMapRepresentation;
+import back.util.Util;
 import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class BookingResource  extends ServerResource {
@@ -78,6 +86,23 @@ public class BookingResource  extends ServerResource {
 
         } catch (JTHDataBaseException e) {
             return JsonMapRepresentation.result(false, "Booking error: database error", null);
+        }
+    }
+
+    public Representation get() throws ResourceException{
+        try{
+            String jtw = Util.getJWTfromRequest(getRequest());
+            User u = JWT.getUserJWT(jtw);
+            u.isAdmin();
+            List<Transaction> res = bookingDAO.getTransactions();
+            Map<String, Object> m = new HashMap<>();
+            m.put("transactions",res);
+            return JsonMapRepresentation.result(true,"here's your transactions",m);
+        }catch(JTHAuthException e){
+            return JsonMapRepresentation.result(false, "you're an impostor!: ", null);
+        }catch (Exception e){
+            e.printStackTrace();
+            return JsonMapRepresentation.result(false, "Something went wrong!" + e.getMessage(), null);
         }
     }
 
