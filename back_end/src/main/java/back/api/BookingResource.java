@@ -3,6 +3,7 @@ package back.api;
 import back.Exceptions.JTHAuthException;
 import back.Exceptions.JTHDataBaseException;
 import back.Exceptions.JTHException;
+import back.Exceptions.JTHInputException;
 import back.conf.Configuration;
 import back.data.BookingDAO;
 import back.data.RoomsDAO;
@@ -57,11 +58,15 @@ public class BookingResource  extends ServerResource {
         }
 
         if (Configuration.CHECK_AUTHORISATION) {
-            String jwt = JWT.getJWTFromHeaders(this);
-            if (!JWT.assertRole(jwt, "visitor")){
-                return JsonMapRepresentation.result(false,"Booking error: forbidden (not a visitor)",null);
-            } else if (!JWT.assertUser(jwt, userId)){
-                return JsonMapRepresentation.result(false,"Booking error: forbidden (not allowed to book room for other user)",null);
+            try {
+                String jwt = JWT.getJWTFromHeaders(getRequest());
+                if (!JWT.assertRole(jwt, "visitor")){
+                    return JsonMapRepresentation.result(false,"Booking error: forbidden (not a visitor)",null);
+                } else if (!JWT.assertUser(jwt, userId)){
+                    return JsonMapRepresentation.result(false,"Booking error: forbidden (not allowed to book room for other user)",null);
+                }
+            } catch (JTHInputException e){
+                return JsonMapRepresentation.result(false,"Booking error: " + e.getErrorMsg(),null);
             }
         }
 
@@ -90,17 +95,19 @@ public class BookingResource  extends ServerResource {
     }
 
     public Representation get() throws ResourceException{
-        try{
-            String jtw = Util.getJWTfromRequest(getRequest());
+        try {
+            String jtw = JWT.getJWTFromHeaders(getRequest());
             User u = JWT.getUserJWT(jtw);
-            u.isAdmin();
+            u.isAdmin();   // @Petros: what is this?
             List<Transaction> res = bookingDAO.getTransactions();
             Map<String, Object> m = new HashMap<>();
             m.put("transactions",res);
             return JsonMapRepresentation.result(true,"here's your transactions",m);
-        }catch(JTHAuthException e){
+        } catch(JTHInputException e) {
+            return JsonMapRepresentation.result(false, e.getErrorMsg(), null);
+        } catch(JTHAuthException e){
             return JsonMapRepresentation.result(false, "you're an impostor!: ", null);
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
             return JsonMapRepresentation.result(false, "Something went wrong!" + e.getMessage(), null);
         }

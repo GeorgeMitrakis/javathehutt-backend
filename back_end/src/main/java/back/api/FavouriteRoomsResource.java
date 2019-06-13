@@ -1,6 +1,7 @@
 package back.api;
 
 import back.Exceptions.JTHDataBaseException;
+import back.Exceptions.JTHInputException;
 import back.conf.Configuration;
 import back.data.BookingDAO;
 import back.model.Rating;
@@ -25,20 +26,24 @@ public class FavouriteRoomsResource extends ServerResource {
     protected Representation get() throws ResourceException {
         String visitorIdStr = getQueryValue("visitorId");
         if (visitorIdStr == null || visitorIdStr.equals("")){
-            return JsonMapRepresentation.result(false, "Get ratings: Missing or empty parameter (room id)", null);
+            return JsonMapRepresentation.result(false, "Get favourite room: Missing or empty parameter (room id)", null);
         }
 
         long visitorId;
         try {
             visitorId = Long.parseLong(visitorIdStr);
         } catch (ArithmeticException e){
-            return JsonMapRepresentation.result(false, "Get ratings: room id given is not a number", null);
+            return JsonMapRepresentation.result(false, "Get favourite room: room id given is not a number", null);
         }
 
         if (Configuration.CHECK_AUTHORISATION) {
-            String jwt = JWT.getJWTFromHeaders(this);
-            if (!JWT.assertRole(jwt, "admin") && !JWT.assertUser(jwt, visitorId)){
-                return JsonMapRepresentation.result(false,"Post favourite room: forbidden (not allowed to see favourite rooms for another user unless admin)",null);
+            try {
+                String jwt = JWT.getJWTFromHeaders(getRequest());
+                if (!JWT.assertRole(jwt, "admin") && !JWT.assertUser(jwt, visitorId)){
+                    return JsonMapRepresentation.result(false,"Get favourite room: forbidden (not allowed to see favourite rooms for another user unless admin)",null);
+                }
+            } catch (JTHInputException e){
+                return JsonMapRepresentation.result(false,"Get favourite room: " + e.getErrorMsg(),null);
             }
         }
 
@@ -46,7 +51,7 @@ public class FavouriteRoomsResource extends ServerResource {
         try {
             rooms = bookingDAO.getFavouriteRoomIdsForVisitor(visitorId);
         } catch (JTHDataBaseException e){
-            return JsonMapRepresentation.result(false, "Get ratings: DataBase error (or invalid room id given)", null);
+            return JsonMapRepresentation.result(false, "Get favourite room: DataBase error (or invalid room id given)", null);
         }
 
         Map<String, Object> m = new HashMap<>();
@@ -75,11 +80,15 @@ public class FavouriteRoomsResource extends ServerResource {
         }
 
         if (Configuration.CHECK_AUTHORISATION) {
-            String jwt = JWT.getJWTFromHeaders(this);
-            if (!JWT.assertRole(jwt, "visitor")){
-                return JsonMapRepresentation.result(false,"Post favourite room: forbidden (not a visitor)",null);
-            } else if (!JWT.assertUser(jwt, visitorId)){
-                return JsonMapRepresentation.result(false,"Post favourite room: forbidden (not allowed to add room to favourites for another user)",null);
+            try {
+                String jwt = JWT.getJWTFromHeaders(getRequest());
+                if (!JWT.assertRole(jwt, "visitor")){
+                    return JsonMapRepresentation.result(false,"Post favourite room: forbidden (not a visitor)",null);
+                } else if (!JWT.assertUser(jwt, visitorId)){
+                    return JsonMapRepresentation.result(false,"Post favourite room: forbidden (not allowed to add room to favourites for another user)",null);
+                }
+            } catch (JTHInputException e) {
+                return JsonMapRepresentation.result(false, "Post favourite room: " + e.getErrorMsg(), null);
             }
         }
 
@@ -112,9 +121,13 @@ public class FavouriteRoomsResource extends ServerResource {
         }
 
         if (Configuration.CHECK_AUTHORISATION) {
-            String jwt = JWT.getJWTFromHeaders(this);
-            if (!JWT.assertRole(jwt, "admin") && !JWT.assertUser(jwt, visitorId)){
-                return JsonMapRepresentation.result(false,"Delete favourite room: forbidden (not allowed to remove room from favourites for another user unless admin)",null);
+            try {
+                String jwt = JWT.getJWTFromHeaders(getRequest());
+                if (!JWT.assertRole(jwt, "admin") && !JWT.assertUser(jwt, visitorId)) {
+                    return JsonMapRepresentation.result(false, "Delete favourite room: forbidden (not allowed to remove room from favourites for another user unless admin)", null);
+                }
+            } catch (JTHInputException e){
+                return JsonMapRepresentation.result(false,"Delete favourite room: " + e.getErrorMsg(),null);
             }
         }
 

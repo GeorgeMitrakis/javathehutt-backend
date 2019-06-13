@@ -46,9 +46,13 @@ public class AdminResource  extends ServerResource {
             }
 
             if (Configuration.CHECK_AUTHORISATION) {
-                String jwt = JWT.getJWTFromHeaders(this);
-                if (!JWT.assertRole(jwt, "admin")){
-                    return JsonMapRepresentation.result(false,"Admin action error: forbidden (not an admin)",null);
+                try {
+                    String jwt = JWT.getJWTFromHeaders(getRequest());
+                    if (!JWT.assertRole(jwt, "admin")){
+                        return JsonMapRepresentation.result(false,"Admin action error: forbidden (not an admin)",null);
+                    }
+                } catch (JTHInputException e){
+                    return JsonMapRepresentation.result(false,"Admin action error: " + e.getErrorMsg(),null);
                 }
             }
 

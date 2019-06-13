@@ -4,6 +4,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 
+import back.Exceptions.JTHInputException;
 import back.model.User;
 import io.jsonwebtoken.*;
 
@@ -12,9 +13,8 @@ import java.util.LinkedHashMap;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
-import org.restlet.Server;
+import org.restlet.Request;
 import org.restlet.data.Header;
-import org.restlet.resource.ServerResource;
 import org.restlet.util.Series;
 
 
@@ -57,8 +57,7 @@ public class JWT {
         return builder.compact();
     }
 
-    public static Claims decodeJWT(String jwt) {
-
+    public static Claims decodeJWT(String jwt) throws Exception {
         //This line will throw an exception if it is not a signed JWS (as expected)
         Claims claims = Jwts.parser()
                 .setSigningKey(DatatypeConverter.parseBase64Binary(SECRET_KEY))
@@ -67,10 +66,14 @@ public class JWT {
         return claims;
     }
 
-    public static User getUserJWT(String jwt) {
-        if (jwt == null) return null;
-        Claims claims = decodeJWT(jwt);
-        return User.fromLinkedHashMap((LinkedHashMap)claims.get("user"));
+    public static User getUserJWT(String jwt) throws JTHInputException {
+        try {
+            if (jwt == null) return null;
+            Claims claims = decodeJWT(jwt);
+            return User.fromLinkedHashMap((LinkedHashMap) claims.get("user"));
+        } catch (Exception e){
+            throw new JTHInputException("Could not decode JWT token");
+        }
     }
 
 
@@ -91,23 +94,34 @@ public class JWT {
         return b.compact();
     }
 
-    public static boolean assertUser(String jwt, long id){
-        if (jwt == null || id < 0) return false;
-        User user = JWT.getUserJWT(jwt);
-        return user != null && user.getId() == id;
+    public static boolean assertUser(String jwt, long id) throws JTHInputException {
+        try {
+            if (jwt == null || id < 0) return false;
+            User user = JWT.getUserJWT(jwt);
+            return user != null && user.getId() == id;
+        } catch (Exception e){
+            throw new JTHInputException("Could not decode JWT token");
+        }
     }
 
-    public static boolean assertRole(String jwt, String role){
-        if (jwt == null || role == null) return false;
-        User user = JWT.getUserJWT(jwt);
-        return user != null && role.equals(user.getRole());
+    public static boolean assertRole(String jwt, String role) throws JTHInputException {
+        try {
+            if (jwt == null || role == null) return false;
+            User user = JWT.getUserJWT(jwt);
+            return user != null && role.equals(user.getRole());
+        } catch (Exception e){
+            throw new JTHInputException("Could not decode JWT token");
+        }
     }
 
-    public static String getJWTFromHeaders(ServerResource resource){
-        if (resource == null) return null;
-        Series<Header> headers = resource.getRequest().getHeaders();
-        if (headers == null) return null;
-        return headers.getFirstValue("token");
+    public static String getJWTFromHeaders(Request request) throws JTHInputException {
+        if (request == null) return null;
+        try {
+            Series<Header> headers = request.getHeaders();
+            return (headers != null) ? headers.getFirstValue("token") : null;
+        } catch (Exception e){
+            throw new JTHInputException("Could not get JWT token from headers");
+        }
     }
 
 }

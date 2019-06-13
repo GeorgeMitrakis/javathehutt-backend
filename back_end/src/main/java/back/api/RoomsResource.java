@@ -1,6 +1,7 @@
 package back.api;
 
 import back.Exceptions.JTHDataBaseException;
+import back.Exceptions.JTHInputException;
 import back.conf.Configuration;
 import back.data.RoomsDAO;
 import back.model.Location;
@@ -95,11 +96,15 @@ public class RoomsResource extends ServerResource  {
         }
 
         if (Configuration.CHECK_AUTHORISATION) {
-            String jwt = JWT.getJWTFromHeaders(this);
-            if (!JWT.assertRole(jwt, "provider")){
-                return JsonMapRepresentation.result(false,"Post room: forbidden (not a provider)",null);
-            } else if (!JWT.assertUser(jwt, providerId)) {
-                return JsonMapRepresentation.result(false,"Post room: forbidden (not allowed to submit a room for another provider)",null);
+            try {
+                String jwt = JWT.getJWTFromHeaders(getRequest());
+                if (!JWT.assertRole(jwt, "provider")){
+                    return JsonMapRepresentation.result(false,"Post room: forbidden (not a provider)",null);
+                } else if (!JWT.assertUser(jwt, providerId)) {
+                    return JsonMapRepresentation.result(false,"Post room: forbidden (not allowed to submit a room for another provider)",null);
+                }
+            } catch (JTHInputException e){
+                return JsonMapRepresentation.result(false,"Post room: " + e.getErrorMsg(),null);
             }
         }
 
@@ -144,10 +149,14 @@ public class RoomsResource extends ServerResource  {
 
         // only a owner-provider and an admin should be allowed to delete a room
         if (Configuration.CHECK_AUTHORISATION) {
-            String jwt = JWT.getJWTFromHeaders(this);
-            User user = JWT.getUserJWT(jwt);
-            if (!JWT.assertRole(jwt, "admin") && (user == null || room.getProviderId() != user.getId())) {
-                return JsonMapRepresentation.result(false, "Delete room: forbidden (not allowed to delete a room for another provider unless admin)", null);
+            try {
+                String jwt = JWT.getJWTFromHeaders(getRequest());
+                User user = JWT.getUserJWT(jwt);
+                if (!JWT.assertRole(jwt, "admin") && (user == null || room.getProviderId() != user.getId())) {
+                    return JsonMapRepresentation.result(false, "Delete room: forbidden (not allowed to delete a room for another provider unless admin)", null);
+                }
+            } catch (JTHInputException e){
+                return JsonMapRepresentation.result(false,"Delete room: " + e.getErrorMsg(),null);
             }
         }
 
