@@ -73,7 +73,7 @@ public class RatingResource extends ServerResource {
         }
 
         if (Configuration.CHECK_AUTHORISATION) {
-            String jwt = getQueryValue("token");
+            String jwt = JWT.getJWTFromHeaders(this);
             if (!JWT.assertRole(jwt, "visitor")){
                 return JsonMapRepresentation.result(false,"Post rating: forbidden (not a visitor)",null);
             } else if (!JWT.assertUser(jwt, visitorId)){
@@ -121,7 +121,7 @@ public class RatingResource extends ServerResource {
 
         // only the visitor who wrote it or an admin should be allowed to delete a rating
         if (Configuration.CHECK_AUTHORISATION) {
-            String jwt = getQueryValue("token");
+            String jwt = JWT.getJWTFromHeaders(this);
             User user = JWT.getUserJWT(jwt);
             if (!JWT.assertRole(jwt, "admin") && (user == null || rating.getVisitorId() != user.getId()) ){
                 return JsonMapRepresentation.result(false, "Delete rating: forbidden (not allowed to delete another visitor's rating unless admin)", null);

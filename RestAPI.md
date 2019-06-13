@@ -1,6 +1,6 @@
 # REST API 
 
-Εδώ περιγράφεται το REST API που προσφέρει το back-end. Το input είναι URL-encoded και το output είναι σε JSon. Όπου αναφέρεται ότι το output είναι ένα object μιας κλάσης (πχ User object ή Room object) εννοούμε ότι είναι η JSon μορφή αυτού του αντικειμένου με όλα τα πεδία που έχει στην αντίστοιχη κλάση του backend. Επίσης, σε κάθε API call που απαιτεί authorisation θα πρέπει να υπάρχει ως παράμετρος με όνομα "token" το Jason Web Token (JWT) που πάρθηκε κατά το login.
+Εδώ περιγράφεται το REST API που προσφέρει το back-end. Το input είναι URL-encoded και το output είναι σε JSon. Όπου αναφέρεται ότι το output είναι ένα object μιας κλάσης (πχ User object ή Room object) εννοούμε ότι είναι η JSon μορφή αυτού του αντικειμένου με όλα τα πεδία που έχει στην αντίστοιχη κλάση του backend. Επίσης, σε κάθε API call που απαιτεί authorisation θα πρέπει να υπάρχει στο HTTP Header τιμή με όνομα "token" και value το Jason Web Token (JWT) που πάρθηκε κατά το login.
 
 Συμβάσεις:
 

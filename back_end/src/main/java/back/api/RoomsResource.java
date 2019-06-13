@@ -95,7 +95,7 @@ public class RoomsResource extends ServerResource  {
         }
 
         if (Configuration.CHECK_AUTHORISATION) {
-            String jwt = form.getFirstValue("token");
+            String jwt = JWT.getJWTFromHeaders(this);
             if (!JWT.assertRole(jwt, "provider")){
                 return JsonMapRepresentation.result(false,"Post room: forbidden (not a provider)",null);
             } else if (!JWT.assertUser(jwt, providerId)) {
@@ -144,7 +144,7 @@ public class RoomsResource extends ServerResource  {
 
         // only a owner-provider and an admin should be allowed to delete a room
         if (Configuration.CHECK_AUTHORISATION) {
-            String jwt = getQueryValue("token");
+            String jwt = JWT.getJWTFromHeaders(this);
             User user = JWT.getUserJWT(jwt);
             if (!JWT.assertRole(jwt, "admin") && (user == null || room.getProviderId() != user.getId())) {
                 return JsonMapRepresentation.result(false, "Delete room: forbidden (not allowed to delete a room for another provider unless admin)", null);

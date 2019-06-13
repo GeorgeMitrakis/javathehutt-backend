@@ -36,7 +36,7 @@ public class FavouriteRoomsResource extends ServerResource {
         }
 
         if (Configuration.CHECK_AUTHORISATION) {
-            String jwt = getQueryValue("token");
+            String jwt = JWT.getJWTFromHeaders(this);
             if (!JWT.assertRole(jwt, "admin") && !JWT.assertUser(jwt, visitorId)){
                 return JsonMapRepresentation.result(false,"Post favourite room: forbidden (not allowed to see favourite rooms for another user unless admin)",null);
             }
@@ -75,7 +75,7 @@ public class FavouriteRoomsResource extends ServerResource {
         }
 
         if (Configuration.CHECK_AUTHORISATION) {
-            String jwt = form.getFirstValue("token");
+            String jwt = JWT.getJWTFromHeaders(this);
             if (!JWT.assertRole(jwt, "visitor")){
                 return JsonMapRepresentation.result(false,"Post favourite room: forbidden (not a visitor)",null);
             } else if (!JWT.assertUser(jwt, visitorId)){
@@ -112,7 +112,7 @@ public class FavouriteRoomsResource extends ServerResource {
         }
 
         if (Configuration.CHECK_AUTHORISATION) {
-            String jwt = getQueryValue("token");
+            String jwt = JWT.getJWTFromHeaders(this);
             if (!JWT.assertRole(jwt, "admin") && !JWT.assertUser(jwt, visitorId)){
                 return JsonMapRepresentation.result(false,"Delete favourite room: forbidden (not allowed to remove room from favourites for another user unless admin)",null);
             }

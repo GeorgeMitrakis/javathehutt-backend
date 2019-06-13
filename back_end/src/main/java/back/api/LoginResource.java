@@ -51,8 +51,8 @@ public class LoginResource extends ServerResource {
             }
             String jwt = JWT.createJWT(u, Configuration.getInstance().getLoginTTL());
             Map<String,Object> data = new HashMap<>();
-            data.put("token",jwt);
-            data.put("user",u);
+            data.put("token", jwt);
+            data.put("user", u);
             return JsonMapRepresentation.result(true,null, data);
         } catch (JTHAuthException e) {
             return JsonMapRepresentation.result(false,"Login error: wrong password",null);

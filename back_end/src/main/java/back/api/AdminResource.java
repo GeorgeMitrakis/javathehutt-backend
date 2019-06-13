@@ -46,7 +46,7 @@ public class AdminResource  extends ServerResource {
             }
 
             if (Configuration.CHECK_AUTHORISATION) {
-                String jwt = form.getFirstValue("token");
+                String jwt = JWT.getJWTFromHeaders(this);
                 if (!JWT.assertRole(jwt, "admin")){
                     return JsonMapRepresentation.result(false,"Admin action error: forbidden (not an admin)",null);
                 }

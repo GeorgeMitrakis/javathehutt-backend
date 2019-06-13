@@ -58,7 +58,7 @@ public class UsersResource extends ServerResource {
                 List<User> matchingUsers = userDAO.getUsersByEmailPrefix(emailPrefix);
 
                 if (Configuration.CHECK_AUTHORISATION) {
-                    String jwt = getQueryValue("token");
+                    String jwt = JWT.getJWTFromHeaders(this);
                     if (!JWT.assertRole(jwt, "admin")){
                         return JsonMapRepresentation.result(false,"forbidden (only an admin can request all users by email prefix)",null);
                     }
@@ -76,7 +76,7 @@ public class UsersResource extends ServerResource {
                 Map<String, Object> m = new HashMap<>();
 
                 if (Configuration.CHECK_AUTHORISATION) {
-                    String jwt = getQueryValue("token");
+                    String jwt = JWT.getJWTFromHeaders(this);
                     if (!JWT.assertRole(jwt, "admin")){
                         return JsonMapRepresentation.result(false,"forbidden (only an admin can request all users)",null);
                     }

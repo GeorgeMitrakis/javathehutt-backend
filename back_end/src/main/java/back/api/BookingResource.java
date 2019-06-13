@@ -49,7 +49,7 @@ public class BookingResource  extends ServerResource {
         }
 
         if (Configuration.CHECK_AUTHORISATION) {
-            String jwt = form.getFirstValue("token");
+            String jwt = JWT.getJWTFromHeaders(this);
             if (!JWT.assertRole(jwt, "visitor")){
                 return JsonMapRepresentation.result(false,"Booking error: forbidden (not a visitor)",null);
             } else if (!JWT.assertUser(jwt, userId)){

@@ -12,6 +12,10 @@ import java.util.LinkedHashMap;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
+import org.restlet.Server;
+import org.restlet.data.Header;
+import org.restlet.resource.ServerResource;
+import org.restlet.util.Series;
 
 
 public class JWT {
@@ -97,6 +101,13 @@ public class JWT {
         if (jwt == null || role == null) return false;
         User user = JWT.getUserJWT(jwt);
         return user != null && role.equals(user.getRole());
+    }
+
+    public static String getJWTFromHeaders(ServerResource resource){
+        if (resource == null) return null;
+        Series<Header> headers = resource.getRequest().getHeaders();
+        if (headers == null) return null;
+        return headers.getFirstValue("token");
     }
 
 }
