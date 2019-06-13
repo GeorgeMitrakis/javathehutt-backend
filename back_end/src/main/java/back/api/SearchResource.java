@@ -6,6 +6,7 @@ import back.data.RoomsDAO;
 import back.data.UserDAO;
 import back.model.Room;
 import back.model.SearchConstraints;
+import back.model.SearchConstraintsBuilder;
 import back.util.JsonMapRepresentation;
 import org.restlet.data.Form;
 import org.restlet.representation.Representation;
@@ -25,9 +26,7 @@ public class SearchResource extends ServerResource {
     @Override
     protected Representation get() throws ResourceException {
 
-        SearchConstraints constraints = new SearchConstraints();
-
-        //Read the parameters
+        // Read the parameters
         String minPriceStr = getQueryValue("minPrice");
         String maxPriceStr = getQueryValue("maxPrice");
         String maxDist = getQueryValue("maxDist");
@@ -39,14 +38,17 @@ public class SearchResource extends ServerResource {
         String pointY = getQueryValue("pointY");
         // TODO: add "people" parameter: number of people for whom to book
 
+        SearchConstraints constraints;
         try {
-            if (maxPriceStr != null) constraints.setMaxCost(Integer.parseInt(maxPriceStr));
-            if (minPriceStr != null) constraints.setMinCost(Integer.parseInt(minPriceStr));
-            if (hasWifi != null) constraints.setWifi(hasWifi.equals("true"));
-            if (hasPool != null) constraints.setPool(hasPool.equals("true"));
-            if (hasShauna != null) constraints.setShauna(hasShauna.equals("true"));
-            if (maxDist != null) constraints.setRange(Integer.parseInt(maxDist));
-            if (pointX != null && pointY != null && cityName != null) constraints.setLocation(cityName, Double.parseDouble(pointX), Double.parseDouble(pointY));
+            constraints = new SearchConstraintsBuilder()
+                    .setMinCost((minPriceStr == null) ? null : Integer.parseInt(minPriceStr))
+                    .setMaxCost((maxPriceStr == null) ? null : Integer.parseInt(maxPriceStr))
+                    .setRange((maxDist == null) ? null : Double.parseDouble(maxDist))
+                    .setWifi((hasWifi == null) ? null : "true".equals(hasWifi))
+                    .setPool((hasPool == null) ? null : "true".equals(hasPool))
+                    .setShauna((hasShauna == null) ? null : "true".equals(hasShauna))
+                    .setLocation(cityName, (pointX == null) ? null : Double.parseDouble(pointX), (pointY == null) ? null : Double.parseDouble(pointY))
+                    .build();
         } catch (NumberFormatException e){
             e.printStackTrace();
             return JsonMapRepresentation.result(false, "Search error: non number sent for a number parameter", null);
