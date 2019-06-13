@@ -117,22 +117,22 @@ public class DataAccess {
         }
     }
 
-    public User getUser(String email, String hashedPassword) throws JTHDataBaseException {
+    public List<User> getUsersByEmailPrefix(String emailPrefix) throws JTHDataBaseException {
+        // TODO return extended objects: ex Visitor?
         try {
-            User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ? and password = ?", new String[]{email, hashedPassword}, new UserRowMapper());
-            return (u != null) ? getUserByRole(u.getRole(), new Long[]{u.getId()}, u) : null;
-        } catch (EmptyResultDataAccessException e) {
-            return null;
+            return jdbcTemplate.query("SELECT * FROM \"user\" WHERE email LIKE ?", new Object[]{emailPrefix + "%"}, new UserRowMapper());
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
     }
 
-    public List<User> getUsersByEmail(String email) throws JTHDataBaseException {
-        // TODO return extended objects: ex Visitor?
+    public User getUser(String email, String hashedPassword) throws JTHDataBaseException {
         try {
-            return jdbcTemplate.query("SELECT * FROM \"user\" WHERE email LIKE ?", new Object[]{email + "%"}, new UserRowMapper());
+            User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ? and password = ?", new String[]{email, hashedPassword}, new UserRowMapper());
+            return (u != null) ? getUserByRole(u.getRole(), new Long[]{u.getId()}, u) : null;
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();

@@ -26,6 +26,7 @@ public class RestfulApp extends Application {
 
 	@Override
 	public synchronized Restlet createInboundRoot() {
+		/* Full API documentation on RestAPI.md file */
 
 		Router router = new Router(getContext());
 		// POST
@@ -34,7 +35,7 @@ public class RestfulApp extends Application {
 		// POST
 		router.attach("/login", LoginResource.class);
 
-		// GET  /users             -> get (my) user info (profile)
+		// GET  /users             -> get User(s) objects
 		// POST /users?signup=yes  -> sign up
         // PUT  /users?edit=yes    -> edit
 		router.attach("/users" , UsersResource.class);
@@ -45,8 +46,6 @@ public class RestfulApp extends Application {
 		router.attach("/autocomplete", AutocompleteResource.class);
 
 		// GET /search (minPrice, maxPrice, maxDist, hasPool, hasWifi, hasShauna, cityName, pointX, pointY)
-		//--data 'minPrice=-1&maxPrice=-1&maxDist=-1&hasPool=false&hasWifi=false&hasShauna=false&Name=Athens&pointX=-1&pointY=-1'
-		//--data 'minPrice=-1&maxPrice=-1&maxDist=100&hasPool=false&hasWifi=false&hasShauna=false&Name=Athens&pointX=37.983810&pointY=23.727539'
 		router.attach("/search", SearchResource.class);
 
 		// POST /book (userId, roomId, startDate, endDate)
@@ -71,7 +70,7 @@ public class RestfulApp extends Application {
         router.attach("/img", ImageResource.class);
 
         //GET (roomId) -> get list of image ids associated with to roomId
-		// router.attach("/roomImages", RoomImagesResource.class);
+        router.attach("/roomImages", RoomImagesResource.class);
 
 		return router;
 	}

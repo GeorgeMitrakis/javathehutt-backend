@@ -26,6 +26,7 @@ public class UsersResource extends ServerResource {
 
     // GET /users?id=...    -> returns user with that id
     // GET /users?email=... -> returns user with that email
+    // GET /users?emailPrefix=... -> returns all users with given prefix on their email
     // GET /users           -> returns all users
     // GET /users?role=...  -> returns all users of that role
     @Override
@@ -33,6 +34,7 @@ public class UsersResource extends ServerResource {
         try {
             String idStr = getQueryValue("id");
             String email = getQueryValue("email");
+            String emailPrefix = getQueryValue("emailPrefix");
             String role = getQueryValue("role");
             if (idStr != null) {
                 User u = userDAO.getById(Long.parseLong(idStr));
@@ -43,25 +45,35 @@ public class UsersResource extends ServerResource {
                     m.put("user", u);
                     return JsonMapRepresentation.result(true, null, m);
                 }
-            } else if (email != null){
-                List<User> matchingUsers = userDAO.getUsersByEmail(email);
+            } else if (email != null) {
+                User u = userDAO.getByEmail(email);
+                if (u == null) {
+                    return JsonMapRepresentation.result(false, null, null);
+                } else {
+                    Map<String, Object> m = new HashMap<>();
+                    m.put("user", u);
+                    return JsonMapRepresentation.result(true, null, m);
+                }
+            } else if (emailPrefix != null) {
+                List<User> matchingUsers = userDAO.getUsersByEmailPrefix(emailPrefix);
 
                 if (Configuration.CHECK_AUTHORISATION) {
                     String jwt = getQueryValue("token");
                     if (!JWT.assertRole(jwt, "admin")){
-                        return JsonMapRepresentation.result(false,"forbidden (only an admin can request all users by email)",null);
+                        return JsonMapRepresentation.result(false,"forbidden (only an admin can request all users by email prefix)",null);
                     }
                 }
 
-                if (matchingUsers == null){
-                    return JsonMapRepresentation.result(false, "database error",null);
-                } else{
+                if (matchingUsers == null) {
+                    return JsonMapRepresentation.result(false, "database error (null)", null);
+                } else {
                     Map<String, Object> m = new HashMap<>();
                     m.put("users", matchingUsers);
                     return JsonMapRepresentation.result(true, null, m);
                 }
             } else {  // return all users
                 List<User> allUsers = userDAO.getUsers(new Limits(0, (int) userDAO.countUsers()));
+                Map<String, Object> m = new HashMap<>();
 
                 if (Configuration.CHECK_AUTHORISATION) {
                     String jwt = getQueryValue("token");
@@ -77,7 +89,6 @@ public class UsersResource extends ServerResource {
                     }
                 }
 
-                Map<String, Object> m = new HashMap<>();
                 m.put("users", allUsers);
                 return JsonMapRepresentation.result(true, null, m);
             }
@@ -91,7 +102,7 @@ public class UsersResource extends ServerResource {
 
     @Override
     protected Representation post(Representation entity) throws ResourceException {
-        User createdUser = null;
+        User createdUser;
         // Registers a new user
         try{
             Form form = new Form(entity);
@@ -107,7 +118,7 @@ public class UsersResource extends ServerResource {
             else if ( !password.equals(password1) ){
                 throw new JTHInputException("mismatching password");
             }
-            else if (userDAO.getUsersByEmail(email) != null){
+            else if (userDAO.getByEmail(email) != null){
                 throw new JTHInputException("email is already taken");
             }
 
@@ -146,8 +157,6 @@ public class UsersResource extends ServerResource {
             return JsonMapRepresentation.result(true,"also logged in", data);
         }
         return JsonMapRepresentation.result(true,null,null);
-
-
     }
 
     @Override
