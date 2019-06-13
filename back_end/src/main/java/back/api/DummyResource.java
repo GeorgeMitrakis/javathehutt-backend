@@ -20,6 +20,7 @@ public class DummyResource extends ServerResource {
     @Override
     protected Representation get() throws ResourceException {
 
+
         JSONParser jsonParser = new JSONParser();
 
         String field = getQueryValue("field");

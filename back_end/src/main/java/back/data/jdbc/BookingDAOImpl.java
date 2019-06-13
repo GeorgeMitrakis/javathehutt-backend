@@ -1,15 +1,19 @@
 package back.data.jdbc;
 
 import back.Exceptions.JTHDataBaseException;
+import back.conf.Configuration;
 import back.data.BookingDAO;
 import back.model.Room;
+import back.model.Transaction;
 import back.model.User;
 
 import java.util.List;
+import java.util.Properties;
 
 public class BookingDAOImpl implements BookingDAO {
 
     private final DataAccess dataAccess;
+
 
     public BookingDAOImpl(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
@@ -35,4 +39,13 @@ public class BookingDAOImpl implements BookingDAO {
         return dataAccess.getFavouriteRoomIdsForVisitor(visitorId);
     }
 
+    @Override
+    public List<Transaction> getTransactions() throws JTHDataBaseException {
+        return dataAccess.getTransactions();
+    }
+
+    @Override
+    public double lefta() throws JTHDataBaseException {
+        return dataAccess.sumTransactionCosts() * Double.parseDouble(Configuration.getInstance().getProperty("tarifa"));
+    }
 }
