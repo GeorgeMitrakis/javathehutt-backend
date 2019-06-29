@@ -4,7 +4,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 
-import back.Exceptions.JTHInputException;
+import back.exceptions.JTHInputException;
 import back.model.User;
 import io.jsonwebtoken.*;
 

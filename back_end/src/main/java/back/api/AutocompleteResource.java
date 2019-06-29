@@ -1,6 +1,6 @@
 package back.api;
 
-import back.Exceptions.JTHDataBaseException;
+import back.exceptions.JTHDataBaseException;
 import back.conf.Configuration;
 import back.data.RoomsDAO;
 import back.util.JsonMapRepresentation;

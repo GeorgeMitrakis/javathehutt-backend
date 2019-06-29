@@ -1,7 +1,7 @@
 package back.model;
 
 
-import back.Exceptions.JTHAuthException;
+import back.exceptions.JTHAuthException;
 
 import java.util.LinkedHashMap;
 

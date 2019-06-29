@@ -1,9 +1,6 @@
 package back.conf;
 
-import back.data.BookingDAO;
-import back.data.ImageDAO;
-import back.data.RoomsDAO;
-import back.data.UserDAO;
+import back.data.*;
 import back.data.jdbc.*;
 
 import java.util.Properties;

@@ -1,13 +1,9 @@
 package back.api;
 
-import back.Exceptions.JTHException;
-import back.Exceptions.JTHInputException;
+import back.exceptions.JTHInputException;
 import back.conf.Configuration;
 import back.data.ImageDAO;
-import back.model.Image;
-import back.util.ImgFetch;
 import back.util.JsonMapRepresentation;
-import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;

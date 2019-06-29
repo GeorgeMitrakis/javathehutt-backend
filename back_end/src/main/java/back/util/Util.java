@@ -1,6 +1,6 @@
 package back.util;
 
-import back.Exceptions.JTHInputException;
+import back.exceptions.JTHInputException;
 
 public class Util {
 

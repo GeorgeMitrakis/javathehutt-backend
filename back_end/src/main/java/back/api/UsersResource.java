@@ -1,7 +1,7 @@
 package back.api;
 
-import back.Exceptions.JTHDataBaseException;
-import back.Exceptions.JTHInputException;
+import back.exceptions.JTHDataBaseException;
+import back.exceptions.JTHInputException;
 import back.data.Limits;
 import back.model.Provider;
 import back.model.Visitor;

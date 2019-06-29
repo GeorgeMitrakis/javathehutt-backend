@@ -1,6 +1,7 @@
-package back.data.jdbc;
+package back.data;
 
-import back.Exceptions.JTHDataBaseException;
+import back.data.jdbc.DataAccess;
+import back.exceptions.JTHDataBaseException;
 import back.conf.Configuration;
 import back.data.BookingDAO;
 import back.model.Room;
@@ -8,7 +9,6 @@ import back.model.Transaction;
 import back.model.User;
 
 import java.util.List;
-import java.util.Properties;
 
 public class BookingDAOImpl implements BookingDAO {
 

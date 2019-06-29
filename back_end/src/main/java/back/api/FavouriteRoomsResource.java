@@ -1,10 +1,9 @@
 package back.api;
 
-import back.Exceptions.JTHDataBaseException;
-import back.Exceptions.JTHInputException;
+import back.exceptions.JTHDataBaseException;
+import back.exceptions.JTHInputException;
 import back.conf.Configuration;
 import back.data.BookingDAO;
-import back.model.Rating;
 import back.model.Room;
 import back.util.JWT;
 import back.util.JsonMapRepresentation;

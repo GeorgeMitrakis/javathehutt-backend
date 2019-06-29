@@ -1,6 +1,6 @@
 package back.data;
 
-import back.Exceptions.JTHDataBaseException;
+import back.exceptions.JTHDataBaseException;
 import back.model.Provider;
 import back.model.Rating;
 import back.model.Room;

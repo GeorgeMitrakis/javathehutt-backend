@@ -1,7 +1,8 @@
-package back.data.jdbc;
+package back.data;
 
-import back.Exceptions.JTHAuthException;
-import back.Exceptions.JTHDataBaseException;
+import back.data.jdbc.DataAccess;
+import back.exceptions.JTHAuthException;
+import back.exceptions.JTHDataBaseException;
 import back.data.Limits;
 import back.data.UserDAO;
 import back.model.Provider;

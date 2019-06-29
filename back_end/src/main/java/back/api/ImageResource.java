@@ -1,8 +1,7 @@
 package back.api;
-import back.Exceptions.JTHInputException;
+import back.exceptions.JTHInputException;
 import back.conf.Configuration;
 import back.data.ImageDAO;
-import back.data.UserDAO;
 import back.model.Image;
 import back.util.ImgFetch;
 import back.util.JsonMapRepresentation;

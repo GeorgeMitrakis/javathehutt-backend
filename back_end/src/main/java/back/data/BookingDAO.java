@@ -1,6 +1,6 @@
 package back.data;
 
-import back.Exceptions.JTHDataBaseException;
+import back.exceptions.JTHDataBaseException;
 import back.model.Room;
 import back.model.Transaction;
 import back.model.User;

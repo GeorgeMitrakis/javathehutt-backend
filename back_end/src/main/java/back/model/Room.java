@@ -1,6 +1,6 @@
 package back.model;
 
-import back.Exceptions.JTHDataBaseException;
+import back.exceptions.JTHDataBaseException;
 import back.conf.Configuration;
 
 import java.util.List;

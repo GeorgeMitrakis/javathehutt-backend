@@ -1,6 +1,6 @@
 package back.data;
 
-import back.Exceptions.JTHDataBaseException;
+import back.exceptions.JTHDataBaseException;
 import back.model.Image;
 
 import java.util.List;

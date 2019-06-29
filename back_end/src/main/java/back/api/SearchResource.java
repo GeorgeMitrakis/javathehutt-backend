@@ -1,14 +1,12 @@
 package back.api;
 
-import back.Exceptions.JTHDataBaseException;
+import back.exceptions.JTHDataBaseException;
 import back.conf.Configuration;
 import back.data.RoomsDAO;
-import back.data.UserDAO;
 import back.model.Room;
 import back.model.SearchConstraints;
 import back.model.SearchConstraintsBuilder;
 import back.util.JsonMapRepresentation;
-import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;

@@ -1,6 +1,7 @@
-package back.data.jdbc;
+package back.data;
 
-import back.Exceptions.JTHDataBaseException;
+import back.data.jdbc.DataAccess;
+import back.exceptions.JTHDataBaseException;
 import back.data.RoomsDAO;
 import back.model.Provider;
 import back.model.Rating;

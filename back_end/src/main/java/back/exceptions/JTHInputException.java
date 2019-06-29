@@ -1,4 +1,4 @@
-package back.Exceptions;
+package back.exceptions;
 
 public class JTHInputException extends JTHException {
 

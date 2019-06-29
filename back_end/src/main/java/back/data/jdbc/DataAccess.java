@@ -1,6 +1,6 @@
 package back.data.jdbc;
 
-import back.Exceptions.JTHDataBaseException;
+import back.exceptions.JTHDataBaseException;
 import back.model.*;
 import back.util.DateHandler;
 import org.apache.commons.dbcp2.BasicDataSource;

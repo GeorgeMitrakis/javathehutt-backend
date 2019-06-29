@@ -1,9 +1,8 @@
 package back.api;
 
-import back.Exceptions.JTHAuthException;
-import back.Exceptions.JTHDataBaseException;
-import back.Exceptions.JTHException;
-import back.Exceptions.JTHInputException;
+import back.exceptions.JTHAuthException;
+import back.exceptions.JTHDataBaseException;
+import back.exceptions.JTHInputException;
 import back.conf.Configuration;
 import back.data.BookingDAO;
 import back.data.RoomsDAO;
@@ -14,7 +13,6 @@ import back.model.User;
 import back.util.DateHandler;
 import back.util.JWT;
 import back.util.JsonMapRepresentation;
-import back.util.Util;
 import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
@@ -96,20 +94,25 @@ public class BookingResource  extends ServerResource {
 
     public Representation get() throws ResourceException{
         try {
-            String jtw = JWT.getJWTFromHeaders(getRequest());
-            User u = JWT.getUserJWT(jtw);
-            u.isAdmin();   // @Petros: what is this?
+
+            if (Configuration.CHECK_AUTHORISATION) {
+                try {
+                    String jwt = JWT.getJWTFromHeaders(getRequest());
+                    if (!JWT.assertRole(jwt, "admin")){
+                        return JsonMapRepresentation.result(false,"Booking error: forbidden (not an admin)",null);
+                    }
+                } catch (JTHInputException e){
+                    return JsonMapRepresentation.result(false,"Booking error: " + e.getErrorMsg(),null);
+                }
+            }
+
             List<Transaction> res = bookingDAO.getTransactions();
             Map<String, Object> m = new HashMap<>();
-            m.put("transactions",res);
-            return JsonMapRepresentation.result(true,"here's your transactions",m);
-        } catch(JTHInputException e) {
-            return JsonMapRepresentation.result(false, e.getErrorMsg(), null);
-        } catch(JTHAuthException e){
-            return JsonMapRepresentation.result(false, "you're an impostor!: ", null);
+            m.put("transactions", res);
+            return JsonMapRepresentation.result(true,"success",m);
         } catch (Exception e){
             e.printStackTrace();
-            return JsonMapRepresentation.result(false, "Something went wrong!" + e.getMessage(), null);
+            return JsonMapRepresentation.result(false, "Something went wrong:" + e.getMessage(), null);
         }
     }
 

@@ -1,7 +1,7 @@
 package back.api;
 
-import back.Exceptions.JTHDataBaseException;
-import back.Exceptions.JTHInputException;
+import back.exceptions.JTHDataBaseException;
+import back.exceptions.JTHInputException;
 import back.conf.Configuration;
 import back.data.RoomsDAO;
 import back.model.Location;

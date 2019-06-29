@@ -1,7 +1,7 @@
 package back.api;
 
-import back.Exceptions.JTHAuthException;
-import back.Exceptions.JTHDataBaseException;
+import back.exceptions.JTHAuthException;
+import back.exceptions.JTHDataBaseException;
 import back.conf.Configuration;
 import back.data.UserDAO;
 import back.model.User;

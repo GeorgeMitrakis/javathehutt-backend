@@ -1,7 +1,7 @@
 package back.data;
 
-import back.Exceptions.JTHAuthException;
-import back.Exceptions.JTHDataBaseException;
+import back.exceptions.JTHAuthException;
+import back.exceptions.JTHDataBaseException;
 import back.model.Provider;
 import back.model.User;
 import back.model.Visitor;
