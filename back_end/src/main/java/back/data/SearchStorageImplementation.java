@@ -9,6 +9,11 @@ import java.util.List;
 public class SearchStorageImplementation implements SearchStorageAPI {
 
     @Override
+    public void test(){
+
+    }
+
+    @Override
     public void pushRoom(Room room, List<Transaction> transactions) {
         // TODO
     }

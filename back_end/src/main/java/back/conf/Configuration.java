@@ -15,6 +15,8 @@ public class Configuration {
     private static final Configuration self = new Configuration();
 
     private final DataAccess dataAccess = new DataAccess();
+    private final SearchStorageImplementation search = new SearchStorageImplementation();
+
     private String contextPath = null;
     private Properties props = new Properties();
 
@@ -66,7 +68,7 @@ public class Configuration {
     }
 
     public RoomsDAO getRoomsDAO() {
-        return new RoomsDAOImpl(dataAccess);
+        return new RoomsDAOImpl(dataAccess, search);
     }
 
     public BookingDAO getBookingDAO() {

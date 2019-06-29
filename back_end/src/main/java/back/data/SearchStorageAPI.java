@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface SearchStorageAPI {
 
+    void test();
+
     void pushRoom(Room room, List<Transaction> transactions);
 
     void pushTransaction(int roomId, Transaction transaction);

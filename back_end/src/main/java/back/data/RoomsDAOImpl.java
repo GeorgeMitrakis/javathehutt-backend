@@ -13,9 +13,11 @@ import java.util.List;
 public class RoomsDAOImpl implements RoomsDAO {
 
     private final DataAccess dataAccess;
+    private final SearchStorageImplementation search;
 
-    public RoomsDAOImpl(DataAccess dataAccess) {
+    public RoomsDAOImpl(DataAccess dataAccess,SearchStorageImplementation search) {
         this.dataAccess = dataAccess;
+        this.search = search;
     }
 
     @Override
