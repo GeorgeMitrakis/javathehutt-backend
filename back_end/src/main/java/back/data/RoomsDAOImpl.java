@@ -15,7 +15,7 @@ public class RoomsDAOImpl implements RoomsDAO {
     private final DataAccess dataAccess;
     private final SearchStorageImplementation search;
 
-    public RoomsDAOImpl(DataAccess dataAccess,SearchStorageImplementation search) {
+    public RoomsDAOImpl(DataAccess dataAccess, SearchStorageImplementation search) {
         this.dataAccess = dataAccess;
         this.search = search;
     }
@@ -27,7 +27,9 @@ public class RoomsDAOImpl implements RoomsDAO {
 
     @Override
     public List<Room> searchRooms(SearchConstraints constraints) throws JTHDataBaseException {
-        return dataAccess.searchRooms(constraints);
+        List<Room> results = search.searchRooms(constraints, -1, -1);
+        if (results == null) results = dataAccess.searchRooms(constraints);   // if not implemented in search
+        return results;
     }
 
     @Override
@@ -54,12 +56,15 @@ public class RoomsDAOImpl implements RoomsDAO {
 
     @Override
     public boolean submitNewRoom(Room room) throws JTHDataBaseException {
-        return dataAccess.submitNewRoom(room);
+        boolean succ = dataAccess.submitNewRoom(room);
+        if (succ) search.pushRoom(room, dataAccess.getTransactionsForRoom(room.getId()));
+        return succ;
     }
 
     @Override
     public void removeRoom(int roomId) throws JTHDataBaseException {
         dataAccess.removeRoom(roomId);
+        search.deleteRoom(roomId);
     }
 
     @Override

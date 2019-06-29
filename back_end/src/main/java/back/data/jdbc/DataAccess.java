@@ -518,6 +518,17 @@ public class DataAccess {
         return results;
     }
 
+    public List<Transaction> getTransactionsForRoom(int roomId) throws JTHDataBaseException {
+        List<Transaction> results;
+        try {
+            results = jdbcTemplate.query("SELECT * FROM transactions WHERE room_id = ?", new Object[]{roomId}, new TransactionRowMapper());
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+        return results;
+    }
+
     public double sumTransactionCosts() throws JTHDataBaseException {
         try{
             double sum = jdbcTemplate.queryForObject("SELECT SUM(cost) FROM transactions", Double.class);

@@ -1,6 +1,5 @@
 package back.api;
 
-import back.exceptions.JTHAuthException;
 import back.exceptions.JTHDataBaseException;
 import back.exceptions.JTHInputException;
 import back.conf.Configuration;

@@ -32,7 +32,7 @@ public class Room {
         this.description = description;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 

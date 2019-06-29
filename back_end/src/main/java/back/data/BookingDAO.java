@@ -22,6 +22,8 @@ public interface BookingDAO {
 
     List<Transaction> getTransactions() throws JTHDataBaseException;
 
+    List<Transaction> getTransactionsForRoom(int roomId) throws JTHDataBaseException;
+
     double lefta() throws JTHDataBaseException;
 
 }

@@ -2,7 +2,7 @@ package back.model;
 
 public class Transaction {
 
-    private int visitorId;
+    private long visitorId;
     private int roomId;
     private int id;
     private String startDate;
@@ -10,7 +10,7 @@ public class Transaction {
     private double cost;
 
 
-    public Transaction(int visitorId, int roomId, int id, String startDate, String endDate, double cost) {
+    public Transaction(long visitorId, int roomId, int id, String startDate, String endDate, double cost) {
         this.visitorId = visitorId;
         this.roomId = roomId;
         this.id = id;
@@ -19,7 +19,7 @@ public class Transaction {
         this.cost = cost;
     }
 
-    public int getVisitorId() {
+    public long getVisitorId() {
         return visitorId;
     }
 
