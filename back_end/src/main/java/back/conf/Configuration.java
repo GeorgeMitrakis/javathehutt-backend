@@ -72,7 +72,7 @@ public class Configuration {
     }
 
     public BookingDAO getBookingDAO() {
-        return new BookingDAOImpl(dataAccess);
+        return new BookingDAOImpl(dataAccess, search);
     }
 
     public ImageDAO getImageDAO() {return new ImageDAOImpl(dataAccess);}
