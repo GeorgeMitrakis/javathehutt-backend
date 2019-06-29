@@ -15,6 +15,9 @@ repositories {
     maven {
         url "http://maven.restlet.org/"
     }
+    maven {
+        url "https://artifacts.elastic.co/maven"
+    }
 }
 
 dependencies {
@@ -29,7 +32,7 @@ dependencies {
     compile 'io.jsonwebtoken:jjwt-jackson:0.10.5'
     runtime "org.restlet.jee:org.restlet.ext.servlet:2.3.12"     // servlet adapter for Restlet framework
     runtime "org.postgresql:postgresql:42.2.0"                   // connect to database
-    runtime "org.elasticsearch.client:transport:7.2.0"           // elastic java API (TODO: check)
+    compile "org.elasticsearch.client:transport:7.1.0"           // elastic java API (TODO: check)
 }
 
 dependencies {
