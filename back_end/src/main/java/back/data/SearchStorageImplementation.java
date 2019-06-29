@@ -15,6 +15,7 @@ import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
+import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -82,6 +83,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
     public List<Room> searchRooms(SearchConstraints constraints, int limit, int offset) {
         List<Map> res = new LinkedList<>();
 
+
         BoolQueryBuilder B = QueryBuilders.boolQuery();
         if(constraints.getWifi()){
             B = B.must(QueryBuilders.matchQuery("wifi",true));
@@ -94,6 +96,20 @@ public class SearchStorageImplementation implements SearchStorageAPI {
         if(constraints.getShauna()){
             B = B.must(QueryBuilders.matchQuery("pool",true));
         }
+
+        if(constraints.hasMinCost()){
+            B = B.must(QueryBuilders.rangeQuery("cost").gte(constraints.getMinCost()));
+        }
+
+        if(constraints.hasMaxCost()){
+            B = B.must(QueryBuilders.rangeQuery("cost").lte(constraints.getMinCost()));
+        }
+
+        if(constraints.hasRange()){
+            B = B.must(QueryBuilders.geoDistanceQuery("location").distance(constraints.getRange(), DistanceUnit.KILOMETERS));
+        }
+
+
 
         SearchResponse response = client.prepareSearch("testindex")
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)

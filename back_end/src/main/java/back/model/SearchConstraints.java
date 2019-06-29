@@ -76,4 +76,15 @@ public class SearchConstraints {
         this.range = range;
     }
 
+    public boolean hasMinCost() {
+        return minCost != -1;
+    }
+
+    public boolean hasMaxCost() {
+        return minCost != -1;
+    }
+
+    public boolean hasRange(){
+        return range != -1;
+    }
 }
