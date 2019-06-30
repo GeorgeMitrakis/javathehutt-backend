@@ -397,14 +397,17 @@ public class DataAccess {
                     cityid = (int) keyHolder.getKeys().get("id");
                 }
 
+                // TODO: Does Location still need geom?
                 // then insert location
                 int location_id;
                 KeyHolder keyHolder = new GeneratedKeyHolder();
                 int finalCityid = cityid;   // dunno why this was needed
                 jdbcTemplate.update(connection -> {
-                    PreparedStatement ps = connection.prepareStatement("INSERT INTO location (id, geom, city_id) VALUES (default, ST_GeomFromText(?), ?)", Statement.RETURN_GENERATED_KEYS);
+                    PreparedStatement ps = connection.prepareStatement("INSERT INTO location (id, geom, city_id, cordX, cordY) VALUES (default, ST_GeomFromText(?), ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                     ps.setString(1, location.getCoords());
                     ps.setInt(2, finalCityid);
+                    ps.setDouble(3, location.getCordX());
+                    ps.setDouble(4, location.getCordY());
                     return ps;
                 }, keyHolder);
                 location_id = (int) keyHolder.getKeys().get("id");

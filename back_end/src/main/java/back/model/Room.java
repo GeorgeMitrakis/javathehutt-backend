@@ -13,7 +13,7 @@ public class Room {
     private int capacity;
     private boolean wifi, pool, shauna;
     private String roomName;
-    private String description = "";   // TODO: add to db and here
+    private String description;
     private Location location;
 
     private Provider provider = null;
@@ -30,6 +30,8 @@ public class Room {
         this.shauna = shauna;
         this.location = location;
         this.description = description;
+        fetchProvider();
+        fetchRatings();
     }
 
     public int getId() {
@@ -62,6 +64,14 @@ public class Room {
 
     public Location getLocation() {
         return location;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public Provider fetchProvider(){
