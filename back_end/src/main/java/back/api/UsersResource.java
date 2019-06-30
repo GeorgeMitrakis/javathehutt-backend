@@ -191,6 +191,17 @@ public class UsersResource extends ServerResource {
             return JsonMapRepresentation.result(false,"Update error: need to give old password in order to update current one",null);
         }
 
+        if (Configuration.CHECK_AUTHORISATION) {
+            try {
+                String jwt = JWT.getJWTFromHeaders(getRequest());
+                if (!JWT.assertRole(jwt, "admin") || !JWT.assertUser(jwt, userId)){
+                    return JsonMapRepresentation.result(false,"Update error: forbidden, only admin or user himself can change his information",null);
+                }
+            } catch (JTHInputException e){
+                return JsonMapRepresentation.result(false,"Update error: " + e.getErrorMsg(),null);
+            }
+        }
+
         // hash passwords
         if (oldpassword != null) oldpassword = Hashing.getHashSHA256(oldpassword);
         if (newpassword != null) newpassword = Hashing.getHashSHA256(newpassword);
