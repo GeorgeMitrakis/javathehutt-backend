@@ -1,8 +1,5 @@
 package back.model;
 
-
-import back.exceptions.JTHAuthException;
-
 import java.util.LinkedHashMap;
 
 
@@ -11,11 +8,20 @@ public class User {
     private long id;
     private final String email;
     private final String role;
+    private boolean isBanned;
 
     public User(long id, String email, String role) {
         this.id = id;
         this.email = email;
         this.role = role;
+        isBanned = false;
+    }
+
+    public User(long id, String email, String role, boolean isBanned) {
+        this.id = id;
+        this.email = email;
+        this.role = role;
+        this.isBanned = isBanned;
     }
 
     public static User fromLinkedHashMap(LinkedHashMap M){
@@ -43,10 +49,8 @@ public class User {
 
     public String getRole() { return role;}
 
-    public void isAdmin() throws JTHAuthException {
-        if(!this.role.equals("admin")){
-            //TODO: always succeed for now because front end is not implemented
-            // throw new JTHAuthException();
-        }
+    public boolean isBanned() {
+        return isBanned;
     }
+
 }

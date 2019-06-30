@@ -8,7 +8,7 @@ public class Admin extends User {
     private final String surname;
 
     public Admin(User usr, String _name, String _surname){
-        super(usr.getId(), usr.getEmail(), "admin");
+        super(usr.getId(), usr.getEmail(), "admin", usr.isBanned());
         name = _name;
         surname = _surname;
     }

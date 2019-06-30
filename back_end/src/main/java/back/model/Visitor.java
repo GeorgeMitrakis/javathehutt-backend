@@ -14,7 +14,7 @@ public class Visitor extends User {
     private List<Room> favouriteRooms = null;
 
     public Visitor(User usr, String _name, String _surname){
-        super(usr.getId(), usr.getEmail(), "visitor");
+        super(usr.getId(), usr.getEmail(), "visitor", usr.isBanned());
         name = _name;
         surname = _surname;
     }
@@ -26,7 +26,7 @@ public class Visitor extends User {
     }
 
     public Visitor(LinkedHashMap M){
-        super((Integer) M.get("id"), (String) M.get("email"), (String) M.get("role"));
+        super((Integer) M.get("id"), (String) M.get("email"), (String) M.get("role"), (M.get("isBanned") != null) ? (boolean) M.get("isBanned") : false);
         this.name = (String)M.get("name");
         this.surname = (String)M.get("surname");
     }

@@ -10,11 +10,11 @@ class UserRowMapper implements RowMapper<User>  {
 
 	@Override
     public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-        
         long id = rs.getLong("id");
         String email = rs.getString("email");
         String role = rs.getString("role");
-        return new User(id, email, role);
+        boolean isBanned = rs.getBoolean("isbanned");
+        return new User(id, email, role, isBanned);
 
     }
 }

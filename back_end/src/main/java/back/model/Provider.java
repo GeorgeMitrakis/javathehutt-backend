@@ -8,7 +8,7 @@ public class Provider extends User{
     private final String providername;
 
     public Provider(User usr, String _providername){
-        super(usr.getId(), usr.getEmail(), "provider");
+        super(usr.getId(), usr.getEmail(), "provider", usr.isBanned());
         providername = _providername;
     }
 
