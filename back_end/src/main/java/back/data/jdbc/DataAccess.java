@@ -72,8 +72,9 @@ public class DataAccess {
     public List<User> getUsers(long start, long count) throws JTHDataBaseException {
         // TODO return extended objects: ex Visitor?
         try {
-            Long[] params = new Long[]{count, start};
-            return jdbcTemplate.query("select * from \"user\" limit ? offset ?", params, new UserRowMapper());
+            return jdbcTemplate.query("(SELECT \"user\".*, \"provider\".*, '-' AS \"name\", '-' AS \"surname\" FROM \"user\", provider WHERE \"user\".id = provider.id" +
+                    ") UNION (" +
+                    "SELECT \"user\".*, visitor.*, '-' AS providerName FROM \"user\", visitor WHERE \"user\".id = visitor.id) LIMIT ? OFFSET ?", new Long[]{count, start}, new UltimateUserRowMapper());
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -85,7 +86,7 @@ public class DataAccess {
             case "visitor":
                 return jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
             case "provider":
-                return jdbcTemplate.queryForObject("SELECT * FROM provider WHERE id = ?", par, new ProviderRowMapper(u));
+                return jdbcTemplate.queryForObject("SELECT * FROM \"provider\" WHERE id = ?", par, new ProviderRowMapper(u));
             case "admin":
                 return jdbcTemplate.queryForObject("SELECT * FROM administrator WHERE id = ?", par, new AdminRowMapper(u));
             default:
@@ -108,9 +109,9 @@ public class DataAccess {
     public void updateBasicUserInfo(long userId, String newemail, String newpassword) throws JTHDataBaseException {
         try {
             System.out.println("GOT HEEEEREEEE: " + newemail);
-            if (newemail != null && newpassword != null) jdbcTemplate.update("UPDATE \"user\" SET email = ?, password = ? WHERE id = ?", newemail, newpassword, userId);
+            if (newemail != null && newpassword != null) jdbcTemplate.update("UPDATE \"user\" SET email = ?, \"password\" = ? WHERE id = ?", newemail, newpassword, userId);
             else if (newemail != null) jdbcTemplate.update("UPDATE \"user\" SET email = ? WHERE id = ?", newemail, userId);
-            else if (newpassword != null) jdbcTemplate.update("UPDATE \"user\" SET password = ? WHERE id = ?", newpassword, userId);
+            else if (newpassword != null) jdbcTemplate.update("UPDATE \"user\" SET \"password\" = ? WHERE id = ?", newpassword, userId);
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -130,7 +131,7 @@ public class DataAccess {
 
     public void updateProvider(long userId, String newProviderName) throws JTHDataBaseException {
         try {
-            if (newProviderName != null) jdbcTemplate.update("UPDATE provider SET providerName = ? WHERE id = ?", newProviderName, userId);
+            if (newProviderName != null) jdbcTemplate.update("UPDATE \"provider\" SET providerName = ? WHERE id = ?", newProviderName, userId);
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -174,7 +175,7 @@ public class DataAccess {
 
     public User getUser(String email, String hashedPassword) throws JTHDataBaseException {
         try {
-            User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ? and password = ?", new String[]{email, hashedPassword}, new UserRowMapper());
+            User u = jdbcTemplate.queryForObject("select * from \"user\" where email = ? and \"password\" = ?", new String[]{email, hashedPassword}, new UserRowMapper());
             return (u != null) ? getUserByRole(u.getRole(), new Long[]{u.getId()}, u) : null;
         } catch (EmptyResultDataAccessException e) {
             return null;
@@ -210,7 +211,7 @@ public class DataAccess {
         try {
             switch (user.getRole()) {
                 case "provider":
-                    jdbcTemplate.update("DELETE FROM provider WHERE id = ?", user.getId());
+                    jdbcTemplate.update("DELETE FROM \"provider\" WHERE id = ?", user.getId());
                     jdbcTemplate.update("UPDATE \"user\" SET role = 'admin' WHERE id = ?", user.getId());
                     jdbcTemplate.update("INSERT INTO administrator (id, name, surname) VALUES (?, ?, ?)",
                             user.getId(), "Guy from " + ((Provider) user).getProvidername(), "Guy from " + ((Provider) user).getProvidername());  // TODO what name to give?
@@ -239,7 +240,7 @@ public class DataAccess {
         try {
             switch (user.getRole()) {
                 case "provider":
-                    jdbcTemplate.update("DELETE FROM provider WHERE id = ?", user.getId());
+                    jdbcTemplate.update("DELETE FROM \"provider\" WHERE id = ?", user.getId());
                     break;
                 case "visitor":
                     jdbcTemplate.update("DELETE FROM visitor WHERE id = ?", user.getId());
@@ -273,8 +274,9 @@ public class DataAccess {
             }, keyHolder);
             long id = (long) keyHolder.getKeys().get("id");
             // use the same id to insert to provider
-            jdbcTemplate.update("INSERT INTO provider (id, providername) VALUES (?, ?)", id, p.getProvidername());
+            jdbcTemplate.update("INSERT INTO \"provider\" (id, providername) VALUES (?, ?)", id, p.getProvidername());
             p.setId(id);
+            System.out.println("\n!!Inserted to provider!!");
         } catch (Exception e) {
             System.err.println("Failed to store provider user");
             e.printStackTrace();
@@ -307,7 +309,7 @@ public class DataAccess {
     public Room getRoom(int id) throws JTHDataBaseException {
         try {
             Object[] par = new Object[]{id};
-            return jdbcTemplate.queryForObject("select room.*, location.*, city.name from room, location, city where room.id = ? and room.location_id = location.id and location.city_id = city.id", par, new RoomRowMapper());
+            return jdbcTemplate.queryForObject("select room.*, \"location\".*, city.name from room, location, city where room.id = ? and room.location_id = location.id and location.city_id = city.id", par, new RoomRowMapper());
         } catch (EmptyResultDataAccessException e) {
             return null;
         } catch (Exception e) {
@@ -318,7 +320,7 @@ public class DataAccess {
 
     public List<Room> getRoomsForProvider(long providerId) throws JTHDataBaseException {
         try {
-            return jdbcTemplate.query("SELECT room.*, location.*, city.name FROM room, location, city WHERE provider_id = ? and room.location_id = location.id and location.city_id = city.id", new Object[]{providerId}, new RoomRowMapper());
+            return jdbcTemplate.query("SELECT room.*, \"location\".*, city.name FROM room, location, city WHERE provider_id = ? and room.location_id = location.id and location.city_id = city.id", new Object[]{providerId}, new RoomRowMapper());
         } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -371,7 +373,7 @@ public class DataAccess {
     public List<Room> searchRooms(SearchConstraints constraints) throws JTHDataBaseException {
         List<Room> results;
         try {
-            String query = "select room.*, location.*, city.name from room, location, city where location.city_id = city.id and location.id = room.location_id";
+            String query = "select room.*, \"location\".*, city.name from room, \"location\", city where \"location\".city_id = city.id and \"location\".id = room.location_id";
 
             // check for range
             if (constraints.getRange() != -1) query += " and ST_DWithin(location.geom, ST_GeomFromText('" + constraints.getLocation().getCoords() + "'), " + constraints.getRange() + ")";
