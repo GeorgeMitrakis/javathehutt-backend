@@ -81,45 +81,48 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 
     @Override
     public List<Room> searchRooms(SearchConstraints constraints, int limit, int offset) {
-        List<Map> res = new LinkedList<>();
+        try {
+            List<Map> res = new LinkedList<>();
 
 
-        BoolQueryBuilder B = QueryBuilders.boolQuery();
-        if(constraints.getWifi()){
-            B = B.must(QueryBuilders.matchQuery("wifi",true));
+            BoolQueryBuilder B = QueryBuilders.boolQuery();
+            if (constraints.getWifi()) {
+                B = B.must(QueryBuilders.matchQuery("wifi", true));
+            }
+
+            if (constraints.getShauna()) {
+                B = B.must(QueryBuilders.matchQuery("shauna", true));
+            }
+
+            if (constraints.getShauna()) {
+                B = B.must(QueryBuilders.matchQuery("pool", true));
+            }
+
+            if (constraints.hasMinCost()) {
+                B = B.must(QueryBuilders.rangeQuery("cost").gte(constraints.getMinCost()));
+            }
+
+            if (constraints.hasMaxCost()) {
+                B = B.must(QueryBuilders.rangeQuery("cost").lte(constraints.getMinCost()));
+            }
+
+            if (constraints.hasRange()) {
+                B = B.must(QueryBuilders.geoDistanceQuery("location").distance(constraints.getRange(), DistanceUnit.KILOMETERS));
+            }
+
+
+            SearchResponse response = client.prepareSearch("testindex")
+                    .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+                    .setQuery(B)
+                    .setFrom(0/*offset*/).setSize(10/*limit*/).setExplain(true)
+                    .get();
+            for (SearchHit h : response.getHits().getHits()) {
+                res.add(h.getSourceAsMap());
+            }
+            System.out.println(res);
+        } catch (Exception e){
+            System.out.println("Tried elastic search and failed");
         }
-
-        if(constraints.getShauna()){
-            B = B.must(QueryBuilders.matchQuery("shauna",true));
-        }
-
-        if(constraints.getShauna()){
-            B = B.must(QueryBuilders.matchQuery("pool",true));
-        }
-
-        if(constraints.hasMinCost()){
-            B = B.must(QueryBuilders.rangeQuery("cost").gte(constraints.getMinCost()));
-        }
-
-        if(constraints.hasMaxCost()){
-            B = B.must(QueryBuilders.rangeQuery("cost").lte(constraints.getMinCost()));
-        }
-
-        if(constraints.hasRange()){
-            B = B.must(QueryBuilders.geoDistanceQuery("location").distance(constraints.getRange(), DistanceUnit.KILOMETERS));
-        }
-
-
-
-        SearchResponse response = client.prepareSearch("testindex")
-                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-                .setQuery(B)
-                .setFrom(0/*offset*/).setSize(10/*limit*/).setExplain(true)
-                .get();
-        for(SearchHit h : response.getHits().getHits()){
-            res.add(h.getSourceAsMap());
-        }
-        System.out.println(res);
         return null;
     }
 

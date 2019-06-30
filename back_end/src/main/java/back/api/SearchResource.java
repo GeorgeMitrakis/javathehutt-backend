@@ -34,7 +34,7 @@ public class SearchResource extends ServerResource {
         String cityName = getQueryValue("cityName");
         String pointX = getQueryValue("pointX");
         String pointY = getQueryValue("pointY");
-        // TODO: add "people" parameter: number of people for whom to book
+        String occupants = getQueryValue("occupants");  // TODO: add logic
 
         SearchConstraints constraints;
         try {
