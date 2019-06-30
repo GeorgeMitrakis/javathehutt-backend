@@ -271,6 +271,15 @@ public class DataAccess {
         }
     }
 
+    public List<Room> getRoomsForProvider(long providerId) throws JTHDataBaseException {
+        try {
+            return jdbcTemplate.query("SELECT room.*, location.*, city.name FROM room, location, city WHERE provider_id = ? and room.location_id = location.id and location.city_id = city.id", new Object[]{providerId}, new RoomRowMapper());
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
     public boolean insertTransaction(User user, Room room, String sqlStartDate, String sqlEndDate, int occupants) throws JTHDataBaseException {
         try {
             Boolean res = transactionTemplate.execute(status -> {

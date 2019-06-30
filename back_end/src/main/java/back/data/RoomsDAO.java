@@ -15,6 +15,8 @@ public interface RoomsDAO {
 
     Room getRoomById(int roomId) throws JTHDataBaseException;
 
+    List<Room> getRoomsForProvider(long providerId) throws JTHDataBaseException;
+
     List<Room> searchRooms(SearchConstraints constraints) throws JTHDataBaseException;
 
     boolean addRatingToRoom(long visitorId, int roomId, int stars, String comment) throws JTHDataBaseException;

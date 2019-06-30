@@ -15,6 +15,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RoomsResource extends ServerResource  {
@@ -25,31 +26,57 @@ public class RoomsResource extends ServerResource  {
     @Override
     protected Representation get() throws ResourceException {
         String roomIdStr = getQueryValue("roomId");
-        if (roomIdStr == null || roomIdStr.equals("")){
-            return JsonMapRepresentation.result(false, "Get room: Missing or empty \"roomId\" parameter", null);
-        }
+        if (roomIdStr == null){
+            String providerIdStr = getQueryValue("providerId");
 
-        int roomId;
-        try {
-            roomId = Integer.parseInt(roomIdStr);
-        } catch (ArithmeticException e){
-            return JsonMapRepresentation.result(false, "Get room: \"roomId\" parameter given is not a number", null);
-        }
+            if (providerIdStr == null || providerIdStr.equals("")){
+                return JsonMapRepresentation.result(false, "Get room: Missing or empty parameter(s)", null);
+            }
 
-        Room room;
-        try {
-            room = roomsDAO.getRoomById(roomId);
-        } catch (JTHDataBaseException e){
-            return JsonMapRepresentation.result(false, "Get room: DataBase error", null);
-        }
+            long providerId;
+            try {
+                providerId = Long.parseLong(providerIdStr);
+            } catch (ArithmeticException e){
+                return JsonMapRepresentation.result(false, "Get rooms: arithmetic parameter(s) given not a number", null);
+            }
 
-        if (room == null){
-            return JsonMapRepresentation.result(false, "Get room: There is no room with given id", null);
-        }
+            List<Room> rooms;
+            try {
+                rooms = roomsDAO.getRoomsForProvider(providerId);
+            } catch (JTHDataBaseException e) {
+                return JsonMapRepresentation.result(false, "Get rooms: database error (null)", null);
+            }
 
-        Map<String, Object> m = new HashMap<>();
-        m.put("room", room);
-        return JsonMapRepresentation.result(true, "success", m);
+            Map<String, Object> m = new HashMap<>();
+            m.put("rooms", rooms);
+            return JsonMapRepresentation.result(true, "success", m);
+        } else {
+            if (roomIdStr.equals("")){
+                return JsonMapRepresentation.result(false, "Get room: empty \"roomId\" parameter", null);
+            }
+
+            int roomId;
+            try {
+                roomId = Integer.parseInt(roomIdStr);
+            } catch (ArithmeticException e){
+                return JsonMapRepresentation.result(false, "Get room: \"roomId\" parameter given is not a number", null);
+            }
+
+            Room room;
+            try {
+                room = roomsDAO.getRoomById(roomId);
+            } catch (JTHDataBaseException e){
+                return JsonMapRepresentation.result(false, "Get room: DataBase error", null);
+            }
+
+            if (room == null){
+                return JsonMapRepresentation.result(false, "Get room: There is no room with given id", null);
+            }
+
+            Map<String, Object> m = new HashMap<>();
+            m.put("room", room);
+            return JsonMapRepresentation.result(true, "success", m);
+        }
     }
 
 
