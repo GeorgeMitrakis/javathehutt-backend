@@ -8,15 +8,17 @@ public class Transaction {
     private String startDate;
     private String endDate;
     private double cost;
+    private int occupants;
 
 
-    public Transaction(long visitorId, int roomId, int id, String startDate, String endDate, double cost) {
+    public Transaction(long visitorId, int roomId, int id, String startDate, String endDate, double cost, int occupants) {
         this.visitorId = visitorId;
         this.roomId = roomId;
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
         this.cost = cost;
+        this.occupants = occupants;
     }
 
     public long getVisitorId() {

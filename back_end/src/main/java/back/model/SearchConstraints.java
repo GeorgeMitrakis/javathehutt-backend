@@ -9,15 +9,15 @@ public class SearchConstraints {
     private boolean pool = false;
     private boolean shauna = false;
     private double range = -1.0;          // in kms
-    private int people = 1;               // 1 is the default
+    private int occupants = 1;            // 1 is the default
 
     // Setters and Getters
-    public int getPeople() {
-        return people;
+    public int getOccupants() {
+        return occupants;
     }
 
-    public void setPeople(int people) {
-        this.people = people;
+    public void setOccupants(int occupants) {
+        this.occupants = occupants;
     }
 
     public boolean getWifi() {

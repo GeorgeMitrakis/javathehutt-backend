@@ -47,7 +47,7 @@ public class Configuration {
         }
 
         // TEST
-        search.test();
+        //search.test();
     }
 
     public String getContextPath() {

@@ -38,13 +38,13 @@
 #### /book
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
-| POST   | userId, roomId, startDate, endDate | success/error message | books given room for given user on given time frame if available
+| POST   | userId, roomId, startDate, endDate, occupants | success/error message | books given room for given user on given time frame if available for given number of occupants
 
 #### /rooms
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
 | GET    | roomId | room: Room object | returns requested room
-| POST   | providerId, price, capacity, cordX, cordY, cityName, roomName, [description, wifi, pool, shauna] | room: Room object on success or error | submits a new room to the system for given provider
+| POST   | providerId, price, capacity, cordX, cordY, cityName, roomName, maxOccupants, [description, wifi, pool, shauna] | room: Room object on success or error | submits a new room to the system for given provider
 
 #### /favourite_rooms
 | Method | Input | Output | Action |
@@ -68,7 +68,7 @@
 #### /search (TODO: add more parameters?)
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
-| GET    | [minPrice, maxPrice, maxDist, pointX, pointY, cityName, hasWifi, hasPool, hasShauna, people] | results: JSon array of eligible Rooms | returns eligible rooms based on search constraints given
+| GET    | [occupants, minPrice, maxPrice, maxDist, pointX, pointY, cityName, hasWifi, hasPool, hasShauna, people] | results: JSon array of eligible Rooms | returns eligible rooms based on search constraints given
 
 
 #### /img (TODO)

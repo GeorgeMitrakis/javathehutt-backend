@@ -21,9 +21,9 @@ public class BookingDAOImpl implements BookingDAO {
     }
 
     @Override
-    public boolean bookRoomForVisitor(User user, Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException {
-        boolean succ = dataAccess.insertTransaction(user, room, sqlStartDate, sqlEndDate);
-        if (succ) search.pushTransaction(room.getId(), new Transaction(user.getId(), room.getId(), -1, sqlStartDate, sqlEndDate, -1.0));
+    public boolean bookRoomForVisitor(User user, Room room, String sqlStartDate, String sqlEndDate, int occupants) throws JTHDataBaseException {
+        boolean succ = dataAccess.insertTransaction(user, room, sqlStartDate, sqlEndDate, occupants);
+        if (succ) search.pushTransaction(room.getId(), new Transaction(user.getId(), room.getId(), -1, sqlStartDate, sqlEndDate, -1.0, occupants));
         return succ;
     }
 

@@ -44,6 +44,11 @@ public class SearchConstraintsBuilder {
         return this;
     }
 
+    public SearchConstraintsBuilder setOccupants(Integer occupants){
+        if (occupants != null) searchConstraints.setOccupants(occupants);
+        return this;
+    }
+
     public SearchConstraints build(){
         return searchConstraints;
     }

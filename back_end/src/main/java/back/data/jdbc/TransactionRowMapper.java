@@ -17,6 +17,7 @@ public class TransactionRowMapper implements RowMapper<Transaction> {
         double cost = rs.getDouble("cost");
         String startDate = DateHandler.SQLDateToFrontDate(rs.getString("start_date"));
         String endDate = DateHandler.SQLDateToFrontDate(rs.getString("end_date"));
-        return new Transaction(visitorId, roomId, id, startDate, endDate, cost);
+        int occupants = rs.getInt("occupants");
+        return new Transaction(visitorId, roomId, id, startDate, endDate, cost, occupants);
     }
 }

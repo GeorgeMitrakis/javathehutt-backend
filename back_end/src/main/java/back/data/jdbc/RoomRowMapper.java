@@ -21,6 +21,7 @@ public class RoomRowMapper implements RowMapper<Room> {
         String roomName = rs.getString("room_name");
         Location location = new Location(rs.getString("name"), rs.getDouble("cordX"), rs.getDouble("cordY"));
         String description = rs.getString("description");
-        return new Room(id, roomName, provider_id, price, capacity, wifi, pool, shauna, location, description);
+        int maxOccupants = rs.getInt("max_occupants");
+        return new Room(id, roomName, provider_id, price, capacity, wifi, pool, shauna, location, description, maxOccupants);
     }
 }

@@ -69,6 +69,7 @@ public class RoomsResource extends ServerResource  {
         String cityName = form.getFirstValue("cityName");
         String description = form.getFirstValue("description");
         String roomName = form.getFirstValue("roomName");
+        String maxOccupantsStr = form.getFirstValue("maxOccupants");
         if (description == null) description = "";
 
         if (providerIdStr == null || providerIdStr.equals("") ||
@@ -83,7 +84,7 @@ public class RoomsResource extends ServerResource  {
         }
 
         long providerId;
-        int capacity;
+        int capacity, maxOccupants;
         double price, cordX, cordY;
         try {
             providerId = Long.parseLong(providerIdStr);
@@ -91,6 +92,7 @@ public class RoomsResource extends ServerResource  {
             cordX = Double.parseDouble(cordXStr);
             cordY = Double.parseDouble(cordYStr);
             capacity = Integer.parseInt(capacityStr);
+            maxOccupants = (maxOccupantsStr != null) ? Integer.parseInt(maxOccupantsStr) : 1;
         } catch (ArithmeticException e){
             return JsonMapRepresentation.result(false, "Post room: arithmetic parameter(s) given not a number", null);
         }
@@ -109,7 +111,7 @@ public class RoomsResource extends ServerResource  {
         }
 
         Location location = new Location(cityName, cordX, cordY);
-        Room room = new Room(-1, roomName, providerId, price, capacity, "true".equals(wifi), "true".equals(pool), "true".equals(shauna), location, description);
+        Room room = new Room(-1, roomName, providerId, price, capacity, "true".equals(wifi), "true".equals(pool), "true".equals(shauna), location, description, maxOccupants);
 
         try {
             roomsDAO.submitNewRoom(room);

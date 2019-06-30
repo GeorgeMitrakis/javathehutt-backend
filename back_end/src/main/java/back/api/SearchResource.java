@@ -34,7 +34,7 @@ public class SearchResource extends ServerResource {
         String cityName = getQueryValue("cityName");
         String pointX = getQueryValue("pointX");
         String pointY = getQueryValue("pointY");
-        String occupants = getQueryValue("occupants");  // TODO: add logic
+        String occupants = getQueryValue("occupants");
 
         SearchConstraints constraints;
         try {
@@ -46,12 +46,12 @@ public class SearchResource extends ServerResource {
                     .setPool((hasPool == null) ? null : "true".equals(hasPool))
                     .setShauna((hasShauna == null) ? null : "true".equals(hasShauna))
                     .setLocation(cityName, (pointX == null) ? null : Double.parseDouble(pointX), (pointY == null) ? null : Double.parseDouble(pointY))
+                    .setOccupants((occupants == null) ? 1 : Integer.parseInt(occupants))
                     .build();
         } catch (NumberFormatException e){
             e.printStackTrace();
             return JsonMapRepresentation.result(false, "Search error: non number sent for a number parameter", null);
         }
-        // todo: setlocation
 
         // search based on those constraints
         List<Room> results;

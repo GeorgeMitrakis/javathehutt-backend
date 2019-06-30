@@ -271,18 +271,22 @@ public class DataAccess {
         }
     }
 
-    public boolean insertTransaction(User user, Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException {
+    public boolean insertTransaction(User user, Room room, String sqlStartDate, String sqlEndDate, int occupants) throws JTHDataBaseException {
         try {
             Boolean res = transactionTemplate.execute(status -> {
+                if (occupants > room.getMaxOccupants()){
+                    System.err.println("Failed to make transaction, too many occupants");
+                    return false;
+                }
                 try {
                     if (room.getCapacity() <= countTransactions(room, sqlStartDate, sqlEndDate)) {
                         System.err.println("Failed to make transaction, no available rooms");
                         return false;
                     }
-                } catch (JTHDataBaseException e) {
+                } catch (JTHDataBaseException | IncorrectResultSizeDataAccessException e) {
                     return false;
                 }
-                jdbcTemplate.update("INSERT INTO transactions (id, visitor_id, room_id, cost, start_date, end_date, closure_date) VALUES (default , ?, ?, ?, ?::date, ?::date, ?::date)", user.getId(), room.getId(), room.getPrice(), sqlStartDate, sqlEndDate, DateHandler.getSQLDateTimeNow());
+                jdbcTemplate.update("INSERT INTO transactions (id, visitor_id, room_id, cost, start_date, end_date, closure_date, occupants) VALUES (default , ?, ?, ?, ?::date, ?::date, ?::date, ?)", user.getId(), room.getId(), room.getPrice(), sqlStartDate, sqlEndDate, DateHandler.getSQLDateTimeNow(), occupants);
                 return true;
             });
             if (res != null && !res) {
@@ -316,20 +320,23 @@ public class DataAccess {
             String query = "select room.*, location.*, city.name from room, location, city where location.city_id = city.id and location.id = room.location_id";
 
             // check for range
-            if(constraints.getRange() != -1) query += " and ST_DWithin(location.geom, ST_GeomFromText('" + constraints.getLocation().getCoords() + "'), " + constraints.getRange() + ")";
+            if (constraints.getRange() != -1) query += " and ST_DWithin(location.geom, ST_GeomFromText('" + constraints.getLocation().getCoords() + "'), " + constraints.getRange() + ")";
+
+            // check of occupants
+            query += " and " + constraints.getOccupants() + " <= maxOccupants";
 
             // check for price range
             if(constraints.getMaxCost() != -1) query += " and price <= "+ constraints.getMaxCost();
             if(constraints.getMinCost() != -1) query += " and price >= "+ constraints.getMinCost();
 
             // check for wifi
-            if(constraints.getWifi()) query += " and wifi = true";
+            if (constraints.getWifi()) query += " and wifi = true";
 
             // check for pool
-            if(constraints.getPool()) query += " and pool = true";
+            if (constraints.getPool()) query += " and pool = true";
 
             // check for shauna
-            if(constraints.getShauna()) query += " and shauna = true";
+            if (constraints.getShauna()) query += " and shauna = true";
 
             results = jdbcTemplate.query(query, new RoomRowMapper());
         } catch (Exception e) {
@@ -397,7 +404,6 @@ public class DataAccess {
                     cityid = (int) keyHolder.getKeys().get("id");
                 }
 
-                // TODO: Does Location still need geom?
                 // then insert location
                 int location_id;
                 KeyHolder keyHolder = new GeneratedKeyHolder();

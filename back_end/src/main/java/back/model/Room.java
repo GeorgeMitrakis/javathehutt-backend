@@ -15,11 +15,12 @@ public class Room {
     private String roomName;
     private String description;
     private Location location;
+    private int maxOccupants;
 
     private Provider provider = null;
     private List<Rating> ratings = null;
 
-    public Room(int id, String roomName, long providerId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, Location location, String description) {
+    public Room(int id, String roomName, long providerId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, Location location, String description, int maxOccupants) {
         this.id = id;
         this.roomName = roomName;
         this.providerId = providerId;
@@ -30,6 +31,7 @@ public class Room {
         this.shauna = shauna;
         this.location = location;
         this.description = description;
+        this.maxOccupants = maxOccupants;
         fetchProvider();
         fetchRatings();
     }
@@ -72,6 +74,10 @@ public class Room {
 
     public String getDescription() {
         return description;
+    }
+
+    public int getMaxOccupants() {
+        return maxOccupants;
     }
 
     public Provider fetchProvider(){

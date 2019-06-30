@@ -39,6 +39,7 @@ public class BookingResource  extends ServerResource {
         String roomIdStr = form.getFirstValue("roomId");
         String startDate = form.getFirstValue("startDate");
         String endDate = form.getFirstValue("endDate");
+        String occupantsStr = form.getFirstValue("occupants");
 
         if (userIdStr == null || roomIdStr == null || startDate == null || endDate == null ||
             userIdStr.equals("") || roomIdStr.equals("") || startDate.equals("") || endDate.equals("")) {
@@ -46,10 +47,11 @@ public class BookingResource  extends ServerResource {
         }
 
         long userId;
-        int roomId;
+        int roomId, occupants;
         try {
             userId = Long.parseLong(userIdStr);
             roomId = Integer.parseInt(roomIdStr);
+            occupants = Integer.parseInt(occupantsStr);
         } catch (ArithmeticException e){
             return JsonMapRepresentation.result(false,"Booking error: id parameters that are not numbers",null);
         }
@@ -73,13 +75,20 @@ public class BookingResource  extends ServerResource {
             if (user == null) {
                 return JsonMapRepresentation.result(false, "Booking error: user does not exist", null);
             }
+
             // check that room exists
             Room room = roomsDAO.getRoomById(roomId);
             if (room == null) {
                 return JsonMapRepresentation.result(false, "Booking error: room does not exist", null);
             }
+
+            // check that occupants < max occupants for room
+            if (occupants > room.getMaxOccupants()){
+                return JsonMapRepresentation.result(false, "Booking error: too many occupants (" + occupantsStr + ") for this room (max is " + room.getMaxOccupants() + ")", null);
+            }
+
             // book the room
-            boolean success = bookingDAO.bookRoomForVisitor(user, room, DateHandler.FrontDateToSQLDate(startDate), DateHandler.FrontDateToSQLDate(endDate));
+            boolean success = bookingDAO.bookRoomForVisitor(user, room, DateHandler.FrontDateToSQLDate(startDate), DateHandler.FrontDateToSQLDate(endDate), occupants);
             if (!success) {
                 return JsonMapRepresentation.result(false, "Booking error: No room available", null);
             } else {
