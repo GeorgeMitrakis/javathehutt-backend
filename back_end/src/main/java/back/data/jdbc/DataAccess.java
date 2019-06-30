@@ -8,6 +8,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -89,6 +90,50 @@ public class DataAccess {
                 return jdbcTemplate.queryForObject("SELECT * FROM administrator WHERE id = ?", par, new AdminRowMapper(u));
             default:
                 return null;
+        }
+    }
+
+    public boolean checkAuthentication(Long userId, String password) throws JTHDataBaseException {
+        try {
+            jdbcTemplate.queryForObject("SELECT 1 FROM \"user\" WHERE id = ? and password = ?", new Object[]{userId, password}, Boolean.class);
+            return true;
+        } catch (EmptyResultDataAccessException | InvalidDataAccessApiUsageException e){
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public void updateBasicUserInfo(long userId, String newemail, String newpassword) throws JTHDataBaseException {
+        try {
+            System.out.println("GOT HEEEEREEEE: " + newemail);
+            if (newemail != null && newpassword != null) jdbcTemplate.update("UPDATE \"user\" SET email = ?, password = ? WHERE id = ?", newemail, newpassword, userId);
+            else if (newemail != null) jdbcTemplate.update("UPDATE \"user\" SET email = ? WHERE id = ?", newemail, userId);
+            else if (newpassword != null) jdbcTemplate.update("UPDATE \"user\" SET password = ? WHERE id = ?", newpassword, userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public void updateVisitor(long userId, String newname, String newsurname) throws JTHDataBaseException {
+        try {
+            if (newname != null && newsurname != null) jdbcTemplate.update("UPDATE visitor SET name = ?, surname = ? WHERE id = ?", newname, newsurname, userId);
+            else if (newname != null)  jdbcTemplate.update("UPDATE visitor SET name = ? WHERE id = ?", newname, userId);
+            else if (newsurname != null)  jdbcTemplate.update("UPDATE visitor SET surname = ? WHERE id = ?", newsurname, userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public void updateProvider(long userId, String newProviderName) throws JTHDataBaseException {
+        try {
+            if (newProviderName != null) jdbcTemplate.update("UPDATE provider SET providerName = ? WHERE id = ?", newProviderName, userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new JTHDataBaseException();
         }
     }
 

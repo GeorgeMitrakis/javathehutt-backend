@@ -23,6 +23,8 @@ public interface UserDAO {
 
     User getByCredentials(String email, String hashedPassword) throws JTHAuthException, JTHDataBaseException;
 
+    boolean updateUserInfo(long userId, String newemail, String newpassword, String oldpassword, String newname, String newsurname, String newProviderName) throws JTHAuthException, JTHDataBaseException;
+
     void storeUser(Provider p, String password) throws JTHDataBaseException;
 
     void storeUser(Visitor v, String password) throws JTHDataBaseException;

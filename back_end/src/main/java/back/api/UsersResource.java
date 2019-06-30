@@ -1,5 +1,6 @@
 package back.api;
 
+import back.exceptions.JTHAuthException;
 import back.exceptions.JTHDataBaseException;
 import back.exceptions.JTHInputException;
 import back.data.Limits;
@@ -164,13 +165,45 @@ public class UsersResource extends ServerResource {
             data.put("token", jwt);
             return JsonMapRepresentation.result(true,"also logged in", data);
         }
-        return JsonMapRepresentation.result(true,null,null);
+        return JsonMapRepresentation.result(true,"registration successful",null);
     }
 
     @Override
     protected Representation put(Representation entity) throws ResourceException {
-        // TODO: updates user information
-        return null;
+        Form form = new Form(entity);
+
+        String userIdStr = form.getFirstValue("userId");
+        String newemail = form.getFirstValue("email");
+        String newpassword = form.getFirstValue("newPassword");
+        String oldpassword = form.getFirstValue("oldPassword");
+        String name = form.getFirstValue("name");
+        String surname = form.getFirstValue("surname");
+        String providerName = form.getFirstValue("providerName");
+
+        long userId;
+        try{
+            userId = Long.parseLong(userIdStr);
+        } catch (ArithmeticException e){
+            return JsonMapRepresentation.result(false,"Update error: non number user id given",null);
+        }
+
+        if (newpassword != null && oldpassword == null){
+            return JsonMapRepresentation.result(false,"Update error: need to give old password in order to update current one",null);
+        }
+
+        // hash passwords
+        if (oldpassword != null) oldpassword = Hashing.getHashSHA256(oldpassword);
+        if (newpassword != null) newpassword = Hashing.getHashSHA256(newpassword);
+
+        try {
+            boolean exists = userDAO.updateUserInfo(userId, newemail, newpassword, oldpassword, name, surname, providerName);
+            if (!exists) return JsonMapRepresentation.result(false,"Update error: there is no user with the given id",null);
+        } catch (JTHAuthException e) {
+            return JsonMapRepresentation.result(false,"Update error: invalid password given",null);
+        } catch (JTHDataBaseException e) {
+            return JsonMapRepresentation.result(false,"Update error: database error",null);
+        }
+        return JsonMapRepresentation.result(true,"success",null);
     }
 
 }

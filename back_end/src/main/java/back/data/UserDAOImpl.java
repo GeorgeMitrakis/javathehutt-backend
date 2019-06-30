@@ -3,8 +3,6 @@ package back.data;
 import back.data.jdbc.DataAccess;
 import back.exceptions.JTHAuthException;
 import back.exceptions.JTHDataBaseException;
-import back.data.Limits;
-import back.data.UserDAO;
 import back.model.Provider;
 import back.model.User;
 import back.model.Visitor;
@@ -74,6 +72,23 @@ public class UserDAOImpl implements UserDAO {
             if (u == null) throw new JTHAuthException();          // ..but password is wrong then AUTH exception
             return u;
         } else return null;
+    }
+
+    @Override
+    public boolean updateUserInfo(long userId, String newemail, String newpassword, String oldpassword, String newname, String newsurname, String newProviderName) throws JTHAuthException, JTHDataBaseException {
+        if (newpassword != null && oldpassword != null && !dataAccess.checkAuthentication(userId, oldpassword)) {
+            throw new JTHAuthException();
+        }
+        dataAccess.updateBasicUserInfo(userId, newemail, newpassword);
+        User user = dataAccess.getUser(userId);
+        if (user != null && user.getRole().equals("visitor") && ((newname != null && !newname.equals("")) || (newsurname != null && !newsurname.equals("")))){
+            dataAccess.updateVisitor(userId, newname, newsurname);
+        } else if (user != null && user.getRole().equals("provider") && newProviderName != null && !newProviderName.equals("")) {
+            dataAccess.updateProvider(userId, newProviderName);
+        } else if (user == null){
+            return false;
+        }
+        return true;
     }
 
     @Override
