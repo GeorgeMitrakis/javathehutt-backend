@@ -27,7 +27,9 @@ public interface RoomsDAO {
 
     Rating getRatingById(int ratingId) throws JTHDataBaseException;
 
-    boolean submitNewRoom(Room room) throws JTHDataBaseException;
+    int submitNewRoom(Room room) throws JTHDataBaseException;
+
+    boolean updateRoom(Room room) throws JTHDataBaseException;
 
     void removeRoom(int roomId) throws JTHDataBaseException;
 

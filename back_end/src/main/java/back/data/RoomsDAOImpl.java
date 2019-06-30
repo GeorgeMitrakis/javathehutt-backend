@@ -2,7 +2,6 @@ package back.data;
 
 import back.data.jdbc.DataAccess;
 import back.exceptions.JTHDataBaseException;
-import back.data.RoomsDAO;
 import back.model.Provider;
 import back.model.Rating;
 import back.model.Room;
@@ -60,8 +59,15 @@ public class RoomsDAOImpl implements RoomsDAO {
     }
 
     @Override
-    public boolean submitNewRoom(Room room) throws JTHDataBaseException {
-        boolean succ = dataAccess.submitNewRoom(room);
+    public int submitNewRoom(Room room) throws JTHDataBaseException {
+        int roomId = dataAccess.submitNewRoom(room);
+        if (roomId != -1) search.pushRoom(room, null);
+        return roomId;
+    }
+
+    @Override
+    public boolean updateRoom(Room room) throws JTHDataBaseException {
+        boolean succ = dataAccess.updateRoom(room);
         if (succ) search.pushRoom(room, dataAccess.getTransactionsForRoom(room.getId()));
         return succ;
     }

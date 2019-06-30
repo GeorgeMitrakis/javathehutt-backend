@@ -9,6 +9,7 @@ public class Room {
 
     private int id;
     private long providerId;
+    private int locationId;  // only used for updating room (can be ignored elsewhere)
     private double price;
     private int capacity;
     private boolean wifi, pool, shauna;
@@ -20,10 +21,11 @@ public class Room {
     private Provider provider = null;
     private List<Rating> ratings = null;
 
-    public Room(int id, String roomName, long providerId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, Location location, String description, int maxOccupants) {
+    public Room(int id, String roomName, long providerId, int locationId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, Location location, String description, int maxOccupants, boolean fetchExtraFromDB) {
         this.id = id;
         this.roomName = roomName;
         this.providerId = providerId;
+        this.locationId = locationId;
         this.price = price;
         this.capacity = capacity;
         this.wifi = wifi;
@@ -32,8 +34,14 @@ public class Room {
         this.location = location;
         this.description = description;
         this.maxOccupants = maxOccupants;
-        fetchProvider();
-        fetchRatings();
+        if (fetchExtraFromDB) {
+            fetchProvider();
+            fetchRatings();
+        }
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getId() {
@@ -42,6 +50,10 @@ public class Room {
 
     public long getProviderId() {
         return providerId;
+    }
+
+    public int getLocationId() {
+        return locationId;
     }
 
     public double getPrice() {
@@ -84,6 +96,8 @@ public class Room {
         if (provider == null) {
             try {
                 provider = Configuration.getInstance().getRoomsDAO().getProviderForRoom(id);
+                if (provider != null) providerId = provider.getId();
+                else System.err.println("Warning: could not fetch provider for room with id " + id);
             } catch (JTHDataBaseException e){
                 provider = null;
             }

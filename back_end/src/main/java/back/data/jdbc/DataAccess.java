@@ -304,9 +304,9 @@ public class DataAccess {
         }
     }
 
-    public Room getRoom(long id) throws JTHDataBaseException {
+    public Room getRoom(int id) throws JTHDataBaseException {
         try {
-            Long[] par = new Long[]{id};
+            Object[] par = new Object[]{id};
             return jdbcTemplate.queryForObject("select room.*, location.*, city.name from room, location, city where room.id = ? and room.location_id = location.id and location.city_id = city.id", par, new RoomRowMapper());
         } catch (EmptyResultDataAccessException e) {
             return null;
@@ -439,10 +439,11 @@ public class DataAccess {
         }
     }
 
-    public boolean submitNewRoom(Room room) throws JTHDataBaseException {
+    public int submitNewRoom(Room room) throws JTHDataBaseException {
         Location location = room.getLocation();
+        Integer room_id = -1;
         try {
-            transactionTemplate.execute(status -> {
+            room_id = transactionTemplate.execute(status -> {
                 // if the city name does not exists already then insert it and keep id
                 int cityid;
                 try {
@@ -472,10 +473,61 @@ public class DataAccess {
                 }, keyHolder);
                 location_id = (int) keyHolder.getKeys().get("id");
 
-                // finally the room
-                jdbcTemplate.update("INSERT INTO room (id, provider_id, location_id, capacity, price, wifi, pool, shauna) " +
-                                     "VALUES (default, ?, ?, ?, ?, ?, ?, ?)",
-                                     room.getProviderId(), location_id, room.getCapacity(), room.getPrice(), room.getWifi(), room.getPool(), room.getShauna());
+                // finally insert the room
+                // Old way:
+                //jdbcTemplate.update("INSERT INTO room (id, provider_id, location_id, capacity, price, wifi, pool, shauna, room_name, description, max_occupants) " +
+                //                     "VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                //                     room.getProviderId(), location_id, room.getCapacity(), room.getPrice(), room.getWifi(), room.getPool(), room.getShauna(), room.getRoomName(), room.getDescription(), room.getMaxOccupants());
+                keyHolder = new GeneratedKeyHolder();
+                jdbcTemplate.update(connection -> {
+                    PreparedStatement ps = connection.prepareStatement("INSERT INTO room (id, provider_id, location_id, capacity, price, wifi, pool, shauna, room_name, description, max_occupants) " +
+                            "VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                    ps.setLong(1, room.getProviderId());
+                    ps.setInt(2, location_id);
+                    ps.setDouble(3, room.getCapacity());
+                    ps.setDouble(4, room.getPrice());
+                    ps.setBoolean(5, room.getWifi());
+                    ps.setBoolean(6, room.getPool());
+                    ps.setBoolean(7, room.getShauna());
+                    ps.setString(8, room.getRoomName());
+                    ps.setString(9, room.getDescription());
+                    ps.setInt(10, room.getMaxOccupants());
+                    return ps;
+                }, keyHolder);
+                return (int) keyHolder.getKeys().get("id");
+            });
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+        return (room_id != null) ? room_id : -1;
+    }
+
+    public boolean updateRoom(Room room) throws JTHDataBaseException {
+        Location location = room.getLocation();
+        try {
+            transactionTemplate.execute(status -> {
+                // if the city name does not exists already then insert it and keep id
+                int cityid;
+                try {
+                    // try querying for object to see if it exists
+                    cityid = jdbcTemplate.queryForObject("SELECT id FROM city WHERE name = ?", new Object[]{location.getCityname()}, Integer.class);
+                } catch (NullPointerException | IncorrectResultSizeDataAccessException e){
+                    KeyHolder keyHolder = new GeneratedKeyHolder();
+                    jdbcTemplate.update(connection -> {
+                        PreparedStatement ps = connection.prepareStatement("INSERT INTO city (id, name) VALUES (default, ?)", Statement.RETURN_GENERATED_KEYS);
+                        ps.setString(1, location.getCityname());
+                        return ps;
+                    }, keyHolder);
+                    cityid = (int) keyHolder.getKeys().get("id");
+                }
+
+                // then update location
+                jdbcTemplate.update("UPDATE location SET city_id = ?, cordx = ?, cordY = ?, geom = ST_GeomFromText(?) WHERE id = ?", cityid, location.getCordX(), location.getCordY(), location.getCoords(), room.getLocationId());
+
+                // finally update the room
+                jdbcTemplate.update("UPDATE room SET location_id = ?, capacity = ?, price = ?, wifi = ?, pool = ?, shauna = ?, room_name = ?, description = ?, max_occupants = ? WHERE id = ?",
+                        room.getLocationId(), room.getCapacity(), room.getPrice(), room.getWifi(), room.getPool(), room.getShauna(), room.getRoomName(), room.getDescription(), room.getMaxOccupants(), room.getId());
                 return true;
             });
         } catch (Exception e){

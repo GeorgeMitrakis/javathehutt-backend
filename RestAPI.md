@@ -44,8 +44,10 @@
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
 | GET    | roomId | room: Room object | returns requested room
-| GET    | providerId | JSon array of Room objects | returns rooms by given provider
+| GET    | providerId | rooms: JSon array of Room objects | returns rooms by given provider
 | POST   | providerId, price, capacity, cordX, cordY, cityName, roomName, maxOccupants, [description, wifi, pool, shauna] | room: Room object on success or error | submits a new room to the system for given provider
+| PUT    | roomId, price, capacity, cordX, cordY, cityName, roomName, maxOccupants, [description, wifi, pool, shauna] | room: Room object on success or error | modifies and returns the new Room objects
+| DELETE | roomId | success/error message | deletes room with given room id
 
 #### /favourite_rooms
 | Method | Input | Output | Action |
