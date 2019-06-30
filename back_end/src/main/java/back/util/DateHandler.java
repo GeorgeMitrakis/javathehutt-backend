@@ -8,12 +8,10 @@ import java.time.format.DateTimeFormatter;
 public class DateHandler {
 
     public static String FrontDateToSQLDate(String frontDate){
-        //TODO: Do we need to format it?
         return frontDate;
     }
 
     public static String SQLDateToFrontDate(String sqlDate){
-        //TODO: Do we need to format it?
         return sqlDate;
     }
 
