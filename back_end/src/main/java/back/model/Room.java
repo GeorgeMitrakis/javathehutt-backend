@@ -4,6 +4,7 @@ import back.exceptions.JTHDataBaseException;
 import back.conf.Configuration;
 
 import java.util.List;
+import java.util.Map;
 
 public class Room {
 
@@ -42,6 +43,10 @@ public class Room {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public static Map fromMap(Map<String, Object> source) {
+        return null;
     }
 
     public int getId() {

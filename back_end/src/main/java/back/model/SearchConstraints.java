@@ -11,6 +11,9 @@ public class SearchConstraints {
     private double range = -1.0;          // in kms
     private int occupants = 1;            // 1 is the default
 
+
+    private String description = null;
+
     // Setters and Getters
     public int getOccupants() {
         return occupants;
@@ -72,6 +75,10 @@ public class SearchConstraints {
         return range;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public void setRange(double range) {
         this.range = range;
     }
@@ -86,5 +93,9 @@ public class SearchConstraints {
 
     public boolean hasRange(){
         return range != -1;
+    }
+
+    public boolean hasDescription(){
+        return description != null;
     }
 }
