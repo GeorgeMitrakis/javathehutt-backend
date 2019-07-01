@@ -108,7 +108,6 @@ public class DataAccess {
 
     public void updateBasicUserInfo(long userId, String newemail, String newpassword) throws JTHDataBaseException {
         try {
-            System.out.println("GOT HEEEEREEEE: " + newemail);
             if (newemail != null && newpassword != null) jdbcTemplate.update("UPDATE \"user\" SET email = ?, \"password\" = ? WHERE id = ?", newemail, newpassword, userId);
             else if (newemail != null) jdbcTemplate.update("UPDATE \"user\" SET email = ? WHERE id = ?", newemail, userId);
             else if (newpassword != null) jdbcTemplate.update("UPDATE \"user\" SET \"password\" = ? WHERE id = ?", newpassword, userId);
@@ -276,7 +275,6 @@ public class DataAccess {
             // use the same id to insert to provider
             jdbcTemplate.update("INSERT INTO \"provider\" (id, providername) VALUES (?, ?)", id, p.getProvidername());
             p.setId(id);
-            System.out.println("\n!!Inserted to provider!!");
         } catch (Exception e) {
             System.err.println("Failed to store provider user");
             e.printStackTrace();
@@ -342,7 +340,7 @@ public class DataAccess {
                 } catch (JTHDataBaseException | IncorrectResultSizeDataAccessException e) {
                     return false;
                 }
-                jdbcTemplate.update("INSERT INTO transactions (id, visitor_id, room_id, cost, start_date, end_date, closure_date, occupants) VALUES (default , ?, ?, ?, ?::date, ?::date, ?::date, ?)", user.getId(), room.getId(), room.getPrice(), sqlStartDate, sqlEndDate, DateHandler.getSQLDateTimeNow(), occupants);
+                jdbcTemplate.update("INSERT INTO transactions (id, visitor_id, room_id, cost, start_date, end_date, closure_date, occupants) VALUES (default , ?, ?, ?, ?::date, ?::date, ?::date, ?)", user.getId(), room.getId(), room.calcCostBasedOnOccupants(occupants), sqlStartDate, sqlEndDate, DateHandler.getSQLDateTimeNow(), occupants);
                 return true;
             });
             if (res != null && !res) {
@@ -379,7 +377,7 @@ public class DataAccess {
             if (constraints.getRange() != -1) query += " and ST_DWithin(location.geom, ST_GeomFromText('" + constraints.getLocation().getCoords() + "'), " + constraints.getRange() + ")";
 
             // check of occupants
-            query += " and " + constraints.getOccupants() + " <= maxOccupants";
+            query += " and " + constraints.getOccupants() + " <= max_occupants";
 
             // check for price range
             if(constraints.getMaxCost() != -1) query += " and price <= "+ constraints.getMaxCost();

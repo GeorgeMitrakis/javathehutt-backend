@@ -45,9 +45,6 @@ public class Configuration {
         } catch (Exception e) {
             throw new ConfigurationException(e.getMessage(), e);
         }
-
-        // TEST
-        //search.test();
     }
 
     public String getContextPath() {

@@ -53,7 +53,9 @@ public class BookingDAOImpl implements BookingDAO {
     }
 
     @Override
-    public double lefta() throws JTHDataBaseException {
-        return dataAccess.sumTransactionCosts() * Double.parseDouble(Configuration.getInstance().getProperty("tarifa"));
+    public double calcSystemProfit() throws JTHDataBaseException {
+        String ratio = Configuration.getInstance().getProperty("systemProfitRatio");
+        if (ratio == null) { System.err.println("> Warning: Missing systemProfitRatio parameter"); return 0.0; }
+        else return dataAccess.sumTransactionCosts() * Double.parseDouble(ratio);
     }
 }

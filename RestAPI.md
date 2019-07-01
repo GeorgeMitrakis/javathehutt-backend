@@ -33,6 +33,7 @@
 #### /admin
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
+| GET    | -     | profit: A real number | returns the system's profit from all the transactions
 | POST   | id, option ∈ {"ban", "unban", "delete", "promote"} | success/error message | bans/unbans/deletes/promotes a user with the given id
 
 #### /book
