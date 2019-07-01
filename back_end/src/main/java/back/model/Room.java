@@ -45,8 +45,24 @@ public class Room {
         this.id = id;
     }
 
-    public static Map fromMap(Map<String, Object> source) {
-        return null;
+    public static Room fromMap(Map<String, Object> source) {
+        System.out.println("source:");
+        System.out.println(source);
+        return new Room(
+                (int)source.get("id"),
+                (String)source.get("roomName"),
+                (int)source.get("providerId"),
+                (int)source.get("locationId"),
+                (double)source.get("price"),
+                (int)source.get("capacity"),
+                (boolean)source.get("wifi"),
+                true,//(boolean)source.get("pool"),
+                (boolean)source.get("shauna"),
+                new Location((Map<String, Object>) source.get("location")),
+                (String)source.get("description"),
+                (int)source.get("maxOccupants"),
+                false
+        );
     }
 
     public int getId() {

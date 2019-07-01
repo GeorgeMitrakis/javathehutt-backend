@@ -31,8 +31,8 @@ public class RoomsDAOImpl implements RoomsDAO {
 
     @Override
     public List<Room> searchRooms(SearchConstraints constraints) throws JTHDataBaseException {
-        List<Room> results = search.searchRooms(constraints, -1, -1);
-        if (results == null) results = dataAccess.searchRooms(constraints);   // if not implemented in search
+        List<Room> results = search.searchRooms(constraints, 100, 0);
+        //if (results == null) results = dataAccess.searchRooms(constraints);   // if not implemented in search
         return results;
     }
 
@@ -60,9 +60,9 @@ public class RoomsDAOImpl implements RoomsDAO {
 
     @Override
     public int submitNewRoom(Room room) throws JTHDataBaseException {
-        //int roomId = dataAccess.submitNewRoom(room);
+        int roomId = dataAccess.submitNewRoom(room);
         search.pushRoom(room, null);
-        return 1;//roomId;
+        return roomId;
     }
 
     @Override

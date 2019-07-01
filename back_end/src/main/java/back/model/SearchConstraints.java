@@ -88,7 +88,7 @@ public class SearchConstraints {
     }
 
     public boolean hasMaxCost() {
-        return minCost != -1;
+        return maxCost != -1;
     }
 
     public boolean hasRange(){
@@ -97,5 +97,9 @@ public class SearchConstraints {
 
     public boolean hasDescription(){
         return description != null;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
