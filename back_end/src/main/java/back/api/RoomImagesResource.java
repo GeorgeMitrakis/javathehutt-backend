@@ -23,16 +23,15 @@ public class RoomImagesResource extends ServerResource {
                 String roomIdStr = getQueryValue("roomId");
                 roomId = new Long(roomIdStr).longValue();
             } catch (Exception e) {
-                throw new JTHInputException("No room id specified/ invalid room Id");
+                throw new JTHInputException("No room id specified / invalid room Id");
             }
             List<Long> ids = imageDAO.getRoomImageIds(roomId);
             Map<String, Object> res = new HashMap<>();
             res.put("ids", ids);
             return JsonMapRepresentation.result(true,"here's your ids!", res );
-
-        }catch(JTHInputException e){
+        } catch(JTHInputException e){
             return JsonMapRepresentation.result(false,"something went wrong: " + e.getErrorMsg(), null);
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
             return JsonMapRepresentation.result(false,"something went wrong", null);
         }

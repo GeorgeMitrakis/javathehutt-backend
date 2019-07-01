@@ -73,8 +73,13 @@
 | ------ | ----- | ------ | ------ |
 | GET    | [occupants, minPrice, maxPrice, maxDist, pointX, pointY, cityName, hasWifi, hasPool, hasShauna, people] | results: JSon array of eligible Rooms | returns eligible rooms based on search constraints given
 
-
-#### /img (TODO)
+#### /img
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
+| GET    | imgId | actual binary images | returns image with given id |
+
+#### /roomImages
+| Method | Input | Output | Action |
+| ------ | ----- | ------ | ------ |
+| GET    | roomId | ids: JSon array of image ids to be used on /img | returns images ids for given room |
 

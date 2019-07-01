@@ -25,9 +25,9 @@ public class ImageResource extends ServerResource {
             Image img = imageDAO.getById(imgId);
             ByteArrayRepresentation bar = ImgFetch.fetch(img.getUrl());
             return bar;
-        }catch(JTHInputException e){
+        } catch(JTHInputException e){
             return JsonMapRepresentation.result(false,"something went wrong: " + e.getErrorMsg(), null);
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
             return JsonMapRepresentation.result(false,"something went wrong", null);
         }
