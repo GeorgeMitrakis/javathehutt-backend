@@ -147,9 +147,7 @@ public class RoomsResource extends ServerResource  {
         }
 
         room.setId(roomId);
-        // so that it's there in JSon return value:
-        room.fetchProvider();
-        room.fetchRatings();
+        room.fetchProvider();  // so that it's there in JSon return value
 
         Map<String, Object> m = new HashMap<>();
         m.put("room", room);
