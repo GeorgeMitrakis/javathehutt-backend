@@ -33,6 +33,7 @@
 #### /admin
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
+| GET    | -     | profit: A real number | returns the system's profit from all the transactions
 | POST   | id, option ∈ {"ban", "unban", "delete", "promote"} | success/error message | bans/unbans/deletes/promotes a user with the given id
 
 #### /book
@@ -73,8 +74,13 @@
 | ------ | ----- | ------ | ------ |
 | GET    | [occupants, minPrice, maxPrice, maxDist, pointX, pointY, cityName, hasWifi, hasPool, hasShauna, people] | results: JSon array of eligible Rooms | returns eligible rooms based on search constraints given
 
-
-#### /img (TODO)
+#### /img
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
+| GET    | imgId | actual binary images | returns image with given id |
+
+#### /roomImages
+| Method | Input | Output | Action |
+| ------ | ----- | ------ | ------ |
+| GET    | roomId | ids: JSon array of image ids to be used on /img | returns images ids for given room |
 

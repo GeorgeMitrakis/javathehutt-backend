@@ -35,9 +35,8 @@ public class Room {
         this.location = location;
         this.description = description;
         this.maxOccupants = maxOccupants;
-        if (fetchExtraFromDB) {
+        if (fetchExtraFromDB) {   // fetch only Provider. Ratings, images, etc are costly and should be done on a separate API call if the user requests to see them
             fetchProvider();
-            fetchRatings();
         }
     }
 
@@ -135,6 +134,10 @@ public class Room {
             }
         }
         return ratings;
+    }
+
+    public double calcCostBasedOnOccupants(int occupants){
+        return price * occupants;
     }
 
 }

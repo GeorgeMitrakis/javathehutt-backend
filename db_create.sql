@@ -1,11 +1,9 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2019-05-25 09:47:37.844
+-- Last modification date: 2019-07-01 15:15:44.58
 
-
--- First Drop any previous db tables
-
+-- FIRST DROP PREVIOUS
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2019-05-25 09:47:37.844
+-- Last modification date: 2019-07-01 15:15:44.58
 
 -- foreign keys
 ALTER TABLE favorites
@@ -16,6 +14,9 @@ ALTER TABLE favorites
 
 ALTER TABLE administrator
     DROP CONSTRAINT administrator_user;
+
+ALTER TABLE img
+    DROP CONSTRAINT img_room;
 
 ALTER TABLE location
     DROP CONSTRAINT location_city;
@@ -51,6 +52,8 @@ DROP TABLE city;
 
 DROP TABLE favorites;
 
+DROP TABLE img;
+
 DROP TABLE location;
 
 DROP TABLE provider;
@@ -65,16 +68,14 @@ DROP TABLE "user";
 
 DROP TABLE visitor;
 
--- End of drop
-
-
--- Then create it from scratch
+-- End of file.
+-- End of DROP
 
 
 -- tables
 -- Table: administrator
 CREATE TABLE administrator (
-    id int  NOT NULL,
+    id long  NOT NULL,
     name varchar(64)  NOT NULL,
     surname varchar(64)  NOT NULL,
     CONSTRAINT administrator_pk PRIMARY KEY (id)
@@ -84,28 +85,38 @@ CREATE TABLE administrator (
 CREATE TABLE city (
     id int  NOT NULL DEFAULT serial,
     name varchar(32)  NOT NULL,
+    geom geometry  NOT NULL,
     CONSTRAINT city_pk PRIMARY KEY (id)
 );
 
 -- Table: favorites
 CREATE TABLE favorites (
-    visitor_id int  NOT NULL,
+    visitor_id long  NOT NULL,
     room_id int  NOT NULL,
     CONSTRAINT favorites_pk PRIMARY KEY (visitor_id,room_id)
+);
+
+-- Table: img
+CREATE TABLE img (
+    id int  NOT NULL,
+    url varchar(256)  NOT NULL,
+    room_id int  NOT NULL,
+    CONSTRAINT img_pk PRIMARY KEY (id)
 );
 
 -- Table: location
 CREATE TABLE location (
     id int  NOT NULL DEFAULT serial,
-    coordinate_X real  NOT NULL,
-    coordiante_Y real  NOT NULL,
+    geom geometry  NOT NULL,
     city_id int  NOT NULL,
+    cordX real  NOT NULL,
+    cordY real  NOT NULL,
     CONSTRAINT location_pk PRIMARY KEY (id)
 );
 
 -- Table: provider
 CREATE TABLE provider (
-    id int  NOT NULL,
+    id long  NOT NULL,
     providername varchar(256)  NOT NULL,
     CONSTRAINT provider_pk PRIMARY KEY (id)
 );
@@ -116,17 +127,20 @@ CREATE TABLE rating (
     comment varchar(200)  NOT NULL,
     stars int  NOT NULL,
     room_id int  NOT NULL,
-    visitor_id int  NOT NULL,
+    visitor_id long  NOT NULL,
     CONSTRAINT rating_pk PRIMARY KEY (id)
 );
 
 -- Table: room
 CREATE TABLE room (
     id int  NOT NULL DEFAULT serial,
-    provider_id int  NOT NULL,
+    provider_id long  NOT NULL,
     location_id int  NOT NULL,
     capacity int  NOT NULL,
+    max_occupants int  NOT NULL,
     price int  NOT NULL,
+    room_name varchar(256)  NOT NULL,
+    description text  NOT NULL,
     wifi boolean  NOT NULL,
     pool boolean  NOT NULL,
     shauna boolean  NOT NULL,
@@ -136,27 +150,29 @@ CREATE TABLE room (
 -- Table: transactions
 CREATE TABLE transactions (
     id int  NOT NULL DEFAULT serial,
-    visitor_id int  NOT NULL,
+    visitor_id long  NOT NULL,
     room_id int  NOT NULL,
     cost real  NOT NULL,
     closure_date timestamp  NOT NULL,
     start_date date  NOT NULL,
     end_date date  NOT NULL,
+    occupants int  NOT NULL,
     CONSTRAINT transactions_pk PRIMARY KEY (id)
 );
 
 -- Table: user
 CREATE TABLE "user" (
-    id int  NOT NULL DEFAULT serial,
+    id long  NOT NULL DEFAULT serial,
     email varchar(64)  NOT NULL,
     password varchar(256)  NOT NULL,
     role varchar(32)  NOT NULL,
+    isbanned boolean  NOT NULL,
     CONSTRAINT user_pk PRIMARY KEY (id)
 );
 
 -- Table: visitor
 CREATE TABLE visitor (
-    id int  NOT NULL,
+    id long  NOT NULL,
     name varchar(64)  NOT NULL,
     surname varchar(64)  NOT NULL,
     CONSTRAINT visitor_pk PRIMARY KEY (id)
@@ -183,6 +199,14 @@ ALTER TABLE favorites ADD CONSTRAINT Favorites_visitor
 ALTER TABLE administrator ADD CONSTRAINT administrator_user
     FOREIGN KEY (id)
     REFERENCES "user" (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: img_room (table: img)
+ALTER TABLE img ADD CONSTRAINT img_room
+    FOREIGN KEY (room_id)
+    REFERENCES room (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -262,4 +286,3 @@ ALTER TABLE visitor ADD CONSTRAINT visitor_user
 ;
 
 -- End of file.
-

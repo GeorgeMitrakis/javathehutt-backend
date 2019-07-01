@@ -191,6 +191,14 @@ public class UsersResource extends ServerResource {
             return JsonMapRepresentation.result(false,"Update error: need to give old password in order to update current one",null);
         }
 
+        try {
+            if (userDAO.getByEmail(newemail) != null){
+                return JsonMapRepresentation.result(false,"Update error: email given is already taken",null);
+            }
+        } catch (JTHDataBaseException e) {
+            return JsonMapRepresentation.result(false,"Update error: database error",null);
+        }
+
         if (Configuration.CHECK_AUTHORISATION) {
             try {
                 String jwt = JWT.getJWTFromHeaders(getRequest());

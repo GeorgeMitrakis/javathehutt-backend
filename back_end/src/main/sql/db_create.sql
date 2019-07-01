@@ -1,200 +1,288 @@
-create table city
-(
-	id integer not null
-		constraint city_pk
-			primary key,
-	name varchar(32) not null,
-	geom geometry
+-- Created by Vertabelo (http://vertabelo.com)
+-- Last modification date: 2019-07-01 15:15:44.58
+
+-- FIRST DROP PREVIOUS
+-- Created by Vertabelo (http://vertabelo.com)
+-- Last modification date: 2019-07-01 15:15:44.58
+
+-- foreign keys
+ALTER TABLE favorites
+    DROP CONSTRAINT Favorites_room;
+
+ALTER TABLE favorites
+    DROP CONSTRAINT Favorites_visitor;
+
+ALTER TABLE administrator
+    DROP CONSTRAINT administrator_user;
+
+ALTER TABLE img
+    DROP CONSTRAINT img_room;
+
+ALTER TABLE location
+    DROP CONSTRAINT location_city;
+
+ALTER TABLE provider
+    DROP CONSTRAINT provider_user;
+
+ALTER TABLE rating
+    DROP CONSTRAINT rating_room;
+
+ALTER TABLE rating
+    DROP CONSTRAINT rating_visitor;
+
+ALTER TABLE room
+    DROP CONSTRAINT room_location;
+
+ALTER TABLE room
+    DROP CONSTRAINT room_provider;
+
+ALTER TABLE transactions
+    DROP CONSTRAINT transactions_room;
+
+ALTER TABLE transactions
+    DROP CONSTRAINT transactions_visitor;
+
+ALTER TABLE visitor
+    DROP CONSTRAINT visitor_user;
+
+-- tables
+DROP TABLE administrator;
+
+DROP TABLE city;
+
+DROP TABLE favorites;
+
+DROP TABLE img;
+
+DROP TABLE location;
+
+DROP TABLE provider;
+
+DROP TABLE rating;
+
+DROP TABLE room;
+
+DROP TABLE transactions;
+
+DROP TABLE "user";
+
+DROP TABLE visitor;
+
+-- End of file.
+-- End of DROP
+
+
+-- tables
+-- Table: administrator
+CREATE TABLE administrator (
+    id long  NOT NULL,
+    name varchar(64)  NOT NULL,
+    surname varchar(64)  NOT NULL,
+    CONSTRAINT administrator_pk PRIMARY KEY (id)
 );
 
-alter table city owner to javathehutt;
-
-create table location
-(
-	id integer not null
-		constraint location_pk
-			primary key,
-	city_id integer not null
-		constraint location_city
-			references city,
-	geom geometry
+-- Table: city
+CREATE TABLE city (
+    id int  NOT NULL DEFAULT serial,
+    name varchar(32)  NOT NULL,
+    geom geometry  NOT NULL,
+    CONSTRAINT city_pk PRIMARY KEY (id)
 );
 
-alter table location owner to javathehutt;
-
-create table "user"
-(
-	id bigint not null
-		constraint user_pk
-			primary key,
-	email varchar(64) not null,
-	password varchar(256) not null,
-	role varchar(32) not null,
-	isbanned boolean default false
+-- Table: favorites
+CREATE TABLE favorites (
+    visitor_id long  NOT NULL,
+    room_id int  NOT NULL,
+    CONSTRAINT favorites_pk PRIMARY KEY (visitor_id,room_id)
 );
 
-alter table "user" owner to javathehutt;
-
-create table administrator
-(
-	id integer not null
-		constraint administrator_pk
-			primary key
-		constraint administrator_user
-			references "user",
-	name varchar(64) not null,
-	surname varchar(64) not null
+-- Table: img
+CREATE TABLE img (
+    id int  NOT NULL,
+    url varchar(256)  NOT NULL,
+    room_id int  NOT NULL,
+    CONSTRAINT img_pk PRIMARY KEY (id)
 );
 
-alter table administrator owner to javathehutt;
-
-create table provider
-(
-	id integer not null
-		constraint provider_pk
-			primary key
-		constraint provider_user
-			references "user",
-	providername varchar(256) not null
+-- Table: location
+CREATE TABLE location (
+    id int  NOT NULL DEFAULT serial,
+    geom geometry  NOT NULL,
+    city_id int  NOT NULL,
+    cordX real  NOT NULL,
+    cordY real  NOT NULL,
+    CONSTRAINT location_pk PRIMARY KEY (id)
 );
 
-alter table provider owner to javathehutt;
-
-create table room
-(
-	id integer not null
-		constraint room_pk
-			primary key,
-	provider_id integer not null
-		constraint room_provider
-			references provider,
-	location_id integer not null
-		constraint room_location
-			references location
-				on update restrict on delete restrict,
-	price integer not null,
-	wifi boolean not null,
-	pool boolean not null,
-	shauna boolean not null,
-	capacity integer
+-- Table: provider
+CREATE TABLE provider (
+    id long  NOT NULL,
+    providername varchar(256)  NOT NULL,
+    CONSTRAINT provider_pk PRIMARY KEY (id)
 );
 
-alter table room owner to javathehutt;
-
-create table visitor
-(
-	id integer not null
-		constraint visitor_pk
-			primary key
-		constraint visitor_user
-			references "user",
-	name varchar(64) not null,
-	surname varchar(64) not null
+-- Table: rating
+CREATE TABLE rating (
+    id int  NOT NULL DEFAULT serial,
+    comment varchar(200)  NOT NULL,
+    stars int  NOT NULL,
+    room_id int  NOT NULL,
+    visitor_id long  NOT NULL,
+    CONSTRAINT rating_pk PRIMARY KEY (id)
 );
 
-alter table visitor owner to javathehutt;
-
-create table favorites
-(
-	visitor_id integer not null
-		constraint favorites_visitor
-			references visitor,
-	room_id integer not null
-		constraint favorites_room
-			references room,
-	constraint favorites_pk
-		primary key (visitor_id, room_id)
+-- Table: room
+CREATE TABLE room (
+    id int  NOT NULL DEFAULT serial,
+    provider_id long  NOT NULL,
+    location_id int  NOT NULL,
+    capacity int  NOT NULL,
+    max_occupants int  NOT NULL,
+    price int  NOT NULL,
+    room_name varchar(256)  NOT NULL,
+    description text  NOT NULL,
+    wifi boolean  NOT NULL,
+    pool boolean  NOT NULL,
+    shauna boolean  NOT NULL,
+    CONSTRAINT room_pk PRIMARY KEY (id)
 );
 
-alter table favorites owner to javathehutt;
-
-create table rating
-(
-	id integer not null
-		constraint rating_pk
-			primary key,
-	comment varchar(200) not null,
-	stars integer not null,
-	room_id integer not null
-		constraint rating_room
-			references room,
-	visitor_id integer not null
-		constraint rating_visitor
-			references visitor
+-- Table: transactions
+CREATE TABLE transactions (
+    id int  NOT NULL DEFAULT serial,
+    visitor_id long  NOT NULL,
+    room_id int  NOT NULL,
+    cost real  NOT NULL,
+    closure_date timestamp  NOT NULL,
+    start_date date  NOT NULL,
+    end_date date  NOT NULL,
+    occupants int  NOT NULL,
+    CONSTRAINT transactions_pk PRIMARY KEY (id)
 );
 
-alter table rating owner to javathehutt;
-
-create table transactions
-(
-	visitor_id integer not null
-		constraint transactions_visitor
-			references visitor,
-	room_id integer not null
-		constraint transactions_room
-			references room,
-	closure_date timestamp not null,
-	start_date date not null,
-	end_date date not null,
-	cost real,
-	id serial not null
-		constraint transactions_pk_2
-			primary key
+-- Table: user
+CREATE TABLE "user" (
+    id long  NOT NULL DEFAULT serial,
+    email varchar(64)  NOT NULL,
+    password varchar(256)  NOT NULL,
+    role varchar(32)  NOT NULL,
+    isbanned boolean  NOT NULL,
+    CONSTRAINT user_pk PRIMARY KEY (id)
 );
 
-alter table transactions owner to javathehutt;
-
-create table spatial_ref_sys
-(
-	srid integer not null
-		constraint spatial_ref_sys_pkey
-			primary key
-		constraint spatial_ref_sys_srid_check
-			check ((srid > 0) AND (srid <= 998999)),
-	auth_name varchar(256),
-	auth_srid integer,
-	srtext varchar(2048),
-	proj4text varchar(2048)
+-- Table: visitor
+CREATE TABLE visitor (
+    id long  NOT NULL,
+    name varchar(64)  NOT NULL,
+    surname varchar(64)  NOT NULL,
+    CONSTRAINT visitor_pk PRIMARY KEY (id)
 );
 
-alter table spatial_ref_sys owner to rdsadmin;
+-- foreign keys
+-- Reference: Favorites_room (table: favorites)
+ALTER TABLE favorites ADD CONSTRAINT Favorites_room
+    FOREIGN KEY (room_id)
+    REFERENCES room (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
 
-create table us_lex
-(
-	id serial not null
-		constraint pk_us_lex
-			primary key,
-	seq integer,
-	word text,
-	stdword text,
-	token integer,
-	is_custom boolean default true not null
-);
+-- Reference: Favorites_visitor (table: favorites)
+ALTER TABLE favorites ADD CONSTRAINT Favorites_visitor
+    FOREIGN KEY (visitor_id)
+    REFERENCES visitor (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
 
-alter table us_lex owner to rdsadmin;
+-- Reference: administrator_user (table: administrator)
+ALTER TABLE administrator ADD CONSTRAINT administrator_user
+    FOREIGN KEY (id)
+    REFERENCES "user" (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
 
-create table us_gaz
-(
-	id serial not null
-		constraint pk_us_gaz
-			primary key,
-	seq integer,
-	word text,
-	stdword text,
-	token integer,
-	is_custom boolean default true not null
-);
+-- Reference: img_room (table: img)
+ALTER TABLE img ADD CONSTRAINT img_room
+    FOREIGN KEY (room_id)
+    REFERENCES room (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
 
-alter table us_gaz owner to rdsadmin;
+-- Reference: location_city (table: location)
+ALTER TABLE location ADD CONSTRAINT location_city
+    FOREIGN KEY (city_id)
+    REFERENCES city (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
 
-create table us_rules
-(
-	id serial not null
-		constraint pk_us_rules
-			primary key,
-	rule text,
-	is_custom boolean default true not null
-);
+-- Reference: provider_user (table: provider)
+ALTER TABLE provider ADD CONSTRAINT provider_user
+    FOREIGN KEY (id)
+    REFERENCES "user" (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
 
-alter table us_rules owner to rdsadmin;
+-- Reference: rating_room (table: rating)
+ALTER TABLE rating ADD CONSTRAINT rating_room
+    FOREIGN KEY (room_id)
+    REFERENCES room (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
 
+-- Reference: rating_visitor (table: rating)
+ALTER TABLE rating ADD CONSTRAINT rating_visitor
+    FOREIGN KEY (visitor_id)
+    REFERENCES visitor (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: room_location (table: room)
+ALTER TABLE room ADD CONSTRAINT room_location
+    FOREIGN KEY (location_id)
+    REFERENCES location (id)
+    ON DELETE  RESTRICT 
+    ON UPDATE  RESTRICT 
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: room_provider (table: room)
+ALTER TABLE room ADD CONSTRAINT room_provider
+    FOREIGN KEY (provider_id)
+    REFERENCES provider (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: transactions_room (table: transactions)
+ALTER TABLE transactions ADD CONSTRAINT transactions_room
+    FOREIGN KEY (room_id)
+    REFERENCES room (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: transactions_visitor (table: transactions)
+ALTER TABLE transactions ADD CONSTRAINT transactions_visitor
+    FOREIGN KEY (visitor_id)
+    REFERENCES visitor (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: visitor_user (table: visitor)
+ALTER TABLE visitor ADD CONSTRAINT visitor_user
+    FOREIGN KEY (id)
+    REFERENCES "user" (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+-- End of file.

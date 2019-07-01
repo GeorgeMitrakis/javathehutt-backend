@@ -1,5 +1,6 @@
 package back.api;
 
+import back.data.BookingDAO;
 import back.exceptions.JTHDataBaseException;
 import back.exceptions.JTHInputException;
 import back.conf.Configuration;
@@ -12,10 +13,39 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class AdminResource  extends ServerResource {
 
     private final UserDAO userDAO = Configuration.getInstance().getUserDAO();
+    private final BookingDAO bookingDAO = Configuration.getInstance().getBookingDAO();
+
+    @Override
+    protected Representation get() throws ResourceException {
+        double systemProfit;
+
+        if (Configuration.CHECK_AUTHORISATION) {
+            try {
+                String jwt = JWT.getJWTFromHeaders(getRequest());
+                if (!JWT.assertRole(jwt, "admin")){
+                    return JsonMapRepresentation.result(false,"Admin get profit: forbidden (not an admin)",null);
+                }
+            } catch (JTHInputException e){
+                return JsonMapRepresentation.result(false,"Admin get profit: " + e.getErrorMsg(),null);
+            }
+        }
+
+        try {
+            systemProfit = bookingDAO.calcSystemProfit();
+        } catch (JTHDataBaseException e) {
+            return JsonMapRepresentation.result(false,"Admin get profit: database error",null);
+        }
+        Map<String, Object> m = new HashMap<>();
+        m.put("profit", systemProfit);
+        return JsonMapRepresentation.result(true,"success", m);
+    }
 
     // POST (id, option=ban)     ->  ban user
     // POST (id, option=unban)   ->  unban user
