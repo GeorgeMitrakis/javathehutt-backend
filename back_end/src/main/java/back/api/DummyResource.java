@@ -1,5 +1,6 @@
 package back.api;
 
+import back.data.SearchStorageImplementation;
 import back.util.JsonMapRepresentation;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -19,6 +20,7 @@ public class DummyResource extends ServerResource {
 
     @Override
     protected Representation get() throws ResourceException {
+
 
 
         JSONParser jsonParser = new JSONParser();

@@ -60,9 +60,9 @@ public class RoomsDAOImpl implements RoomsDAO {
 
     @Override
     public int submitNewRoom(Room room) throws JTHDataBaseException {
-        int roomId = dataAccess.submitNewRoom(room);
-        if (roomId != -1) search.pushRoom(room, null);
-        return roomId;
+        //int roomId = dataAccess.submitNewRoom(room);
+        search.pushRoom(room, null);
+        return 1;//roomId;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class RoomsDAOImpl implements RoomsDAO {
 
     @Override
     public void removeRoom(int roomId) throws JTHDataBaseException {
-        dataAccess.removeRoom(roomId);
+        //dataAccess.removeRoom(roomId);
         search.deleteRoom(roomId);
     }
 

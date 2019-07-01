@@ -6,24 +6,21 @@ import back.model.SearchConstraints;
 import back.model.Transaction;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.*;
 
+import org.apache.http.HttpHost;
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.geo.GeoPoint;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.script.Script;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 
@@ -41,25 +38,27 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 
  */
 
-    private TransportClient client;
-    private String roomIndexName;
+    private RestHighLevelClient client;
 
     public SearchStorageImplementation(){
     }
 
     public void setup(String eshost, int port, String roomIndexName) throws Exception {
-        client = new PreBuiltTransportClient(Settings.EMPTY)
-                .addTransportAddress(new TransportAddress(InetAddress.getByName(eshost), port));
+
+        client = new RestHighLevelClient(RestClient.builder(
+                new HttpHost(eshost, port, "http")));
+
     }
 
 
     @Override
     public void pushRoom(Room room, List<Transaction> transactions) throws JTHDataBaseException {
-        try {
-            String roomId = String.format("%d", room.getId());
-            XContentBuilder builder = RoomToXContent(room);
-            IndexResponse response = client.prepareIndex(roomIndexName, "room", roomId).setSource(builder).get();
-        }catch(Exception e){
+        try{
+            IndexRequest request = new IndexRequest("jth_rooms").id(Integer.toString(room.getId())).source(
+                    RoomToXContent(room)
+            );
+            client.index(request, RequestOptions.DEFAULT);
+        }catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
@@ -92,17 +91,26 @@ public class SearchStorageImplementation implements SearchStorageAPI {
     }
 
     @Override
-    public void pushTransaction(int roomId, Transaction transaction) throws Exception{
-        XContentBuilder t = TransactionToXContent(transaction);
+    public void pushTransaction(int roomId, Transaction transaction) throws JTHDataBaseException{
+        try {
+            XContentBuilder t = TransactionToXContent(transaction);
+        } catch (IOException e) {
+            throw new JTHDataBaseException();
+        }
         //UpdateResponse res = client.prepareUpdate(roomIndexName, "room", Integer.toString(roomId)).setScript(new Script("").getParams().pu)
 
 
     }
 
     @Override
-    public void deleteRoom(int roomId) {
+    public void deleteRoom(int roomId) throws JTHDataBaseException {
         String roomIdStr = String.format("%d",roomId);
-        DeleteResponse response = client.prepareDelete(roomIndexName, "room", roomIdStr).get();
+        try {
+            client.delete(new DeleteRequest("jth_rooms",Integer.toString(roomId)), RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
     }
 
     @Override
@@ -141,7 +149,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 
             B = B.must(QueryBuilders.rangeQuery("max_occupants").gte(constraints.getOccupants()));
 
-            SearchResponse response = client.prepareSearch(roomIndexName)
+            /*SearchResponse response = client.prepareSearch(roomIndexName)
                     .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                     .setQuery(B)
                     .setFrom(offset).setSize(limit).setExplain(true)
@@ -149,7 +157,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             for (SearchHit h : response.getHits().getHits()) {
                 res.add(h.getSourceAsMap());
                 res.add(Room.fromMap(h.getSourceAsMap()));
-            }
+            }*/
             System.out.println(res);
         } catch (Exception e){
             System.out.println("Tried elastic search and failed");

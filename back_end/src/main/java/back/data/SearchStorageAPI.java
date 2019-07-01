@@ -14,7 +14,7 @@ public interface SearchStorageAPI {
 
     void pushTransaction(int roomId, Transaction transaction) throws Exception;
 
-    void deleteRoom(int roomId);
+    void deleteRoom(int roomId) throws JTHDataBaseException;
 
     List<Room> searchRooms(SearchConstraints constraints, int limit, int offset);
 
