@@ -646,9 +646,24 @@ public class DataAccess {
 
     public double sumTransactionCosts() throws JTHDataBaseException {
         try{
-            double sum = jdbcTemplate.queryForObject("SELECT SUM(cost) FROM transactions", Double.class);
-            return sum;
-        }catch (Exception e){
+            Double sum = jdbcTemplate.queryForObject("SELECT SUM(cost) FROM transactions", Double.class);
+            return (sum != null) ? sum : 0.0;
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return 0.0;
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public double sumTransactionCosts(long providerId) throws JTHDataBaseException {
+        try{
+            Double sum = jdbcTemplate.queryForObject("SELECT SUM(transactions.cost) FROM transactions, room WHERE transactions.room_id = room.id and room.provider_id = ?", new Long[]{providerId}, Double.class);
+            return (sum != null) ? sum : 0.0;
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return 0.0;
+        } catch (Exception e){
+            e.printStackTrace();
             throw new JTHDataBaseException();
         }
     }

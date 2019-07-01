@@ -101,26 +101,44 @@ public class BookingResource  extends ServerResource {
     }
 
     public Representation get() throws ResourceException{
-        try {
-
+        String providerIdStr = getQueryValue("providerId");
+        if (providerIdStr == null) {
             if (Configuration.CHECK_AUTHORISATION) {
                 try {
                     String jwt = JWT.getJWTFromHeaders(getRequest());
-                    if (!JWT.assertRole(jwt, "admin")){
-                        return JsonMapRepresentation.result(false,"Booking error: forbidden (not an admin)",null);
+                    if (!JWT.assertRole(jwt, "admin")) {
+                        return JsonMapRepresentation.result(false, "Booking error: forbidden (not an admin)", null);
                     }
-                } catch (JTHInputException e){
-                    return JsonMapRepresentation.result(false,"Booking error: " + e.getErrorMsg(),null);
+                } catch (JTHInputException e) {
+                    return JsonMapRepresentation.result(false, "Booking error: " + e.getErrorMsg(), null);
                 }
             }
+            try {
+                List<Transaction> res = bookingDAO.getTransactions();
+                Map<String, Object> m = new HashMap<>();
+                m.put("transactions", res);
+                return JsonMapRepresentation.result(true, "success", m);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return JsonMapRepresentation.result(false, "Something went wrong:" + e.getMessage(), null);
+            }
+        } else {
+            long providerId;
+            try {
+                providerId = Long.parseLong(providerIdStr);
+            } catch (ArithmeticException e){
+                return JsonMapRepresentation.result(false, "Transaction error: arithmetic parameter(s) given not a number", null);
+            }
 
-            List<Transaction> res = bookingDAO.getTransactions();
+            double systemProfit;
+            try {
+                systemProfit = bookingDAO.calcProviderProfit(providerId);
+            } catch (JTHDataBaseException e) {
+                return JsonMapRepresentation.result(false,"Transaction error: database error",null);
+            }
             Map<String, Object> m = new HashMap<>();
-            m.put("transactions", res);
-            return JsonMapRepresentation.result(true,"success",m);
-        } catch (Exception e){
-            e.printStackTrace();
-            return JsonMapRepresentation.result(false, "Something went wrong:" + e.getMessage(), null);
+            m.put("profit", systemProfit);
+            return JsonMapRepresentation.result(true,"success", m);
         }
     }
 

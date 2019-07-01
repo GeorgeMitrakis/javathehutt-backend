@@ -56,6 +56,19 @@ public class BookingDAOImpl implements BookingDAO {
     public double calcSystemProfit() throws JTHDataBaseException {
         String ratio = Configuration.getInstance().getProperty("systemProfitRatio");
         if (ratio == null) { System.err.println("> Warning: Missing systemProfitRatio parameter"); return 0.0; }
+        else if (Double.parseDouble(ratio) < 0.0 || Double.parseDouble(ratio) > 1.0) { System.err.println("> Warning: Wrong systemProfitRatio parameter"); return 0.0; }
         else return dataAccess.sumTransactionCosts() * Double.parseDouble(ratio);
+    }
+
+    @Override
+    public double calcProviderProfit(long providerId) throws JTHDataBaseException {
+        String ratio = Configuration.getInstance().getProperty("systemProfitRatio");
+        if (ratio == null) { System.err.println("> Warning: Missing systemProfitRatio parameter"); return 0.0; }
+        else if (Double.parseDouble(ratio) < 0.0 || Double.parseDouble(ratio) > 1.0) { System.err.println("> Warning: Wrong systemProfitRatio parameter"); return 0.0; }
+        else {
+            double d = dataAccess.sumTransactionCosts(providerId);
+            System.out.println("ration = " + ratio + " sum = " + d);
+            return d * (1.0 - Double.parseDouble(ratio));
+        }
     }
 }

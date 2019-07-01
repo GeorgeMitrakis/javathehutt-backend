@@ -26,4 +26,5 @@ public interface BookingDAO {
 
     double calcSystemProfit() throws JTHDataBaseException;
 
+    double calcProviderProfit(long providerId) throws JTHDataBaseException;
 }
