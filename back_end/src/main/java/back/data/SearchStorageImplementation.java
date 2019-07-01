@@ -57,7 +57,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
     @Override
     public void pushRoom(Room room, List<Transaction> transactions) throws JTHDataBaseException {
         try{
-            IndexRequest request = new IndexRequest("jth_rooms").id(Integer.toString(room.getId())).source(
+            IndexRequest request = new IndexRequest("jth_rooms").type("room").id(Integer.toString(room.getId())).source(
                     RoomToXContent(room)
             );
             client.index(request, RequestOptions.DEFAULT);
@@ -111,7 +111,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
     @Override
     public void deleteRoom(int roomId) throws JTHDataBaseException {
         try {
-            client.delete(new DeleteRequest("jth_rooms",Integer.toString(roomId)), RequestOptions.DEFAULT);
+            client.delete(new DeleteRequest("jth_rooms").id(Integer.toString(roomId)), RequestOptions.DEFAULT);
         } catch (IOException e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
