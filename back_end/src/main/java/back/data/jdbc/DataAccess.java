@@ -539,8 +539,11 @@ public class DataAccess {
 
     public void removeRoom(int roomId) throws JTHDataBaseException {
         try {
-            // CASCADE option should take care of all the necessary deletes on other tables like location and city (TODO: check)
+            // added all deletes in case there is no CASCADE set
             jdbcTemplate.update("DELETE FROM room WHERE id = ?", roomId);
+            jdbcTemplate.update("DELETE FROM transactions WHERE room_id = ?", roomId);
+            jdbcTemplate.update("DELETE FROM ratings WHERE room_id = ?", roomId);
+            jdbcTemplate.update("DELETE FROM favorites WHERE room_id = ?", roomId);
         } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
