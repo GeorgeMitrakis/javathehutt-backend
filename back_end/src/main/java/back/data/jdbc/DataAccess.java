@@ -237,12 +237,20 @@ public class DataAccess {
 
     public boolean deleteUser(User user) throws JTHDataBaseException {
         try {
+            // Note: make all transitive deletes in case there is no CASCADE in the database
             switch (user.getRole()) {
                 case "provider":
                     jdbcTemplate.update("DELETE FROM \"provider\" WHERE id = ?", user.getId());
+                    List<Room> hisRooms = getRoomsForProvider(user.getId());
+                    for (Room room: hisRooms) {
+                        removeRoom(room.getId());
+                    }
                     break;
                 case "visitor":
                     jdbcTemplate.update("DELETE FROM visitor WHERE id = ?", user.getId());
+                    jdbcTemplate.update("DELETE FROM favorites WHERE visitor_id = ?", user.getId());
+                    jdbcTemplate.update("DELETE FROM transactions WHERE visitor_id = ?", user.getId());
+                    jdbcTemplate.update("DELETE FROM rating WHERE visitor_id = ?", user.getId());
                     break;
                 case "admin":
                     System.out.println("Warning: Deleting an administrator!");
