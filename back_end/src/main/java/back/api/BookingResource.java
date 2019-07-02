@@ -102,7 +102,8 @@ public class BookingResource  extends ServerResource {
 
     public Representation get() throws ResourceException{
         String providerIdStr = getQueryValue("providerId");
-        if (providerIdStr == null) {
+        String visitorIdStr = getQueryValue("visitorId");
+        if (providerIdStr == null && visitorIdStr == null) {
             if (Configuration.CHECK_AUTHORISATION) {
                 try {
                     String jwt = JWT.getJWTFromHeaders(getRequest());
@@ -122,7 +123,7 @@ public class BookingResource  extends ServerResource {
                 e.printStackTrace();
                 return JsonMapRepresentation.result(false, "Something went wrong:" + e.getMessage(), null);
             }
-        } else {
+        } else if (providerIdStr != null) {
             long providerId;
             try {
                 providerId = Long.parseLong(providerIdStr);
@@ -130,15 +131,48 @@ public class BookingResource  extends ServerResource {
                 return JsonMapRepresentation.result(false, "Transaction error: arithmetic parameter(s) given not a number", null);
             }
 
-            double systemProfit;
-            try {
-                systemProfit = bookingDAO.calcProviderProfit(providerId);
-            } catch (JTHDataBaseException e) {
-                return JsonMapRepresentation.result(false,"Transaction error: database error",null);
+            String profit = getQueryValue("profit");
+            if (profit != null) {
+                double systemProfit;
+                try {
+                    systemProfit = bookingDAO.calcProviderProfit(providerId);
+                } catch (JTHDataBaseException e) {
+                    return JsonMapRepresentation.result(false, "Transaction error: database error", null);
+                }
+
+                Map<String, Object> m = new HashMap<>();
+                m.put("profit", systemProfit);
+                return JsonMapRepresentation.result(true, "success", m);
+            } else {
+                List<Transaction> transactions;
+                try {
+                    transactions = bookingDAO.getTransactionsForProvider(providerId);
+                } catch (JTHDataBaseException e) {
+                    return JsonMapRepresentation.result(false, "Transaction error: database error", null);
+                }
+
+                Map<String, Object> m = new HashMap<>();
+                m.put("transactions", transactions);
+                return JsonMapRepresentation.result(true, "success", m);
             }
+        } else {   // visitorIdStr != null
+            long visitorId;
+            try {
+                visitorId = Long.parseLong(visitorIdStr);
+            } catch (ArithmeticException e){
+                return JsonMapRepresentation.result(false, "Transaction error: arithmetic parameter(s) given not a number", null);
+            }
+
+            List<Transaction> transactions;
+            try {
+                transactions = bookingDAO.getTransactionsForVisitor(visitorId);
+            } catch (JTHDataBaseException e) {
+                return JsonMapRepresentation.result(false, "Transaction error: database error", null);
+            }
+
             Map<String, Object> m = new HashMap<>();
-            m.put("profit", systemProfit);
-            return JsonMapRepresentation.result(true,"success", m);
+            m.put("transactions", transactions);
+            return JsonMapRepresentation.result(true, "success", m);
         }
     }
 

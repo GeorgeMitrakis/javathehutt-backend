@@ -656,6 +656,28 @@ public class DataAccess {
         return results;
     }
 
+    public List<Transaction> getTransactionsForProvider(long providerId) throws JTHDataBaseException {
+        List<Transaction> results;
+        try {
+            results = jdbcTemplate.query("SELECT * FROM transactions, room WHERE transactions.room_id = room.id AND room.provider_id = ?", new Object[]{providerId}, new TransactionRowMapper());
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+        return results;
+    }
+
+    public List<Transaction> getTransactionsForVisitor(long visitorId) throws JTHDataBaseException {
+        List<Transaction> results;
+        try {
+            results = jdbcTemplate.query("SELECT * FROM transactions WHERE visitor_id = ?", new Object[]{visitorId}, new TransactionRowMapper());
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+        return results;
+    }
+
     public double sumTransactionCosts() throws JTHDataBaseException {
         try{
             Double sum = jdbcTemplate.queryForObject("SELECT SUM(cost) FROM transactions", Double.class);
