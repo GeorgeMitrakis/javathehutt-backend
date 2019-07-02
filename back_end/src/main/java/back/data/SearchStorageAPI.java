@@ -1,5 +1,6 @@
 package back.data;
 
+import back.exceptions.JTHDataBaseException;
 import back.model.Room;
 import back.model.SearchConstraints;
 import back.model.Transaction;
@@ -9,13 +10,11 @@ import java.util.List;
 
 public interface SearchStorageAPI {
 
-    void test();
+    void pushRoom(Room room, List<Transaction> transactions) throws JTHDataBaseException;
 
-    void pushRoom(Room room, List<Transaction> transactions);
+    void pushTransaction(int roomId, Transaction transaction) throws Exception;
 
-    void pushTransaction(int roomId, Transaction transaction);
-
-    void deleteRoom(int roomId);
+    void deleteRoom(int roomId) throws JTHDataBaseException;
 
     List<Room> searchRooms(SearchConstraints constraints, int limit, int offset);
 

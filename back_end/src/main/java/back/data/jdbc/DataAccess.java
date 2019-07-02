@@ -508,7 +508,13 @@ public class DataAccess {
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
-        return (room_id != null) ? room_id : -1;
+        System.out.println("room id coming right up");
+        System.out.println(room_id);
+        if(room_id != null && room_id != -1){
+            room.setId(room_id);
+            return room_id;
+        }
+        return -1;
     }
 
     public boolean updateRoom(Room room) throws JTHDataBaseException {

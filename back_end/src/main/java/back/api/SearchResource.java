@@ -35,6 +35,7 @@ public class SearchResource extends ServerResource {
         String pointX = getQueryValue("pointX");
         String pointY = getQueryValue("pointY");
         String occupants = getQueryValue("occupants");
+        String description = getQueryValue("description");
 
         SearchConstraints constraints;
         try {
@@ -47,6 +48,7 @@ public class SearchResource extends ServerResource {
                     .setShauna((hasShauna == null) ? null : "true".equals(hasShauna))
                     .setLocation(cityName, (pointX == null) ? null : Double.parseDouble(pointX), (pointY == null) ? null : Double.parseDouble(pointY))
                     .setOccupants((occupants == null) ? 1 : Integer.parseInt(occupants))
+                    .setDescription(description)
                     .build();
         } catch (NumberFormatException e){
             e.printStackTrace();
