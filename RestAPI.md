@@ -43,7 +43,7 @@
 | GET    | providerId         | transactions: JSon array of provider's transactions | returns all system transactions for given provider
 | GET    | providerId, profit | profit: a real number | returns the profit of transactions for given provider
 | GET    | visitorId |  transactions: JSon array of visitor's transactions | returns all system transactions for given visitor
-| POST   | userId, roomId, startDate, endDate, occupants | transaction_id/error message | books given room for given user on given time frame if available for given number of occupants
+| POST   | userId, roomId, startDate, endDate, occupants | transactionId: the id of new transaction or error message | books given room for given user on given time frame if available for given number of occupants and returns transaction id
 
 #### /rooms
 | Method | Input | Output | Action |
