@@ -70,11 +70,10 @@ public class DataAccess {
     }
 
     public List<User> getUsers(long start, long count) throws JTHDataBaseException {
-        // TODO return extended objects: ex Visitor?
         try {
-            return jdbcTemplate.query("(SELECT \"user\".*, \"provider\".*, '-' AS \"name\", '-' AS \"surname\" FROM \"user\", provider WHERE \"user\".id = provider.id" +
-                    ") UNION (" +
-                    "SELECT \"user\".*, visitor.*, '-' AS providerName FROM \"user\", visitor WHERE \"user\".id = visitor.id) LIMIT ? OFFSET ?", new Long[]{count, start}, new UltimateUserRowMapper());
+            return jdbcTemplate.query("(SELECT \"user\".*, \"provider\".providername, '-' AS \"name\", '-' AS \"surname\" FROM \"user\", provider WHERE \"user\".id = provider.id)" +
+                    " UNION ALL " +
+                    "(SELECT \"user\".*, '-' AS providerName, visitor.name, visitor.surname FROM \"user\", visitor WHERE \"user\".id = visitor.id) LIMIT ? OFFSET ?", new Long[]{count, start}, new UltimateUserRowMapper());
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -163,9 +162,10 @@ public class DataAccess {
     }
 
     public List<User> getUsersByEmailPrefix(String emailPrefix) throws JTHDataBaseException {
-        // TODO return extended objects: ex Visitor?
         try {
-            return jdbcTemplate.query("SELECT * FROM \"user\" WHERE email LIKE ?", new Object[]{emailPrefix + "%"}, new UserRowMapper());
+            return jdbcTemplate.query("(SELECT \"user\".*, \"provider\".providername, '-' AS \"name\", '-' AS \"surname\" FROM \"user\", \"provider\" WHERE \"user\".id = \"provider\".id AND email LIKE ?)" +
+                    " UNION ALL " +
+                    "(SELECT \"user\".*, '-' AS providerName, visitor.name, visitor.surname FROM \"user\", visitor WHERE \"user\".id = visitor.id AND email LIKE ?)", new Object[]{emailPrefix + "%", emailPrefix + "%"}, new UltimateUserRowMapper());
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
