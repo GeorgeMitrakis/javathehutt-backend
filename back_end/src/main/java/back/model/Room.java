@@ -13,7 +13,7 @@ public class Room {
     private int locationId;  // only used for updating room (can be ignored elsewhere)
     private double price;
     private int capacity;
-    private boolean wifi, pool, shauna;
+    private boolean wifi, pool, shauna, breakfast;
     private String roomName;
     private String description;
     private Location location;
@@ -22,7 +22,7 @@ public class Room {
     private Provider provider = null;
     private List<Rating> ratings = null;
 
-    public Room(int id, String roomName, long providerId, int locationId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, Location location, String description, int maxOccupants, boolean fetchProviderFromDB) {
+    public Room(int id, String roomName, long providerId, int locationId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, boolean breakfast, Location location, String description, int maxOccupants, boolean fetchProviderFromDB) {
         this.id = id;
         this.roomName = roomName;
         this.providerId = providerId;
@@ -32,6 +32,7 @@ public class Room {
         this.wifi = wifi;
         this.pool = pool;
         this.shauna = shauna;
+        this.breakfast = breakfast;
         this.location = location;
         this.description = description;
         this.maxOccupants = maxOccupants;
@@ -45,7 +46,7 @@ public class Room {
     }
 
     public static Room fromMap(Map<String, Object> source) {
-        //TODO: check
+        //TODO: fix arg (@Petros)
         //System.out.println("source:");
         //System.out.println(source);
         return new Room(
@@ -56,7 +57,8 @@ public class Room {
                 (double) source.get("price"),
                 (int) source.get("capacity"),
                 (boolean) source.get("wifi"),
-                true, //(boolean)source.get("pool"),
+                false, // (boolean) source.get("pool"),
+                false, // (boolean) source.get("breakfast"),
                 (boolean) source.get("shauna"),
                 new Location((Map<String, Object>) source.get("location")),
                 (String) source.get("description"),
@@ -95,6 +97,10 @@ public class Room {
 
     public boolean getShauna() {
         return shauna;
+    }
+
+    public boolean getBreakfast() {
+        return breakfast;
     }
 
     public Location getLocation() {

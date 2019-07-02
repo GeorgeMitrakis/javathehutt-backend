@@ -80,7 +80,7 @@ public class DataAccess {
         }
     }
 
-    private User getUserByRole(String role, Object[] par, User u) throws EmptyResultDataAccessException, IncorrectResultSizeDataAccessException {
+    private User getUserByRole(String role, Object[] par, User u) throws IncorrectResultSizeDataAccessException {
         switch (role) {
             case "visitor":
                 return jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
@@ -379,10 +379,11 @@ public class DataAccess {
     public List<Room> searchRooms(SearchConstraints constraints) throws JTHDataBaseException {
         List<Room> results;
         try {
+            // TODO: This search is incomplete and possibly dangerous (for SQL Injection)
             String query = "select room.*, \"location\".*, city.name from room, \"location\", city where \"location\".city_id = city.id and \"location\".id = room.location_id";
 
             // check for range
-            if (constraints.getRange() != -1) query += " and ST_DWithin(location.geom, ST_GeomFromText('" + constraints.getLocation().getCoords() + "'), " + constraints.getRange() + ")";
+            if (constraints.getRange() != -1.0) query += " and ST_DWithin(location.geom, ST_GeomFromText('" + constraints.getLocation().getCoords() + "'), " + constraints.getRange() + ")";
 
             // check of occupants
             query += " and " + constraints.getOccupants() + " <= max_occupants";
@@ -399,6 +400,9 @@ public class DataAccess {
 
             // check for shauna
             if (constraints.getShauna()) query += " and shauna = true";
+
+            // check for breakfast
+            if (constraints.getBreakfast()) query += " and breakfast = true";
 
             results = jdbcTemplate.query(query, new RoomRowMapper());
         } catch (Exception e) {
@@ -483,13 +487,13 @@ public class DataAccess {
 
                 // finally insert the room
                 // Old way:
-                //jdbcTemplate.update("INSERT INTO room (id, provider_id, location_id, capacity, price, wifi, pool, shauna, room_name, description, max_occupants) " +
-                //                     "VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                //                     room.getProviderId(), location_id, room.getCapacity(), room.getPrice(), room.getWifi(), room.getPool(), room.getShauna(), room.getRoomName(), room.getDescription(), room.getMaxOccupants());
+                //jdbcTemplate.update("INSERT INTO room (id, provider_id, location_id, capacity, price, wifi, pool, shauna, breakfast, room_name, description, max_occupants) " +
+                //                     "VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                //                     room.getProviderId(), location_id, room.getCapacity(), room.getPrice(), room.getWifi(), room.getPool(), room.getShauna(), room.getBreakfast(), room.getRoomName(), room.getDescription(), room.getMaxOccupants());
                 keyHolder = new GeneratedKeyHolder();
                 jdbcTemplate.update(connection -> {
-                    PreparedStatement ps = connection.prepareStatement("INSERT INTO room (id, provider_id, location_id, capacity, price, wifi, pool, shauna, room_name, description, max_occupants) " +
-                            "VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                    PreparedStatement ps = connection.prepareStatement("INSERT INTO room (id, provider_id, location_id, capacity, price, wifi, pool, shauna, breakfast, room_name, description, max_occupants) " +
+                            "VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                     ps.setLong(1, room.getProviderId());
                     ps.setInt(2, location_id);
                     ps.setDouble(3, room.getCapacity());
@@ -497,9 +501,10 @@ public class DataAccess {
                     ps.setBoolean(5, room.getWifi());
                     ps.setBoolean(6, room.getPool());
                     ps.setBoolean(7, room.getShauna());
-                    ps.setString(8, room.getRoomName());
-                    ps.setString(9, room.getDescription());
-                    ps.setInt(10, room.getMaxOccupants());
+                    ps.setBoolean(8, room.getBreakfast());
+                    ps.setString(9, room.getRoomName());
+                    ps.setString(10, room.getDescription());
+                    ps.setInt(11, room.getMaxOccupants());
                     return ps;
                 }, keyHolder);
                 return (int) keyHolder.getKeys().get("id");
@@ -537,8 +542,8 @@ public class DataAccess {
                 jdbcTemplate.update("UPDATE location SET city_id = ?, cordx = ?, cordY = ?, geom = ST_GeomFromText(?) WHERE id = ?", cityid, location.getCordX(), location.getCordY(), location.getCoords(), room.getLocationId());
 
                 // finally update the room
-                jdbcTemplate.update("UPDATE room SET location_id = ?, capacity = ?, price = ?, wifi = ?, pool = ?, shauna = ?, room_name = ?, description = ?, max_occupants = ? WHERE id = ?",
-                        room.getLocationId(), room.getCapacity(), room.getPrice(), room.getWifi(), room.getPool(), room.getShauna(), room.getRoomName(), room.getDescription(), room.getMaxOccupants(), room.getId());
+                jdbcTemplate.update("UPDATE room SET location_id = ?, capacity = ?, price = ?, wifi = ?, pool = ?, shauna = ?, breakfast = ?, room_name = ?, description = ?, max_occupants = ? WHERE id = ?",
+                        room.getLocationId(), room.getCapacity(), room.getPrice(), room.getWifi(), room.getPool(), room.getShauna(), room.getBreakfast(), room.getRoomName(), room.getDescription(), room.getMaxOccupants(), room.getId());
                 return true;
             });
         } catch (Exception e){

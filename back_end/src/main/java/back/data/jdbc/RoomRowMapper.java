@@ -19,10 +19,11 @@ public class RoomRowMapper implements RowMapper<Room> {
         boolean wifi = rs.getBoolean("wifi");
         boolean pool = rs.getBoolean("pool");
         boolean shauna = rs.getBoolean("shauna");
+        boolean breakfast = rs.getBoolean("breakfast");
         String roomName = rs.getString("room_name");
         Location location = new Location(rs.getString("name"), rs.getDouble("cordX"), rs.getDouble("cordY"));
         String description = rs.getString("description");
         int maxOccupants = rs.getInt("max_occupants");
-        return new Room(id, roomName, provider_id, location_id, price, capacity, wifi, pool, shauna, location, description, maxOccupants, true);
+        return new Room(id, roomName, provider_id, location_id, price, capacity, wifi, pool, shauna, breakfast, location, description, maxOccupants, true);
     }
 }

@@ -89,6 +89,7 @@ public class RoomsResource extends ServerResource  {
         String wifi = form.getFirstValue("wifi");
         String pool = form.getFirstValue("pool");
         String shauna = form.getFirstValue("shauna");
+        String breakfast = form.getFirstValue("breakfast");
         String cordXStr = form.getFirstValue("cordX");
         String cordYStr = form.getFirstValue("cordY");
         String cityName = form.getFirstValue("cityName");
@@ -137,7 +138,7 @@ public class RoomsResource extends ServerResource  {
         }
 
         Location location = new Location(cityName, cordX, cordY);
-        Room room = new Room(-1, roomName, providerId, -1, price, capacity, "true".equals(wifi), "true".equals(pool), "true".equals(shauna), location, description, maxOccupants, false);
+        Room room = new Room(-1, roomName, providerId, -1, price, capacity, "true".equals(wifi), "true".equals(pool), "true".equals(shauna), "true".equals(breakfast), location, description, maxOccupants, false);
 
         int roomId;
         try {
@@ -210,6 +211,7 @@ public class RoomsResource extends ServerResource  {
         String wifi = form.getFirstValue("wifi");
         String pool = form.getFirstValue("pool");
         String shauna = form.getFirstValue("shauna");
+        String breakfast = form.getFirstValue("breakfast");
         String cordXStr = form.getFirstValue("cordX");
         String cordYStr = form.getFirstValue("cordY");
         String cityName = form.getFirstValue("cityName");
@@ -269,10 +271,10 @@ public class RoomsResource extends ServerResource  {
         // restore defaults if not provided from old room
         if (description == null) description = oldRoom.getDescription();
         boolean _wifi = (wifi == null) ? oldRoom.getWifi() : "true".equals(wifi) ;
-        boolean _pool = (wifi == null) ? oldRoom.getPool() : "true".equals(pool) ;
-        boolean _shauna = (wifi == null) ? oldRoom.getShauna() : "true".equals(shauna) ;
-
-        Room room = new Room(roomId, roomName, oldRoom.getProviderId(), oldRoom.getLocationId(), price, capacity, _wifi, _pool, _shauna, location, description, maxOccupants, true);
+        boolean _pool = (pool == null) ? oldRoom.getPool() : "true".equals(pool) ;
+        boolean _shauna = (shauna == null) ? oldRoom.getShauna() : "true".equals(shauna) ;
+        boolean _breakfast = (breakfast == null) ? oldRoom.getBreakfast() : "true".equals(breakfast);
+        Room room = new Room(roomId, roomName, oldRoom.getProviderId(), oldRoom.getLocationId(), price, capacity, _wifi, _pool, _shauna, _breakfast, location, description, maxOccupants, true);
 
         try {
             roomsDAO.updateRoom(room);

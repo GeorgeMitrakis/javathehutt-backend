@@ -50,8 +50,8 @@
 | ------ | ----- | ------ | ------ |
 | GET    | roomId | room: Room object | returns requested room
 | GET    | providerId | rooms: JSon array of Room objects | returns rooms by given provider
-| POST   | providerId, price, capacity, cordX, cordY, cityName, roomName, maxOccupants, [description, wifi, pool, shauna] | room: Room object on success or error | submits a new room to the system for given provider
-| PUT    | roomId, price, capacity, cordX, cordY, cityName, roomName, maxOccupants, [description, wifi, pool, shauna] | room: Room object on success or error | modifies and returns the new Room objects
+| POST   | providerId, price, capacity, cordX, cordY, cityName, roomName, maxOccupants, [description, wifi, pool, shauna, breakfast] | room: Room object on success or error | submits a new room to the system for given provider
+| PUT    | roomId, price, capacity, cordX, cordY, cityName, roomName, maxOccupants, [description, wifi, pool, shauna, breakfast] | room: Room object on success or error | modifies and returns the new Room objects
 | DELETE | roomId | success/error message | deletes room with given room id
 
 #### /favourite_rooms
@@ -73,10 +73,10 @@
 | ------ | ----- | ------ | ------ |
 | GET    | str   | cityNames: JSon array of city names that match str as a prefix | returns list of autocompleted city names
 
-#### /search (TODO: add more parameters?)
+#### /search
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
-| GET    | [occupants, minPrice, maxPrice, maxDist, pointX, pointY, cityName, hasWifi, hasPool, hasShauna, people] | results: JSon array of eligible Rooms | returns eligible rooms based on search constraints given
+| GET    | [occupants, minPrice, maxPrice, maxDist, pointX, pointY, cityName, hasWifi, hasPool, hasShauna, hasBreakfast, people] | results: JSon array of eligible Rooms | returns eligible rooms based on search constraints given
 
 #### /img
 | Method | Input | Output | Action |

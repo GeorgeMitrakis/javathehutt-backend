@@ -74,15 +74,15 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             .field("price", room.getPrice())
             .field("wifi",room.getWifi())
             .field("shauna", room.getShauna())
+            .field("breakfast", room.getBreakfast())
             .field("description", room.getDescription())
             .field("capacity", room.getCapacity())
             .field("transactions", new ArrayList<>())
             .field("roomName", room.getRoomName())
-            .field("location",new GeoPoint(room.getLocation().getCordX(), room.getLocation().getCordY()))
+            .field("location", new GeoPoint(room.getLocation().getCordX(), room.getLocation().getCordY()))
             .field("providerId",room.getProviderId())
             .field("locationId",room.getLocationId())
             .field("maxOccupants", room.getMaxOccupants())
-
             .endObject()
             ;
 
@@ -127,31 +127,28 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             if (constraints.getWifi()) {
                 B = B.must(QueryBuilders.matchQuery("wifi", true));
             }
-
+            if (constraints.getPool()) {
+                B = B.must(QueryBuilders.matchQuery("pool", true));
+            }
             if (constraints.getShauna()) {
                 B = B.must(QueryBuilders.matchQuery("shauna", true));
             }
-
-            if (constraints.getPool()) {
-                B = B.must(QueryBuilders.matchQuery("pool", true));
+            if (constraints.getBreakfast()) {
+                B = B.must(QueryBuilders.matchQuery("breakfast", true));
             }
 
             if (constraints.hasMinCost()) {
                 B = B.must(QueryBuilders.rangeQuery("price").gte(constraints.getMinCost()));
             }
-
             if (constraints.hasMaxCost()) {
 
                 B = B.must(QueryBuilders.rangeQuery("price").lte(constraints.getMaxCost()));
             }
 
-
             if (constraints.hasRange()) {
-
                 B = B.must(QueryBuilders.geoDistanceQuery("location")
-                        .point(constraints.getLocation().getCordX(),constraints.getLocation().getCordY()).distance(constraints.getRange(), DistanceUnit.KILOMETERS));
+                    .point(constraints.getLocation().getCordX(),constraints.getLocation().getCordY()).distance(constraints.getRange(), DistanceUnit.KILOMETERS));
             }
-
 
             if (constraints.hasDescription()){
                 B = B.must(QueryBuilders.matchQuery("description", constraints.getDescription()).fuzziness(Fuzziness.AUTO));
@@ -159,23 +156,21 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 
             B = B.must(QueryBuilders.rangeQuery("maxOccupants").gte(constraints.getOccupants()));
 
-
-
-            SearchRequest request = new SearchRequest("jth_rooms").source(
-                    new SearchSourceBuilder().from(offset).size(limit).query(B)
-            );
+            SearchRequest request = new SearchRequest("jth_rooms").source(new SearchSourceBuilder().from(offset).size(limit).query(B));
             SearchResponse response = client.search(request, RequestOptions.DEFAULT);
 
             for (SearchHit h : response.getHits().getHits()) {
                 res.add(Room.fromMap(h.getSourceAsMap()));
             }
+
             //System.out.println(res);
+
             return res;
         } catch (Exception e){
             e.printStackTrace();
             System.out.println("Tried elastic search and failed");
+            return null;
         }
-        return null;
     }
 
     @Override

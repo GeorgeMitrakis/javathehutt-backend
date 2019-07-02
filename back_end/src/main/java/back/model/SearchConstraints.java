@@ -8,6 +8,7 @@ public class SearchConstraints {
     private boolean wifi = false;
     private boolean pool = false;
     private boolean shauna = false;
+    private boolean breakfast = false;
     private double range = -1.0;          // in kms
     private int occupants = 1;            // 1 is the default
     private String description = null;
@@ -43,6 +44,14 @@ public class SearchConstraints {
 
     public void setShauna(boolean shauna) {
         this.shauna = shauna;
+    }
+
+    public boolean getBreakfast() {
+        return breakfast;
+    }
+
+    public void setBreakfast(boolean breakfast) {
+        this.breakfast = breakfast;
     }
 
     public Location getLocation() {

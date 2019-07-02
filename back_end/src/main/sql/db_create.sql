@@ -144,6 +144,7 @@ CREATE TABLE room (
     wifi boolean  NOT NULL,
     pool boolean  NOT NULL,
     shauna boolean  NOT NULL,
+    breakfast boolean  NOT NULL,
     CONSTRAINT room_pk PRIMARY KEY (id)
 );
 
