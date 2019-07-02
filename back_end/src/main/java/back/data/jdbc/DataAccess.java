@@ -333,7 +333,7 @@ public class DataAccess {
         }
     }
 
-    public boolean insertTransaction(User user, Room room, String sqlStartDate, String sqlEndDate, int occupants) throws JTHDataBaseException {
+    public long insertTransaction(User user, Room room, String sqlStartDate, String sqlEndDate, int occupants) throws JTHDataBaseException {
         try {
             Boolean res = transactionTemplate.execute(status -> {
                 if (occupants > room.getMaxOccupants()){
@@ -352,16 +352,16 @@ public class DataAccess {
                 return true;
             });
             if (res != null && !res) {
-                return false;  // not enough rooms
+                return -1;  // not enough rooms
             }
         } catch (DuplicateKeyException e) {  // should not happen for new db with seperate id PK
             System.err.println("Tried to make a duplicate booking");
-            return false;
+            return -1;
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
-        return true;
+        return jdbcTemplate.queryForObject("select id from transactions where room_id = ? and start_date = ? ::date and end_date = ? ::date", new Object[]{room.getId(), sqlStartDate, sqlEndDate}, Long.class);
     }
 
     public int countTransactions(Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException {
