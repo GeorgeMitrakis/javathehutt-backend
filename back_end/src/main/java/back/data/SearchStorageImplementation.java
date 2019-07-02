@@ -47,21 +47,16 @@ public class SearchStorageImplementation implements SearchStorageAPI {
     }
 
     public void setup(String eshost, int port, String roomIndexName) throws Exception {
-
-        client = new RestHighLevelClient(RestClient.builder(
-                new HttpHost(eshost, port, "http")));
-
+        client = new RestHighLevelClient(RestClient.builder(new HttpHost(eshost, port, "http")));
     }
 
 
     @Override
     public void pushRoom(Room room, List<Transaction> transactions) throws JTHDataBaseException {
-        try{
-            IndexRequest request = new IndexRequest("jth_rooms").type("room").id(Integer.toString(room.getId())).source(
-                    RoomToXContent(room)
-            );
+        try {
+            IndexRequest request = new IndexRequest("jth_rooms").type("room").id(Integer.toString(room.getId())).source(RoomToXContent(room));
             client.index(request, RequestOptions.DEFAULT);
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
@@ -83,17 +78,14 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             .field("providerId",room.getProviderId())
             .field("locationId",room.getLocationId())
             .field("maxOccupants", room.getMaxOccupants())
-            .endObject()
-            ;
-
+            .endObject();
     }
 
     private XContentBuilder TransactionToXContent(Transaction transaction) throws IOException {
         return jsonBuilder().startObject()
             .field("start_date", transaction.getStartDate())
             .field("end_date", transaction.getEndDate())
-                .endObject()
-        ;
+            .endObject();
     }
 
     @Override
@@ -104,8 +96,6 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             throw new JTHDataBaseException();
         }
         //UpdateResponse res = client.prepareUpdate(roomIndexName, "room", Integer.toString(roomId)).setScript(new Script("").getParams().pu)
-
-
     }
 
     @Override

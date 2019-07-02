@@ -124,6 +124,10 @@ public class RoomsResource extends ServerResource  {
             return JsonMapRepresentation.result(false, "Post room: arithmetic parameter(s) given not a number", null);
         }
 
+        if (cordX < -90 || cordX > 90 || cordY < -180 || cordY > 180){
+            return JsonMapRepresentation.result(false, "Post room: Invalid coordinates given", null);
+        }
+
         if (Configuration.CHECK_AUTHORISATION) {
             try {
                 String jwt = JWT.getJWTFromHeaders(getRequest());
@@ -244,6 +248,10 @@ public class RoomsResource extends ServerResource  {
             maxOccupants = Integer.parseInt(maxOccupantsStr);
         } catch (ArithmeticException e){
             return JsonMapRepresentation.result(false, "Put room: arithmetic parameter(s) given not a number", null);
+        }
+
+        if (cordX < -90 || cordX > 90 || cordY < -180 || cordY > 180){
+            return JsonMapRepresentation.result(false, "Post room: Invalid coordinates given", null);
         }
 
         if (Configuration.CHECK_AUTHORISATION) {
