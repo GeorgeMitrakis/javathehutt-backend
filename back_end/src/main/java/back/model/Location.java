@@ -15,8 +15,8 @@ public class Location {
     }
 
     public Location(Map<String,Object> location) {
-        cordX = (double)location.get("lat");
-        cordY = (double)location.get("lon");
+        cordX = (double) location.get("lat");
+        cordY = (double) location.get("lon");
         cityname = null;
     }
 

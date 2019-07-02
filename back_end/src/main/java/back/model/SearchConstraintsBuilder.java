@@ -54,7 +54,7 @@ public class SearchConstraintsBuilder {
     }
 
     public SearchConstraintsBuilder setDescription(String description) {
-        searchConstraints.setDescription(description);
+        if (description != null) searchConstraints.setDescription(description);
         return this;
     }
 }
