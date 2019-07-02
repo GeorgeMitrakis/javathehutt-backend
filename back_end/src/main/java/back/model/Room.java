@@ -22,7 +22,7 @@ public class Room {
     private Provider provider = null;
     private List<Rating> ratings = null;
 
-    public Room(int id, String roomName, long providerId, int locationId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, Location location, String description, int maxOccupants, boolean fetchExtraFromDB) {
+    public Room(int id, String roomName, long providerId, int locationId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, Location location, String description, int maxOccupants, boolean fetchProviderFromDB) {
         this.id = id;
         this.roomName = roomName;
         this.providerId = providerId;
@@ -35,7 +35,7 @@ public class Room {
         this.location = location;
         this.description = description;
         this.maxOccupants = maxOccupants;
-        if (fetchExtraFromDB) {   // fetch only Provider. Ratings, images, etc are costly and should be done on a separate API call if the user requests to see them
+        if (fetchProviderFromDB) {   // fetch only Provider. Ratings, images, etc are costly and should be done on a separate API call if the user requests to see them
             fetchProvider();
         }
     }
@@ -61,7 +61,7 @@ public class Room {
                 new Location((Map<String, Object>) source.get("location")),
                 (String) source.get("description"),
                 (int) source.get("maxOccupants"),
-                false
+                true
         );
     }
 
