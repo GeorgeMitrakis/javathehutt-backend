@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    
+    compile 'org.elasticsearch.client:elasticsearch-rest-high-level-client:6.7.0'
     compile "javax.servlet:javax.servlet-api:3.1.0"              // the Java servlet libraries
     compile "org.restlet.jee:org.restlet:2.3.12"                 // for writing RESTful APIs
     compile "com.google.code.gson:gson:2.8.2"                    // json library
@@ -32,7 +32,7 @@ dependencies {
     compile 'io.jsonwebtoken:jjwt-jackson:0.10.5'
     runtime "org.restlet.jee:org.restlet.ext.servlet:2.3.12"     // servlet adapter for Restlet framework
     runtime "org.postgresql:postgresql:42.2.0"                   // connect to database
-    compile "org.elasticsearch.client:transport:7.1.0"           // elastic java API
+
 }
 
 dependencies {

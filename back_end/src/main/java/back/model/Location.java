@@ -1,6 +1,8 @@
 package back.model;
 
 
+import java.util.Map;
+
 public class Location {
 
     private String cityname;
@@ -10,6 +12,12 @@ public class Location {
         this.setCityname(cityname);
         this.cordX = cordX;
         this.cordY = cordY;
+    }
+
+    public Location(Map<String,Object> location) {
+        cordX = (double) location.get("lat");
+        cordY = (double) location.get("lon");
+        cityname = null;
     }
 
     public void setCityname(String cityname) {

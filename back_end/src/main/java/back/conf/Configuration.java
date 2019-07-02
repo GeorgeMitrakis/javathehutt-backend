@@ -42,6 +42,13 @@ public class Configuration {
                     getProperty("db.user"),
                     getProperty("db.pass")
             );
+
+            search.setup(
+                    getProperty("es.host"),
+                    Integer.parseInt(getProperty("es.port")),
+                    getProperty("es.roomIndexName")
+            );
+
         } catch (Exception e) {
             throw new ConfigurationException(e.getMessage(), e);
         }

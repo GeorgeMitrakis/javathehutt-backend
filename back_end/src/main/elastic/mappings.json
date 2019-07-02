@@ -1,0 +1,23 @@
+{
+  "properties" : {
+    "location" : {
+      "type": "geo_point"
+    },
+    "name":{
+      "type":"text"
+    },
+    "transactions":{
+      "type":"nested",
+      "properties" : {
+        "end_date" : {
+          "type" : "date",
+          "format" : "yyyy-MM-dd"
+        },
+        "start_date" : {
+          "type" : "date",
+          "format" : "yyyy-MM-dd"
+        }
+      }
+    }
+  }
+}

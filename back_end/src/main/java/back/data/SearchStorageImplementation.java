@@ -1,28 +1,33 @@
 package back.data;
 
+import back.exceptions.JTHDataBaseException;
 import back.model.Room;
 import back.model.SearchConstraints;
 import back.model.Transaction;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.TransportAddress;
+import org.apache.http.HttpHost;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.unit.DistanceUnit;
+import org.elasticsearch.common.unit.Fuzziness;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 
 public class SearchStorageImplementation implements SearchStorageAPI {
@@ -36,56 +41,89 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 
  */
 
-    private TransportClient client;
-
+    private RestHighLevelClient client;
 
     public SearchStorageImplementation(){
-        try {
-            client = new PreBuiltTransportClient(Settings.EMPTY)
-                    .addTransportAddress(new TransportAddress(InetAddress.getByName("localhost"), 9300));
-        } catch (UnknownHostException e) {
+    }
+
+    public void setup(String eshost, int port, String roomIndexName) throws Exception {
+
+        client = new RestHighLevelClient(RestClient.builder(
+                new HttpHost(eshost, port, "http")));
+
+    }
+
+
+    @Override
+    public void pushRoom(Room room, List<Transaction> transactions) throws JTHDataBaseException {
+        try{
+            IndexRequest request = new IndexRequest("jth_rooms").type("room").id(Integer.toString(room.getId())).source(
+                    RoomToXContent(room)
+            );
+            client.index(request, RequestOptions.DEFAULT);
+        }catch (Exception e){
             e.printStackTrace();
-            client = null;
+            throw new JTHDataBaseException();
         }
-        // on shutdown
-        //client.close(); but no destructor in Java (TODO?)
 
     }
 
+    private XContentBuilder RoomToXContent(Room room) throws IOException {
+        return jsonBuilder().startObject()
+            .field("id", room.getId())
+            .field("price", room.getPrice())
+            .field("wifi",room.getWifi())
+            .field("shauna", room.getShauna())
+            .field("description", room.getDescription())
+            .field("capacity", room.getCapacity())
+            .field("transactions", new ArrayList<>())
+            .field("roomName", room.getRoomName())
+            .field("location",new GeoPoint(room.getLocation().getCordX(), room.getLocation().getCordY()))
+            .field("providerId",room.getProviderId())
+            .field("locationId",room.getLocationId())
+            .field("maxOccupants", room.getMaxOccupants())
+
+            .endObject()
+            ;
+
+    }
+
+    private XContentBuilder TransactionToXContent(Transaction transaction) throws IOException {
+        return jsonBuilder().startObject()
+            .field("start_date", transaction.getStartDate())
+            .field("end_date", transaction.getEndDate())
+                .endObject()
+        ;
+    }
+
     @Override
-    public void test(){
-        System.out.println("\nTEST:");
+    public void pushTransaction(int roomId, Transaction transaction) throws JTHDataBaseException{
         try {
-            GetResponse response = client.prepareGet("rooms", "_doc", "room").get();
-            System.out.println(response.getSourceAsString());
-        } catch( Exception e){
-            e.printStackTrace();
-            System.out.print("FAILED TEST (TODO FIX ELASTIC)");
+            XContentBuilder t = TransactionToXContent(transaction);
+        } catch (IOException e) {
+            throw new JTHDataBaseException();
         }
+        //UpdateResponse res = client.prepareUpdate(roomIndexName, "room", Integer.toString(roomId)).setScript(new Script("").getParams().pu)
+
+
     }
 
     @Override
-    public void pushRoom(Room room, List<Transaction> transactions) {
-        // TODO
-    }
-
-    @Override
-    public void pushTransaction(int roomId, Transaction transaction) {
-        // TODO
-    }
-
-    @Override
-    public void deleteRoom(int roomId) {
-        // TODO
+    public void deleteRoom(int roomId) throws JTHDataBaseException {
+        try {
+            client.delete(new DeleteRequest("jth_rooms").id(Integer.toString(roomId)), RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
     }
 
     @Override
     public List<Room> searchRooms(SearchConstraints constraints, int limit, int offset) {
         try {
-            List<Map> res = new LinkedList<>();
-
-
+            List<Room> res = new LinkedList<>();
             BoolQueryBuilder B = QueryBuilders.boolQuery();
+
             if (constraints.getWifi()) {
                 B = B.must(QueryBuilders.matchQuery("wifi", true));
             }
@@ -94,33 +132,47 @@ public class SearchStorageImplementation implements SearchStorageAPI {
                 B = B.must(QueryBuilders.matchQuery("shauna", true));
             }
 
-            if (constraints.getShauna()) {
+            if (constraints.getPool()) {
                 B = B.must(QueryBuilders.matchQuery("pool", true));
             }
 
             if (constraints.hasMinCost()) {
-                B = B.must(QueryBuilders.rangeQuery("cost").gte(constraints.getMinCost()));
+                B = B.must(QueryBuilders.rangeQuery("price").gte(constraints.getMinCost()));
             }
 
             if (constraints.hasMaxCost()) {
-                B = B.must(QueryBuilders.rangeQuery("cost").lte(constraints.getMinCost()));
+
+                B = B.must(QueryBuilders.rangeQuery("price").lte(constraints.getMaxCost()));
             }
+
 
             if (constraints.hasRange()) {
-                B = B.must(QueryBuilders.geoDistanceQuery("location").distance(constraints.getRange(), DistanceUnit.KILOMETERS));
+
+                B = B.must(QueryBuilders.geoDistanceQuery("location")
+                        .point(constraints.getLocation().getCordX(),constraints.getLocation().getCordY()).distance(constraints.getRange(), DistanceUnit.KILOMETERS));
             }
 
 
-            SearchResponse response = client.prepareSearch("testindex")
-                    .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-                    .setQuery(B)
-                    .setFrom(0/*offset*/).setSize(10/*limit*/).setExplain(true)
-                    .get();
+            if (constraints.hasDescription()){
+                B = B.must(QueryBuilders.matchQuery("description", constraints.getDescription()).fuzziness(Fuzziness.AUTO));
+            }
+
+            B = B.must(QueryBuilders.rangeQuery("maxOccupants").gte(constraints.getOccupants()));
+
+
+
+            SearchRequest request = new SearchRequest("jth_rooms").source(
+                    new SearchSourceBuilder().from(offset).size(limit).query(B)
+            );
+            SearchResponse response = client.search(request, RequestOptions.DEFAULT);
+
             for (SearchHit h : response.getHits().getHits()) {
-                res.add(h.getSourceAsMap());
+                res.add(Room.fromMap(h.getSourceAsMap()));
             }
-            System.out.println(res);
+            //System.out.println(res);
+            return res;
         } catch (Exception e){
+            e.printStackTrace();
             System.out.println("Tried elastic search and failed");
         }
         return null;
