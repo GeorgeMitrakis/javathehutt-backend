@@ -31,7 +31,7 @@ public class FavouriteRoomsResource extends ServerResource {
         long visitorId;
         try {
             visitorId = Long.parseLong(visitorIdStr);
-        } catch (ArithmeticException e){
+        } catch (NumberFormatException e){
             return JsonMapRepresentation.result(false, "Get favourite room: room id given is not a number", null);
         }
 
@@ -74,7 +74,7 @@ public class FavouriteRoomsResource extends ServerResource {
         try {
             visitorId = Long.parseLong(visitorIdStr);
             roomId = Integer.parseInt(roomIdStr);
-        } catch (ArithmeticException e){
+        } catch (NumberFormatException e){
             return JsonMapRepresentation.result(false, "Post favourite room: parameter(s) given is not a number", null);
         }
 
@@ -115,7 +115,7 @@ public class FavouriteRoomsResource extends ServerResource {
         try {
             visitorId = Long.parseLong(visitorIdStr);
             roomId = Integer.parseInt(roomIdStr);
-        } catch (ArithmeticException e){
+        } catch (NumberFormatException e){
             return JsonMapRepresentation.result(false, "Delete favourite room: parameter(s) given is not a number", null);
         }
 

@@ -37,7 +37,7 @@ public class RoomsResource extends ServerResource  {
             long providerId;
             try {
                 providerId = Long.parseLong(providerIdStr);
-            } catch (ArithmeticException e){
+            } catch (NumberFormatException e){
                 return JsonMapRepresentation.result(false, "Get rooms: arithmetic parameter(s) given not a number", null);
             }
 
@@ -59,7 +59,7 @@ public class RoomsResource extends ServerResource  {
             int roomId;
             try {
                 roomId = Integer.parseInt(roomIdStr);
-            } catch (ArithmeticException e){
+            } catch (NumberFormatException e){
                 return JsonMapRepresentation.result(false, "Get room: \"roomId\" parameter given is not a number", null);
             }
 
@@ -121,7 +121,7 @@ public class RoomsResource extends ServerResource  {
             cordY = Double.parseDouble(cordYStr);
             capacity = Integer.parseInt(capacityStr);
             maxOccupants = Integer.parseInt(maxOccupantsStr);
-        } catch (ArithmeticException e){
+        } catch (NumberFormatException e){
             return JsonMapRepresentation.result(false, "Post room: arithmetic parameter(s) given not a number", null);
         }
 
@@ -171,7 +171,7 @@ public class RoomsResource extends ServerResource  {
         int roomId;
         try {
             roomId = Integer.parseInt(roomIdStr);
-        } catch (ArithmeticException e){
+        } catch (NumberFormatException e){
             return JsonMapRepresentation.result(false, "Delete room: \"roomId\" parameter given is not a number", null);
         }
 
@@ -247,7 +247,7 @@ public class RoomsResource extends ServerResource  {
             cordY = Double.parseDouble(cordYStr);
             capacity = Integer.parseInt(capacityStr);
             maxOccupants = Integer.parseInt(maxOccupantsStr);
-        } catch (ArithmeticException e){
+        } catch (NumberFormatException e){
             return JsonMapRepresentation.result(false, "Put room: arithmetic parameter(s) given not a number", null);
         }
 

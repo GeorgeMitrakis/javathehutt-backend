@@ -52,7 +52,7 @@ public class BookingResource  extends ServerResource {
             userId = Long.parseLong(userIdStr);
             roomId = Integer.parseInt(roomIdStr);
             occupants = Integer.parseInt(occupantsStr);
-        } catch (ArithmeticException e){
+        } catch (NumberFormatException e){
             return JsonMapRepresentation.result(false,"Booking error: id parameters that are not numbers",null);
         }
 
@@ -129,7 +129,7 @@ public class BookingResource  extends ServerResource {
             long providerId;
             try {
                 providerId = Long.parseLong(providerIdStr);
-            } catch (ArithmeticException e){
+            } catch (NumberFormatException e){
                 return JsonMapRepresentation.result(false, "Transaction error: arithmetic parameter(s) given not a number", null);
             }
 
@@ -161,7 +161,7 @@ public class BookingResource  extends ServerResource {
             long visitorId;
             try {
                 visitorId = Long.parseLong(visitorIdStr);
-            } catch (ArithmeticException e){
+            } catch (NumberFormatException e){
                 return JsonMapRepresentation.result(false, "Transaction error: arithmetic parameter(s) given not a number", null);
             }
 

@@ -103,7 +103,7 @@ public class UsersResource extends ServerResource {
             }
         } catch (JTHDataBaseException e){
             return JsonMapRepresentation.result(false,"database error", null);
-        } catch (ArithmeticException e){
+        } catch (NumberFormatException e){
             return JsonMapRepresentation.result(false,"id given is not a number", null);
         }
     }
@@ -183,7 +183,7 @@ public class UsersResource extends ServerResource {
         long userId;
         try{
             userId = Long.parseLong(userIdStr);
-        } catch (ArithmeticException e){
+        } catch (NumberFormatException e){
             return JsonMapRepresentation.result(false,"Update error: non number user id given",null);
         }
 

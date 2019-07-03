@@ -10,7 +10,6 @@ import java.util.*;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.client.RequestOptions;
@@ -24,8 +23,8 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
@@ -35,16 +34,12 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 /*
     NoSQL document structure:
 
-    { roomId, providerId, price, capacity, cityName, cordX, cordY, transactions: [ { transactionId, visitorId, startDate, endDate } , ... ], wifi, pool, shauna }
-
-    example: { "roomId" : 1, "providerId": 1, "price": 20, "capacity": 72, "cityName": "Athens", "cordX" : -1.0, "cordY": -1.0, "transactions": [ { "transactionId": 1, "visitorId": 3, "startDate": null, "endDate": null } ], "wifi": true, "pool": false, "shauna": false }
+    { id, providerId, roomName, description, price, capacity, cityName, location, maxOccupants, transactions: [ { startDate, endDate } , ... ], wifi, pool, shauna, breakfast }
 
  */
 
     private RestHighLevelClient client;
 
-    public SearchStorageImplementation(){
-    }
 
     public void setup(String eshost, int port, String roomIndexName) throws Exception {
         client = new RestHighLevelClient(RestClient.builder(new HttpHost(eshost, port, "http")));
@@ -65,27 +60,38 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 
     private XContentBuilder RoomToXContent(Room room) throws IOException {
         return jsonBuilder().startObject()
-            .field("id", room.getId())
-            .field("price", room.getPrice())
-            .field("wifi",room.getWifi())
-            .field("shauna", room.getShauna())
-            .field("breakfast", room.getBreakfast())
-            .field("description", room.getDescription())
-            .field("capacity", room.getCapacity())
-            .field("transactions", new ArrayList<>())
-            .field("roomName", room.getRoomName())
-            .field("location", new GeoPoint(room.getLocation().getCordX(), room.getLocation().getCordY()))
-            .field("providerId",room.getProviderId())
-            .field("locationId",room.getLocationId())
-            .field("maxOccupants", room.getMaxOccupants())
-            .endObject();
+                .field("id", room.getId())
+                .field("providerId", room.getProviderId())
+                .field("roomName", room.getRoomName())
+                .field("description", room.getDescription())
+                .field("price", room.getPrice())
+                .field("capacity", room.getCapacity())
+                .field("cityName", room.getLocation().getCityname())
+                .field("location", new GeoPoint(room.getLocation().getCordX(), room.getLocation().getCordY()))
+                .field("locationId", room.getLocationId())
+                .field("wifi",room.getWifi())
+                .field("pool", room.getPool())
+                .field("shauna", room.getShauna())
+                .field("breakfast", room.getBreakfast())
+                .field("maxOccupants", room.getMaxOccupants())
+                .field("transactions", getJSonTransactions(room.getTransactions()))
+                .endObject();
+    }
+
+    private List<XContentBuilder> getJSonTransactions(List<Transaction> transactions) throws IOException {
+        List<XContentBuilder> res = new ArrayList<>();
+        if (transactions == null) return res;
+        for (Transaction t : transactions){
+            res.add(TransactionToXContent(t));
+        }
+        return res;
     }
 
     private XContentBuilder TransactionToXContent(Transaction transaction) throws IOException {
         return jsonBuilder().startObject()
-            .field("start_date", transaction.getStartDate())
-            .field("end_date", transaction.getEndDate())
-            .endObject();
+                .field("startDate", transaction.getStartDate())
+                .field("endDate", transaction.getEndDate())
+                .endObject();
     }
 
     @Override
@@ -131,7 +137,6 @@ public class SearchStorageImplementation implements SearchStorageAPI {
                 B = B.must(QueryBuilders.rangeQuery("price").gte(constraints.getMinCost()));
             }
             if (constraints.hasMaxCost()) {
-
                 B = B.must(QueryBuilders.rangeQuery("price").lte(constraints.getMaxCost()));
             }
 

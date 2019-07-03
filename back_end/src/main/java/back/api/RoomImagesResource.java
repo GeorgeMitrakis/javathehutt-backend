@@ -26,7 +26,7 @@ public class RoomImagesResource extends ServerResource {
             int roomId;
             try {
                 roomId = Integer.parseInt(roomIdStr);
-            } catch (ArithmeticException e) {
+            } catch (NumberFormatException e) {
                 throw new JTHInputException("roomId given is not a number");
             }
             List<Long> ids = imageDAO.getRoomImageIds(roomId);

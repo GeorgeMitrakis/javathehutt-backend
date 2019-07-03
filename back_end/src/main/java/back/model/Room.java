@@ -143,6 +143,14 @@ public class Room {
         return ratings;
     }
 
+    public List<Transaction> getTransactions(){
+        try {
+            return Configuration.getInstance().getBookingDAO().getTransactionsForRoom(id);
+        } catch (JTHDataBaseException e){
+            return null;
+        }
+    }
+
     public double calcCostBasedOnOccupants(int occupants){
         return price * occupants;
     }

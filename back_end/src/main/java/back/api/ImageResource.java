@@ -110,7 +110,7 @@ public class ImageResource extends ServerResource {
             }
 
             imageDAO.deleteImage(imgId);
-        } catch (ArithmeticException e) {
+        } catch (NumberFormatException e) {
             return JsonMapRepresentation.result(false,"Image error: non number given to arithmetic parameter", null);
         } catch (JTHInputException e){
             return JsonMapRepresentation.result(false,"Image error: " + e.getErrorMsg(), null);

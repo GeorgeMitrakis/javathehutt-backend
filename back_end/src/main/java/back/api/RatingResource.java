@@ -32,7 +32,7 @@ public class RatingResource extends ServerResource {
         int roomId;
         try {
             roomId = Integer.parseInt(roomIdStr);
-        } catch (ArithmeticException e){
+        } catch (NumberFormatException e){
             return JsonMapRepresentation.result(false, "Get ratings: room id given is not a number", null);
         }
 
@@ -69,7 +69,7 @@ public class RatingResource extends ServerResource {
             visitorId = Long.parseLong(visitorIdStr);
             roomId = Integer.parseInt(roomIdStr);
             stars = Integer.parseInt(starsStr);
-        } catch (ArithmeticException e){
+        } catch (NumberFormatException e){
             return JsonMapRepresentation.result(false, "Post rating: parameter(s) given is not a number", null);
         }
 
@@ -110,7 +110,7 @@ public class RatingResource extends ServerResource {
         int ratingId;
         try {
             ratingId = Integer.parseInt(ratingIdStr);
-        } catch (ArithmeticException e){
+        } catch (NumberFormatException e){
             return JsonMapRepresentation.result(false, "Delete rating: parameter given is not a number", null);
         }
 
