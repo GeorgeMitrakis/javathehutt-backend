@@ -22,7 +22,6 @@ import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.action.search.SearchResponse;
@@ -130,9 +129,6 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             for (SearchHit h : response.getHits().getHits()) {
                 res.add(Room.fromMap(h.getSourceAsMap()));
             }
-
-            System.out.println(res);
-
             return res;
         } catch (Exception e){
             e.printStackTrace();

@@ -49,7 +49,7 @@ public class Room {
             return new Room(
                     (int) source.get("id"),
                     (String) source.get("roomName"),
-                    (long) source.get("providerId"),
+                    (int) source.get("providerId"),
                     (int) source.get("locationId"),
                     (double) source.get("price"),
                     (int) source.get("capacity"),
@@ -61,9 +61,10 @@ public class Room {
                     (String) source.get("cityName")),
                     (String) source.get("description"),
                     (int) source.get("maxOccupants"),
-                    new Provider(new User((long) source.get("providerId"), (String) source.get("email"), "provider", (Boolean) source.get("isBanned")), (String) source.get("providerName"))
+                    new Provider(new User((int) source.get("providerId"), (String) source.get("email"), "provider", (Boolean) source.get("isBanned")), (String) source.get("providerName"))
             );
         } catch (Exception e){
+            e.printStackTrace();
             System.err.println("WARNING: Missing parameters in JSon of SearchStorage's documents");
             return null;
         }
