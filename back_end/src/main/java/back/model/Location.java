@@ -14,10 +14,10 @@ public class Location {
         this.cordY = cordY;
     }
 
-    public Location(Map<String,Object> location) {
-        cordX = (double) location.get("lat");
-        cordY = (double) location.get("lon");
-        cityname = null;
+    public Location(Map<String,Object> location, String cityname) {
+        cordX = (double)location.get("lat");
+        cordY = (double)location.get("lon");
+        this.cityname = cityname;
     }
 
     public void setCityname(String cityname) {

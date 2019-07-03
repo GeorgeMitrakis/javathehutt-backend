@@ -22,7 +22,7 @@ public class Room {
     private Provider provider = null;
     private List<Rating> ratings = null;
 
-    public Room(int id, String roomName, long providerId, int locationId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, boolean breakfast, Location location, String description, int maxOccupants, boolean fetchProviderFromDB) {
+    public Room(int id, String roomName, long providerId, int locationId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, boolean breakfast, Location location, String description, int maxOccupants, boolean fetchExtraFromDB) {
         this.id = id;
         this.roomName = roomName;
         this.providerId = providerId;
@@ -30,13 +30,13 @@ public class Room {
         this.price = price;
         this.capacity = capacity;
         this.wifi = wifi;
+        this.breakfast = breakfast;
         this.pool = pool;
         this.shauna = shauna;
-        this.breakfast = breakfast;
         this.location = location;
         this.description = description;
         this.maxOccupants = maxOccupants;
-        if (fetchProviderFromDB) {   // fetch only Provider. Ratings, images, etc are costly and should be done on a separate API call if the user requests to see them
+        if (fetchExtraFromDB) {   // fetch only Provider. Ratings, images, etc are costly and should be done on a separate API call if the user requests to see them
             fetchProvider();
         }
     }
@@ -46,9 +46,8 @@ public class Room {
     }
 
     public static Room fromMap(Map<String, Object> source) {
-        //TODO: fix arg (@Petros)
-        //System.out.println("source:");
-        //System.out.println(source);
+        System.out.println("source:");
+        System.out.println(source);
         return new Room(
                 (int) source.get("id"),
                 (String) source.get("roomName"),
@@ -58,9 +57,9 @@ public class Room {
                 (int) source.get("capacity"),
                 (boolean) source.get("wifi"),
                 false, // (boolean) source.get("pool"),
-                false, // (boolean) source.get("breakfast"),
                 (boolean) source.get("shauna"),
-                new Location((Map<String, Object>) source.get("location")),
+                false, // (boolean) source.get("breakfast"),
+                new Location((Map<String, Object>) source.get("location"), (String)source.get("cityName")),
                 (String) source.get("description"),
                 (int) source.get("maxOccupants"),
                 true
@@ -82,6 +81,9 @@ public class Room {
     public double getPrice() {
         return price;
     }
+    public boolean getBreakfast() {
+        return breakfast;
+    }
 
     public int getCapacity(){
         return capacity;
@@ -97,10 +99,6 @@ public class Room {
 
     public boolean getShauna() {
         return shauna;
-    }
-
-    public boolean getBreakfast() {
-        return breakfast;
     }
 
     public Location getLocation() {
