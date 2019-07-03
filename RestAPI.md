@@ -28,7 +28,7 @@
 | GET    | emailPrefix | users: JSon array of all User Objects with given prefix on their emails | returns user with given prefix on their emails |
 | GET    | role ∈ {"visitor", "provider", "admin"} | users: JSon array of all User Objects with given role | returns all users for given role
 | POST   | email, password, password1, type ∈ {"visitor", "provider"}, [name, surname : if visitor], [providername : if provider], [autologin] | token: login token and user: User object if autologin given, otherwise success/error message | registers a new user
-| PUT    | userId, [email], [newpassword και oldpassword], [name, surname : if visitor], [providername : if provider] | success/error message | updates account info for user (to change password the old one must be given, if incorrect old password all update fails)
+| PUT    | userId, [email], [newPassword και oldPassword], [name, surname : if visitor], [providername : if provider] | success/error message | updates account info for user (to change password the old one must be given, if incorrect old password all update fails)
 
 #### /admin
 | Method | Input | Output | Action |

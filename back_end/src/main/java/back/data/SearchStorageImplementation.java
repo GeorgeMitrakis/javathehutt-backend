@@ -145,19 +145,15 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             BoolQueryBuilder B = QueryBuilders.boolQuery();
 
             if (constraints.getWifi()) {
-                System.out.println("\n1111111");
                 B = B.must(QueryBuilders.matchQuery("wifi", true));
             }
             if (constraints.getPool()) {
-                System.out.println("\n2222222");
                 B = B.must(QueryBuilders.matchQuery("pool", true));
             }
             if (constraints.getShauna()) {
-                System.out.println("\n3333333");
                 B = B.must(QueryBuilders.matchQuery("shauna", true));
             }
             if (constraints.getBreakfast()) {
-                System.out.println("\n44444444");
                 B = B.must(QueryBuilders.matchQuery("breakfast", true));
             }
 
