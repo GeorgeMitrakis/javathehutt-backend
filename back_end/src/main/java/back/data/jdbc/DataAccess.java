@@ -314,8 +314,9 @@ public class DataAccess {
 
     public Room getRoom(int id) throws JTHDataBaseException {
         try {
-            Object[] par = new Object[]{id};
-            return jdbcTemplate.queryForObject("select room.*, \"location\".*, city.name from room, location, city where room.id = ? and room.location_id = location.id and location.city_id = city.id", par, new RoomRowMapper());
+            return jdbcTemplate.queryForObject( "SELECT room.*, location.*, city.name, provider.providerName, \"user\".id AS \"uid\", \"user\".email, \"user\".role, \"user\".isBanned " +
+                                                    "FROM room, location, city, provider, \"user\" " +
+                                                    "WHERE room.id = ? and room.location_id = location.id and location.city_id = city.id and room.provider_id = provider.id and provider.id = \"user\".id", new Object[]{id}, new RoomRowMapper());
         } catch (EmptyResultDataAccessException e) {
             return null;
         } catch (Exception e) {
@@ -326,7 +327,9 @@ public class DataAccess {
 
     public List<Room> getRoomsForProvider(long providerId) throws JTHDataBaseException {
         try {
-            return jdbcTemplate.query("SELECT room.*, \"location\".*, city.name FROM room, location, city WHERE provider_id = ? and room.location_id = location.id and location.city_id = city.id", new Object[]{providerId}, new RoomRowMapper());
+            return jdbcTemplate.query(  "SELECT room.*, \"location\".*, city.name, provider.providerName, \"user\".id AS \"uid\", \"user\".email, \"user\".role, \"user\".isBanned " +
+                                            "FROM room, location, city, provider, \"user\" " +
+                                            "WHERE room.provider_id = ? and room.location_id = location.id and location.city_id = city.id and room.provider_id = provider.id and provider.id = \"user\".id", new Object[]{providerId}, new RoomRowMapper());
         } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -380,7 +383,9 @@ public class DataAccess {
         List<Room> results;
         try {
             // TODO: This search is incomplete and possibly dangerous (for SQL Injection)
-            String query = "select room.*, \"location\".*, city.name from room, \"location\", city where \"location\".city_id = city.id and \"location\".id = room.location_id";
+            String query =  "SELECT room.*, \"location\".*, city.name, provider.providerName, \"user\".id AS \"uid\", \"user\".email, \"user\".role, \"user\".isBanned " +
+                            "FROM room, \"location\", city, provider, \"user\" " +
+                            "WHERE \"location\".city_id = city.id AND \"location\".id = room.location_id and room.provider_id = provider.id and provider.id = \"user\".id";
 
             // check for range
             if (constraints.getRange() != -1.0) query += " and ST_DWithin(location.geom, ST_GeomFromText('" + constraints.getLocation().getCoords() + "'), " + constraints.getRange() + ")";
@@ -589,8 +594,11 @@ public class DataAccess {
 
     public List<Room> getFavouriteRoomIdsForVisitor(long visitorId) throws JTHDataBaseException {
         try {
-            return jdbcTemplate.query("select room.* from room, favorites, visitor " +
-                                          "where room.id = favorites.room_id and favorites.visitor_id = visitor.id and visitor.id = ?", new Object[]{visitorId}, new RoomRowMapper());
+            return jdbcTemplate.query("SELECT room.*, location.*, city.name, provider.providerName, \"user\".id AS \"uid\", \"user\".email, \"user\".role, \"user\".isBanned " +
+                                          "FROM room, favorites, visitor, location, city, provider, \"user\" " +
+                                          "WHERE room.id = favorites.room_id and favorites.visitor_id = visitor.id and visitor.id = ? " +
+                                                "and room.location_id = location.id and location.city_id = city.id and room.provider_id = provider.id and provider.id = \"user\".id",
+                                           new Object[]{visitorId}, new RoomRowMapper());
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();

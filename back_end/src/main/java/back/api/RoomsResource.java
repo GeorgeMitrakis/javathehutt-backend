@@ -143,7 +143,7 @@ public class RoomsResource extends ServerResource  {
         }
 
         Location location = new Location(cityName, cordX, cordY);
-        Room room = new Room(-1, roomName, providerId, -1, price, capacity, "true".equals(wifi), "true".equals(pool), "true".equals(shauna), "true".equals(breakfast), location, description, maxOccupants, false);
+        Room room = new Room(-1, roomName, providerId, -1, price, capacity, "true".equals(wifi), "true".equals(pool), "true".equals(shauna), "true".equals(breakfast), location, description, maxOccupants, null);
 
         int roomId;
         try {
@@ -293,7 +293,8 @@ public class RoomsResource extends ServerResource  {
         boolean _pool = (pool == null) ? oldRoom.getPool() : "true".equals(pool) ;
         boolean _shauna = (shauna == null) ? oldRoom.getShauna() : "true".equals(shauna) ;
         boolean _breakfast = (breakfast == null) ? oldRoom.getBreakfast() : "true".equals(breakfast);
-        Room room = new Room(roomId, roomName, oldRoom.getProviderId(), oldRoom.getLocationId(), price, capacity, _wifi, _pool, _shauna, _breakfast, location, description, maxOccupants, true);
+        Room room = new Room(roomId, roomName, oldRoom.getProviderId(), oldRoom.getLocationId(), price, capacity, _wifi, _pool, _shauna, _breakfast, location, description, maxOccupants, null);
+        room.fetchProvider();
 
         try {
             roomsDAO.updateRoom(room);

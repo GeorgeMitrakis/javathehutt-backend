@@ -18,11 +18,10 @@ public class Room {
     private String description;
     private Location location;
     private int maxOccupants;
-
     private Provider provider = null;
     private List<Rating> ratings = null;
 
-    public Room(int id, String roomName, long providerId, int locationId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, boolean breakfast, Location location, String description, int maxOccupants, boolean fetchProviderFromDB) {
+    public Room(int id, String roomName, long providerId, int locationId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, boolean breakfast, Location location, String description, int maxOccupants, Provider provider) {
         this.id = id;
         this.roomName = roomName;
         this.providerId = providerId;
@@ -36,9 +35,7 @@ public class Room {
         this.location = location;
         this.description = description;
         this.maxOccupants = maxOccupants;
-        if (fetchProviderFromDB) {   // fetch only Provider. Ratings, images, etc are costly and should be done on a separate API call if the user requests to see them
-            fetchProvider();
-        }
+        this.provider = provider;
     }
 
     public void setId(int id) {
@@ -48,23 +45,28 @@ public class Room {
     public static Room fromMap(Map<String, Object> source) {
         //System.out.println("source:");
         //System.out.println(source);
-        return new Room(
-                (int) source.get("id"),
-                (String) source.get("roomName"),
-                (int) source.get("providerId"),
-                (int) source.get("locationId"),
-                (double) source.get("price"),
-                (int) source.get("capacity"),
-                (boolean) source.get("wifi"),
-                (boolean) source.get("pool"),
-                (boolean) source.get("shauna"),
-                (boolean) source.get("breakfast"),
-                new Location((Map<String, Object>) source.get("location"),
-                (String)source.get("cityName")),
-                (String) source.get("description"),
-                (int) source.get("maxOccupants"),
-                true
-        );
+        try {
+            return new Room(
+                    (int) source.get("id"),
+                    (String) source.get("roomName"),
+                    (long) source.get("providerId"),
+                    (int) source.get("locationId"),
+                    (double) source.get("price"),
+                    (int) source.get("capacity"),
+                    (boolean) source.get("wifi"),
+                    (boolean) source.get("pool"),
+                    (boolean) source.get("shauna"),
+                    (boolean) source.get("breakfast"),
+                    new Location((Map<String, Object>) source.get("location"),
+                    (String) source.get("cityName")),
+                    (String) source.get("description"),
+                    (int) source.get("maxOccupants"),
+                    new Provider(new User((long) source.get("providerId"), (String) source.get("email"), "provider", (Boolean) source.get("isBanned")), (String) source.get("providerName"))
+            );
+        } catch (Exception e){
+            System.err.println("WARNING: Missing parameters in JSon of SearchStorage's documents");
+            return null;
+        }
     }
 
     public int getId() {
