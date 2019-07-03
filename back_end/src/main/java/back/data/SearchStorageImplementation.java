@@ -57,6 +57,12 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 
     }
 
+    @Override
+    public void pushTransaction(Room room, Transaction transaction) throws JTHDataBaseException {
+        // TODO: Implement real version maybe?
+        pushRoom(room, room.getTransactions());
+    }
+
     private XContentBuilder RoomToXContent(Room room) throws IOException {
         return jsonBuilder().startObject()
                 .field("id", room.getId())
@@ -91,16 +97,6 @@ public class SearchStorageImplementation implements SearchStorageAPI {
                 .field("startDate", transaction.getStartDate())
                 .field("endDate", transaction.getEndDate())
                 .endObject();
-    }
-
-    @Override
-    public void pushTransaction(int roomId, Transaction transaction) throws JTHDataBaseException{
-        try {
-            XContentBuilder t = TransactionToXContent(transaction);
-        } catch (IOException e) {
-            throw new JTHDataBaseException();
-        }
-        //UpdateResponse res = client.prepareUpdate(roomIndexName, "room", Integer.toString(roomId)).setScript(new Script("").getParams().pu)
     }
 
     @Override
