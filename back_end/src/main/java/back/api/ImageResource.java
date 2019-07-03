@@ -10,7 +10,6 @@ import back.util.ImgFetch;
 import back.util.JWT;
 import back.util.JsonMapRepresentation;
 import org.restlet.data.Form;
-import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
@@ -24,17 +23,27 @@ public class ImageResource extends ServerResource {
     @Override
     protected Representation get() throws ResourceException {
         try {
-//            String imgIdStr = getQueryValue("imgId");
-//            if(imgIdStr == null){
-//                throw new JTHInputException("no image id specified");
-//            }
-//            long imgId = Long.parseLong(imgIdStr);
-//            Image img = imageDAO.getById(imgId);
-            String randomUrl = imageDAO.getRandomImageUrl();
-            if (randomUrl.isEmpty()){
-                return JsonMapRepresentation.result(false,"Image not found", null);
+            String imgIdStr = getQueryValue("imgId");
+            String roomIdStr = getQueryValue("roomId");
+            if (imgIdStr == null && roomIdStr != null){
+                int roomId = Integer.parseInt(roomIdStr);
+                String randomUrl = imageDAO.getRandomImageUrl(roomId);
+                if (randomUrl.isEmpty()){
+                    return JsonMapRepresentation.result(false,"There is no image for given room", null);
+                }
+                return ImgFetch.fetch(randomUrl);
+            } else if (imgIdStr != null){
+                long imgId = Long.parseLong(imgIdStr);
+                Image img = imageDAO.getById(imgId);
+                if (img == null){
+                    return JsonMapRepresentation.result(false,"Image not found", null);
+                }
+                return ImgFetch.fetch(img.getUrl());
+            } else {
+                return JsonMapRepresentation.result(false,"Missing parameter(s)", null);
             }
-            return ImgFetch.fetch(randomUrl);
+        } catch (NumberFormatException e){
+            return JsonMapRepresentation.result(false,"Image error: non number parameter given", null);
         } catch (Exception e){
             e.printStackTrace();
             return JsonMapRepresentation.result(false,"Image error", null);

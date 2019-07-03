@@ -2,7 +2,6 @@ package back.data;
 
 import back.data.jdbc.DataAccess;
 import back.exceptions.JTHDataBaseException;
-import back.data.ImageDAO;
 import back.model.Image;
 
 import java.util.List;
@@ -21,8 +20,8 @@ public class ImageDAOImpl implements ImageDAO {
     }
 
     @Override
-    public String getRandomImageUrl() throws JTHDataBaseException{
-        return dataAccess.getRandomImageUrl();
+    public String getRandomImageUrl(int roomId) throws JTHDataBaseException{
+        return dataAccess.getRandomImageUrl(roomId);
     }
 
     @Override

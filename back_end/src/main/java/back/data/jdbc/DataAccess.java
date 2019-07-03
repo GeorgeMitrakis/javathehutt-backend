@@ -18,7 +18,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -643,15 +642,15 @@ public class DataAccess {
         }
     }
 
-    public String getRandomImageUrl() throws JTHDataBaseException{
+    public String getRandomImageUrl(int roomId) throws JTHDataBaseException {
         try{
-            List<String> imgList = jdbcTemplate.queryForList("SELECT url FROM img", String.class);
+            List<String> imgList = jdbcTemplate.queryForList("SELECT url FROM img WHERE room_id = ?", new Object[]{roomId}, String.class);
             Random randomGenerator = new Random();
             int randomInt = randomGenerator.nextInt(imgList.size());
             return imgList.get(randomInt);
-        }catch (IncorrectResultSizeDataAccessException e){
+        } catch (IncorrectResultSizeDataAccessException e){
             return null;
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
         }

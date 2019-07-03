@@ -9,7 +9,7 @@ public interface ImageDAO {
 
     Image getById(long imgId) throws JTHDataBaseException;
 
-    String getRandomImageUrl() throws JTHDataBaseException;
+    String getRandomImageUrl(int roomId) throws JTHDataBaseException;
 
     List<Long> getRoomImageIds(int roomId) throws JTHDataBaseException;
 
