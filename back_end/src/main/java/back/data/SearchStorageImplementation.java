@@ -59,20 +59,22 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 
     private XContentBuilder RoomToXContent(Room room) throws IOException {
         return jsonBuilder().startObject()
-            .field("id", room.getId())
-            .field("price", room.getPrice())
-            .field("wifi",room.getWifi())
-            .field("shauna", room.getShauna())
-            .field("breakfast", room.getBreakfast())
-            .field("description", room.getDescription())
-            .field("capacity", room.getCapacity())
-            .field("transactions", new ArrayList<>())
-            .field("roomName", room.getRoomName())
-            .field("location", new GeoPoint(room.getLocation().getCordX(), room.getLocation().getCordY()))
-            .field("providerId",room.getProviderId())
-            .field("locationId",room.getLocationId())
-            .field("maxOccupants", room.getMaxOccupants())
-            .endObject();
+                .field("id", room.getId())
+                .field("providerId", room.getProviderId())
+                .field("roomName", room.getRoomName())
+                .field("description", room.getDescription())
+                .field("price", room.getPrice())
+                .field("capacity", room.getCapacity())
+                .field("cityName", room.getLocation().getCityname())
+                .field("location", new GeoPoint(room.getLocation().getCordX(), room.getLocation().getCordY()))
+                .field("locationId", room.getLocationId())
+                .field("wifi",room.getWifi())
+                .field("pool", room.getPool())
+                .field("shauna", room.getShauna())
+                .field("breakfast", room.getBreakfast())
+                .field("maxOccupants", room.getMaxOccupants())
+                .field("transactions", getJSonTransactions(room.getTransactions()))
+                .endObject();
     }
 
     private List<XContentBuilder> getJSonTransactions(List<Transaction> transactions) throws IOException {
@@ -86,9 +88,9 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 
     private XContentBuilder TransactionToXContent(Transaction transaction) throws IOException {
         return jsonBuilder().startObject()
-            .field("start_date", transaction.getStartDate())
-            .field("end_date", transaction.getEndDate())
-            .endObject();
+                .field("startDate", transaction.getStartDate())
+                .field("endDate", transaction.getEndDate())
+                .endObject();
     }
 
     @Override
