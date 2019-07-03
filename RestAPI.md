@@ -82,6 +82,8 @@
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
 | GET    | imgId | actual binary images | returns image with given id |
+| POST   | roomId, url | success/error message | adds img to given room (must be owner or admin) |
+| DELETE | imgId | success/error message | deletes img with given id (must be owner or admin) |
 
 #### /roomImages
 | Method | Input | Output | Action |

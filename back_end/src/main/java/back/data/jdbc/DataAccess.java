@@ -622,24 +622,56 @@ public class DataAccess {
     }
 
     public Image getImageById(long imgId) throws JTHDataBaseException {
-        try{
-            Image img = jdbcTemplate.queryForObject("SELECT * FROM img where id = ?", new Long[]{imgId}, new ImageRowMapper());
+        try {
+            Image img = jdbcTemplate.queryForObject("SELECT * FROM img where id = ?", new Object[]{imgId}, new ImageRowMapper());
             return img;
-        }catch (Exception e){
+        } catch (IncorrectResultSizeDataAccessException e) {   // img does not exist
+            return null;
+        } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
     }
 
-    public List<Long> getRoomImageIds(long roomId) throws JTHDataBaseException {
+    public void addImage(int roomId, String url) throws JTHDataBaseException {
+        try {
+            jdbcTemplate.update("INSERT INTO img (id, url, room_id) VALUES (default, ?, ?)", url, roomId);
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public void deleteImage(long imgId) throws JTHDataBaseException {
+        try {
+            jdbcTemplate.update("DELETE FROM img WHERE id = ?", imgId);
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public List<Long> getRoomImageIds(int roomId) throws JTHDataBaseException {
         List<Long> results;
         try {
-            results = jdbcTemplate.queryForList("SELECT id FROM img WHERE room_id = ?", new Long[]{roomId}, Long.class);
+            results = jdbcTemplate.queryForList("SELECT id FROM img WHERE room_id = ?", new Object[]{roomId}, Long.class);
         } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
         return results;
+    }
+
+    public int getRoomIdForImage(long imgId) throws JTHDataBaseException {
+        try {
+            Integer roomId = jdbcTemplate.queryForObject("SELECT room_id FROM img WHERE id = ?", new Object[]{imgId}, Integer.class);
+            return (roomId != null) ? roomId : -1;
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return -1;
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
     }
 
     public List<Transaction> getTransactions() throws JTHDataBaseException {

@@ -5,6 +5,7 @@ import back.exceptions.JTHInputException;
 import back.conf.Configuration;
 import back.data.RoomsDAO;
 import back.model.Location;
+import back.model.Provider;
 import back.model.Room;
 import back.model.User;
 import back.util.JWT;
@@ -254,12 +255,22 @@ public class RoomsResource extends ServerResource  {
             return JsonMapRepresentation.result(false, "Post room: Invalid coordinates given", null);
         }
 
+        Provider provider;
+        try {
+            provider = roomsDAO.getProviderForRoom(roomId);
+            if (provider == null){
+                return JsonMapRepresentation.result(false, "Put room: invalid roomId given (could not find its provider)", null);
+            }
+        } catch (JTHDataBaseException e) {
+            return JsonMapRepresentation.result(false, "Put room: DataBase error (or invalid roomId given)", null);
+        }
+
         if (Configuration.CHECK_AUTHORISATION) {
             try {
                 String jwt = JWT.getJWTFromHeaders(getRequest());
                 if (!JWT.assertRole(jwt, "provider")){
                     return JsonMapRepresentation.result(false,"Put room: forbidden (not a provider)",null);
-                } else if (!JWT.assertUser(jwt, roomId)) {
+                } else if (!JWT.assertUser(jwt, provider.getId())) {
                     return JsonMapRepresentation.result(false,"Put room: forbidden (not allowed to submit a room for another provider)",null);
                 }
             } catch (JTHInputException e){
