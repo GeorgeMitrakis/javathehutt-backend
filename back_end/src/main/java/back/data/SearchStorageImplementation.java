@@ -62,60 +62,9 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 
     @Override
     public void pushTransaction(Room room, Transaction transaction) throws JTHDataBaseException {
-        // TODO: Implement real version maybe?
+        // This is a lazy implementation of pushTransaction... it could be better.
         pushRoom(room, room.getTransactions());
     }
-
-    private XContentBuilder RoomToXContent(Room room) throws IOException, JTHDataBaseException {
-        Provider provider = room.fetchProvider();
-        if (provider == null) throw new JTHDataBaseException();
-        XContentBuilder res = jsonBuilder().startObject()
-                .field("id", room.getId())
-                .field("providerId", room.getProviderId())
-                .field("roomName", room.getRoomName())
-                .field("description", room.getDescription())
-                .field("price", room.getPrice())
-                .field("capacity", room.getCapacity())
-                .field("cityName", room.getLocation().getCityname())
-                .field("location", new GeoPoint(room.getLocation().getCordX(), room.getLocation().getCordY()))
-                .field("locationId", room.getLocationId())
-                .field("wifi", room.getWifi())
-                .field("pool", room.getPool())
-                .field("shauna", room.getShauna())
-                .field("breakfast", room.getBreakfast())
-                .field("maxOccupants", room.getMaxOccupants())
-                .field("email", provider.getEmail())
-                .field("isBanned", provider.isBanned())
-                .field("providerName", provider.getProvidername());
-        res = addTransactions(res,room.getTransactions());
-        res = res.endObject();
-        return res;
-
-    }
-
-    private XContentBuilder addTransactions(XContentBuilder res,List<Transaction> transactions) throws IOException {
-        res = res.startArray("transactions");
-
-        for(Transaction t: transactions){
-            res = res.startObject()
-                    .field("start_date", t.getStartDate())
-                    .field("end_date", t.getEndDate())
-                    .endObject();
-        }
-        res = res.endArray();
-        return res;
-    }
-
-
-
-
-    private XContentBuilder TransactionToXContent(Transaction transaction) throws IOException {
-        return jsonBuilder().startObject()
-                .field("startDate", transaction.getStartDate())
-                .field("endDate", transaction.getEndDate())
-                .endObject();
-    }
-
 
     @Override
     public void deleteRoom(int roomId) throws JTHDataBaseException {
@@ -125,24 +74,6 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
-    }
-
-    private BoolQueryBuilder availabilityQuery(BoolQueryBuilder b, String start, String end){
-
-        return QueryBuilders.boolQuery().mustNot(
-                QueryBuilders.nestedQuery("transactions",
-                        QueryBuilders.boolQuery()
-                        .should(QueryBuilders.rangeQuery("transactions.start_date").gte(start).lt(end))
-                        .should(QueryBuilders.rangeQuery("transactions.end_date").gte(start).lt(end))
-                        .should(QueryBuilders
-                            .boolQuery()
-                                .must(QueryBuilders.rangeQuery("transactions.start_date").lt(start))
-                                .must(QueryBuilders.rangeQuery("transactions.end_date").gt(end))
-                        )
-                        ,
-
-                ScoreMode.Avg)
-        );
     }
 
     @Override
@@ -186,7 +117,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 
             if (constraints.hasRange()) {
                 B = B.must(QueryBuilders.geoDistanceQuery("location")
-                        .point(constraints.getLocation().getCordX(),constraints.getLocation().getCordY()).distance(constraints.getRange(), DistanceUnit.KILOMETERS));
+                     .point(constraints.getLocation().getCordX(),constraints.getLocation().getCordY()).distance(constraints.getRange(), DistanceUnit.KILOMETERS));
             }
 
             if (constraints.hasDateConstraints()) {
@@ -208,6 +139,67 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             System.out.println("Tried elastic search and failed");
             return null;
         }
+    }
+
+    private XContentBuilder RoomToXContent(Room room) throws IOException, JTHDataBaseException {
+        Provider provider = room.fetchProvider();
+        if (provider == null) throw new JTHDataBaseException();
+        XContentBuilder res = jsonBuilder().startObject()
+                .field("id", room.getId())
+                .field("providerId", room.getProviderId())
+                .field("roomName", room.getRoomName())
+                .field("description", room.getDescription())
+                .field("price", room.getPrice())
+                .field("capacity", room.getCapacity())
+                .field("cityName", room.getLocation().getCityname())
+                .field("location", new GeoPoint(room.getLocation().getCordX(), room.getLocation().getCordY()))
+                .field("locationId", room.getLocationId())
+                .field("wifi", room.getWifi())
+                .field("pool", room.getPool())
+                .field("shauna", room.getShauna())
+                .field("breakfast", room.getBreakfast())
+                .field("maxOccupants", room.getMaxOccupants())
+                .field("email", provider.getEmail())
+                .field("isBanned", provider.isBanned())
+                .field("providerName", provider.getProvidername());
+        res = addTransactions(res,room.getTransactions());
+        res = res.endObject();
+        return res;
+
+    }
+
+    private XContentBuilder addTransactions(XContentBuilder res,List<Transaction> transactions) throws IOException {
+        res = res.startArray("transactions");
+        for(Transaction t: transactions){
+            res = res.startObject()
+                     .field("start_date", t.getStartDate())
+                     .field("end_date", t.getEndDate())
+                     .endObject();
+        }
+        res = res.endArray();
+        return res;
+    }
+
+
+    private XContentBuilder TransactionToXContent(Transaction transaction) throws IOException {
+        return jsonBuilder().startObject()
+                .field("startDate", transaction.getStartDate())
+                .field("endDate", transaction.getEndDate())
+                .endObject();
+    }
+
+
+    private BoolQueryBuilder availabilityQuery(BoolQueryBuilder b, String start, String end){
+        return QueryBuilders.boolQuery().mustNot(
+                QueryBuilders.nestedQuery("transactions",
+                        QueryBuilders.boolQuery()
+                        .should(QueryBuilders.rangeQuery("transactions.start_date").gte(start).lt(end))
+                        .should(QueryBuilders.rangeQuery("transactions.end_date").gte(start).lt(end))
+                        .should(QueryBuilders
+                                .boolQuery()
+                                .must(QueryBuilders.rangeQuery("transactions.start_date").lt(start))
+                                .must(QueryBuilders.rangeQuery("transactions.end_date").gt(end))
+                        ), ScoreMode.Avg));
     }
 
 }
