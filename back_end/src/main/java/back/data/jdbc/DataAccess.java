@@ -564,7 +564,7 @@ public class DataAccess {
             // added all deletes in case there is no CASCADE set
             jdbcTemplate.update("DELETE FROM room WHERE id = ?", roomId);
             jdbcTemplate.update("DELETE FROM transactions WHERE room_id = ?", roomId);
-            jdbcTemplate.update("DELETE FROM ratings WHERE room_id = ?", roomId);
+            jdbcTemplate.update("DELETE FROM rating WHERE room_id = ?", roomId);
             jdbcTemplate.update("DELETE FROM favorites WHERE room_id = ?", roomId);
             jdbcTemplate.update("DELETE FROM img WHERE room_id = ?", roomId);
             jdbcTemplate.update("DELETE FROM location WHERE id = (SELECT location_id FROM room WHERE id = ?)", roomId);
