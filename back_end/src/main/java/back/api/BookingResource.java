@@ -88,13 +88,11 @@ public class BookingResource  extends ServerResource {
             }
 
             // book the room
-            int transac_id = bookingDAO.bookRoomForVisitor(user, room, DateHandler.FrontDateToSQLDate(startDate), DateHandler.FrontDateToSQLDate(endDate), occupants);
-            if (transac_id == -1) {
+            boolean succ = bookingDAO.bookRoomForVisitor(user, room, DateHandler.FrontDateToSQLDate(startDate), DateHandler.FrontDateToSQLDate(endDate), occupants);
+            if (!succ) {
                 return JsonMapRepresentation.result(false, "Booking error: No room available", null);
             } else {
-                Map<String, Object> m = new HashMap<>();
-                m.put("transactionId", transac_id);
-                return JsonMapRepresentation.result(true, "Booking of room successful", m);
+                return JsonMapRepresentation.result(true, "Booking of room successful", null);
             }
 
         } catch (JTHDataBaseException e) {

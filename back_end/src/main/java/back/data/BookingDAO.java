@@ -12,7 +12,7 @@ public interface BookingDAO {
 
     // Interface for accessing the Book-keeping part of the database
 
-    int bookRoomForVisitor(User user, Room room, String sqlStartDate, String sqlEndDate, int occupants) throws JTHDataBaseException;
+    boolean bookRoomForVisitor(User user, Room room, String sqlStartDate, String sqlEndDate, int occupants) throws JTHDataBaseException;
 
     boolean addRoomToFavourites(long visitorId, int roomId) throws JTHDataBaseException;
 

@@ -74,7 +74,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
                 .field("cityName", room.getLocation().getCityname())
                 .field("location", new GeoPoint(room.getLocation().getCordX(), room.getLocation().getCordY()))
                 .field("locationId", room.getLocationId())
-                .field("wifi",room.getWifi())
+                .field("wifi", room.getWifi())
                 .field("pool", room.getPool())
                 .field("shauna", room.getShauna())
                 .field("breakfast", room.getBreakfast())
@@ -116,15 +116,19 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             BoolQueryBuilder B = QueryBuilders.boolQuery();
 
             if (constraints.getWifi()) {
+                System.out.println("\n1111111");
                 B = B.must(QueryBuilders.matchQuery("wifi", true));
             }
             if (constraints.getPool()) {
+                System.out.println("\n2222222");
                 B = B.must(QueryBuilders.matchQuery("pool", true));
             }
             if (constraints.getShauna()) {
+                System.out.println("\n3333333");
                 B = B.must(QueryBuilders.matchQuery("shauna", true));
             }
             if (constraints.getBreakfast()) {
+                System.out.println("\n44444444");
                 B = B.must(QueryBuilders.matchQuery("breakfast", true));
             }
 
