@@ -567,6 +567,7 @@ public class DataAccess {
             jdbcTemplate.update("DELETE FROM ratings WHERE room_id = ?", roomId);
             jdbcTemplate.update("DELETE FROM favorites WHERE room_id = ?", roomId);
             jdbcTemplate.update("DELETE FROM img WHERE room_id = ?", roomId);
+            jdbcTemplate.update("DELETE FROM location WHERE id = (SELECT location_id FROM room WHERE id = ?)", roomId);
         } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
