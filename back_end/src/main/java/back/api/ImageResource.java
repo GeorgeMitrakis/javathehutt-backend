@@ -30,8 +30,10 @@ public class ImageResource extends ServerResource {
             }
             long imgId = Long.parseLong(imgIdStr);
             Image img = imageDAO.getById(imgId);
-            ByteArrayRepresentation bar = ImgFetch.fetch(img.getUrl());
-            return bar;
+            if (img == null){
+                return JsonMapRepresentation.result(false,"Image not found", null);
+            }
+            return ImgFetch.fetch(img.getUrl());
         } catch (JTHInputException e){
             return JsonMapRepresentation.result(false,"Image error: " + e.getErrorMsg(), null);
         } catch (Exception e){
