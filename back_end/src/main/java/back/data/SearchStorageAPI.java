@@ -18,8 +18,4 @@ public interface SearchStorageAPI {
 
     List<Room> searchRooms(SearchConstraints constraints, int limit, int offset);
 
-    List<String> autocomplete(String prefix);  // Maybe (leave it for last)
-
-    void pushSQLtoSearchStorage();             // pushes the whole SQL Data Base to search storage (leave it for last)
-
 }

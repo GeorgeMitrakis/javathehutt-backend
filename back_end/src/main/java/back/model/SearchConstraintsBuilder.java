@@ -54,12 +54,22 @@ public class SearchConstraintsBuilder {
         return this;
     }
 
-    public SearchConstraints build(){
-        return searchConstraints;
-    }
-
     public SearchConstraintsBuilder setDescription(String description) {
         if (description != null) searchConstraints.setDescription(description);
         return this;
+    }
+
+    public SearchConstraintsBuilder setStartDate(String startDate){
+        if (startDate != null) searchConstraints.setStartDate(startDate);
+        return this;
+    }
+
+    public SearchConstraintsBuilder setEndDate(String endDate){
+        if (endDate != null) searchConstraints.setEndDate(endDate);
+        return this;
+    }
+
+    public SearchConstraints build(){
+        return searchConstraints;
     }
 }

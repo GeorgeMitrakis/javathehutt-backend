@@ -147,12 +147,15 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             if (constraints.getWifi()) {
                 B = B.must(QueryBuilders.matchQuery("wifi", true));
             }
+
             if (constraints.getPool()) {
                 B = B.must(QueryBuilders.matchQuery("pool", true));
             }
+
             if (constraints.getShauna()) {
                 B = B.must(QueryBuilders.matchQuery("shauna", true));
             }
+
             if (constraints.getBreakfast()) {
                 B = B.must(QueryBuilders.matchQuery("breakfast", true));
             }
@@ -164,16 +167,24 @@ public class SearchStorageImplementation implements SearchStorageAPI {
                 B = B.must(QueryBuilders.rangeQuery("price").lte(constraints.getMaxCost()));
             }
 
-            if (constraints.hasRange()) {
-                B = B.must(QueryBuilders.geoDistanceQuery("location")
-                    .point(constraints.getLocation().getCordX(),constraints.getLocation().getCordY()).distance(constraints.getRange(), DistanceUnit.KILOMETERS));
+            B = B.must(QueryBuilders.rangeQuery("maxOccupants").gte(constraints.getOccupants()));
+
+            if (constraints.getLocation().getCityname() != null && !"".equals(constraints.getLocation().getCityname())){
+                B = B.must(QueryBuilders.matchQuery("cityName", constraints.getLocation().getCityname()).fuzziness(Fuzziness.AUTO));
             }
 
             if (constraints.hasDescription()){
                 B = B.must(QueryBuilders.matchQuery("description", constraints.getDescription()).fuzziness(Fuzziness.AUTO));
             }
 
-            B = B.must(QueryBuilders.rangeQuery("maxOccupants").gte(constraints.getOccupants()));
+            if (constraints.hasRange()) {
+                B = B.must(QueryBuilders.geoDistanceQuery("location")
+                        .point(constraints.getLocation().getCordX(),constraints.getLocation().getCordY()).distance(constraints.getRange(), DistanceUnit.KILOMETERS));
+            }
+
+            // TODO: do something with:
+            //constraints.getStartDate()
+            //constraints.getEndDate()
 
             SearchRequest request = new SearchRequest("jth_rooms").source(new SearchSourceBuilder().from(offset).size(limit).query(B));
             SearchResponse response = client.search(request, RequestOptions.DEFAULT);
@@ -182,7 +193,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
                 res.add(Room.fromMap(h.getSourceAsMap()));
             }
 
-            //System.out.println(res);
+            System.out.println(res);
 
             return res;
         } catch (Exception e){
@@ -190,17 +201,6 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             System.out.println("Tried elastic search and failed");
             return null;
         }
-    }
-
-    @Override
-    public List<String> autocomplete(String prefix) {
-        // TODO (last)
-        return null;
-    }
-
-    @Override
-    public void pushSQLtoSearchStorage() {
-        // TODO (last)
     }
 
 }

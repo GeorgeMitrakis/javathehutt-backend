@@ -12,6 +12,8 @@ public class SearchConstraints {
     private double range = -1.0;          // in kms
     private int occupants = 1;            // 1 is the default
     private String description = null;
+    String startDate = null;
+    String endDate = null;
 
     // Setters and Getters
     public int getOccupants() {
@@ -60,6 +62,22 @@ public class SearchConstraints {
 
     public void setLocation(String cityname, double cordX, double cordY) {
         this.location = new Location(cityname, cordX, cordY);
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
     public int getMinCost() {

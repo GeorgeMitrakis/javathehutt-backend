@@ -37,6 +37,8 @@ public class SearchResource extends ServerResource {
         String pointY = getQueryValue("pointY");
         String occupants = getQueryValue("occupants");
         String description = getQueryValue("description");
+        String startDate = getQueryValue("startDate");
+        String endDate = getQueryValue("endDate");
 
         SearchConstraints constraints;
         try {
@@ -51,6 +53,8 @@ public class SearchResource extends ServerResource {
                     .setLocation(cityName, (pointX == null) ? null : Double.parseDouble(pointX), (pointY == null) ? null : Double.parseDouble(pointY))
                     .setOccupants((occupants == null) ? 1 : Integer.parseInt(occupants))
                     .setDescription(description)
+                    .setStartDate(startDate)
+                    .setEndDate(endDate)
                     .build();
         } catch (NumberFormatException e){
             e.printStackTrace();
@@ -59,7 +63,7 @@ public class SearchResource extends ServerResource {
 
         String limitStr = getQueryValue("limit");
         String offsetStr = getQueryValue("offset");
-        int limit = 10, offset = 0;   // default
+        int limit = 100, offset = 0;   // default
         if (limitStr != null)  {
             try { limit = Integer.parseInt(limitStr); } catch (NumberFormatException e) { return JsonMapRepresentation.result(false, "Search error: non number sent for a number parameter", null); }
         }

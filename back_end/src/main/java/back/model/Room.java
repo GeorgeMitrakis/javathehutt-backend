@@ -46,8 +46,8 @@ public class Room {
     }
 
     public static Room fromMap(Map<String, Object> source) {
-        System.out.println("source:");
-        System.out.println(source);
+        //System.out.println("source:");
+        //System.out.println(source);
         return new Room(
                 (int) source.get("id"),
                 (String) source.get("roomName"),
