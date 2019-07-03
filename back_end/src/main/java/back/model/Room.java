@@ -13,7 +13,7 @@ public class Room {
     private int locationId;  // only used for updating room (can be ignored elsewhere)
     private double price;
     private int capacity;
-    private boolean wifi, pool, shauna;
+    private boolean wifi, pool, shauna, breakfast;
     private String roomName;
     private String description;
     private Location location;
@@ -22,7 +22,7 @@ public class Room {
     private Provider provider = null;
     private List<Rating> ratings = null;
 
-    public Room(int id, String roomName, long providerId, int locationId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, Location location, String description, int maxOccupants, boolean fetchExtraFromDB) {
+    public Room(int id, String roomName, long providerId, int locationId, double price, int capacity, boolean wifi, boolean pool, boolean shauna, boolean breakfast, Location location, String description, int maxOccupants, boolean fetchExtraFromDB) {
         this.id = id;
         this.roomName = roomName;
         this.providerId = providerId;
@@ -30,6 +30,7 @@ public class Room {
         this.price = price;
         this.capacity = capacity;
         this.wifi = wifi;
+        this.breakfast = breakfast;
         this.pool = pool;
         this.shauna = shauna;
         this.location = location;
@@ -56,8 +57,8 @@ public class Room {
                 (int) source.get("capacity"),
                 (boolean) source.get("wifi"),
                 false, // (boolean) source.get("pool"),
-                false, // (boolean) source.get("breakfast"),
                 (boolean) source.get("shauna"),
+                false, // (boolean) source.get("breakfast"),
                 new Location((Map<String, Object>) source.get("location"), (String)source.get("cityName")),
                 (String) source.get("description"),
                 (int) source.get("maxOccupants"),
@@ -79,6 +80,9 @@ public class Room {
 
     public double getPrice() {
         return price;
+    }
+    public boolean getBreakfast() {
+        return breakfast;
     }
 
     public int getCapacity(){
