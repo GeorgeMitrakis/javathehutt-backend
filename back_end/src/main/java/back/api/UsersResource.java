@@ -77,7 +77,17 @@ public class UsersResource extends ServerResource {
                     return JsonMapRepresentation.result(true, null, m);
                 }
             } else {  // return all users
-                List<User> allUsers = userDAO.getUsers(new Limits(0, (int) userDAO.countUsers()));
+                String limitStr = getQueryValue("limit");
+                String offsetStr = getQueryValue("offset");
+                int limit, offset = 0;   // default
+                if (limitStr != null)  {
+                    try { limit = Integer.parseInt(limitStr); } catch (NumberFormatException e) { return JsonMapRepresentation.result(false, "Get users: non number sent for a number parameter", null); }
+                } else limit = (int) userDAO.countUsers();
+                if (offsetStr != null) {
+                    try { offset = Integer.parseInt(offsetStr); } catch (NumberFormatException e) { return JsonMapRepresentation.result(false, "Get users: non number sent for a number parameter", null); }
+                }
+
+                List<User> allUsers = userDAO.getUsers(new Limits(offset, limit));
                 Map<String, Object> m = new HashMap<>();
 
                 if (Configuration.CHECK_AUTHORISATION) {

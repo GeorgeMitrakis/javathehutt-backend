@@ -22,7 +22,7 @@
 #### /users
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
-| GET    | -     | users: JSon array of all User Objects | returns all users |
+| GET    | [limit, offset] | users: JSon array of all User Objects | returns all users (unless specified a limit and offset) |
 | GET    | id    | user: User object with given id (if it exists) | returns user with given id (if it exists) |
 | GET    | email | user: User object with given email (if it exists) | returns user with given email (if it exists) |
 | GET    | emailPrefix | users: JSon array of all User Objects with given prefix on their emails | returns user with given prefix on their emails |
@@ -43,7 +43,7 @@
 | GET    | providerId         | transactions: JSon array of provider's transactions | returns all system transactions for given provider
 | GET    | providerId, profit | profit: a real number | returns the profit of transactions for given provider
 | GET    | visitorId |  transactions: JSon array of visitor's transactions | returns all system transactions for given visitor
-| POST   | userId, roomId, startDate, endDate, occupants | transactionId: the id of new transaction or error message | books given room for given user on given time frame if available for given number of occupants and returns transaction id
+| POST   | userId, roomId, startDate, endDate, occupants | success/error message | books given room for given user on given time frame if available for given number of occupants
 
 #### /rooms
 | Method | Input | Output | Action |
