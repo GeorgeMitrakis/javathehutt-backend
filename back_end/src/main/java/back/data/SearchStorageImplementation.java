@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.*;
 
 import org.apache.http.HttpHost;
+import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
@@ -20,6 +21,7 @@ import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.action.search.SearchResponse;
@@ -33,7 +35,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 /*
     NoSQL document structure:
 
-    { id, providerId, roomName, description, price, capacity, cityName, location, maxOccupants, transactions: [ { startDate, endDate } , ... ], wifi, pool, shauna, breakfast }
+    { id, providerId, roomName, description, price, capacity, cityName, location, maxOccupants, transactions: [ { start_date, end_date } , ... ], wifi, pool, shauna, breakfast }
 
  */
 
@@ -64,7 +66,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
     }
 
     private XContentBuilder RoomToXContent(Room room) throws IOException {
-        return jsonBuilder().startObject()
+        XContentBuilder res = jsonBuilder().startObject()
                 .field("id", room.getId())
                 .field("providerId", room.getProviderId())
                 .field("roomName", room.getRoomName())
@@ -74,22 +76,39 @@ public class SearchStorageImplementation implements SearchStorageAPI {
                 .field("cityName", room.getLocation().getCityname())
                 .field("location", new GeoPoint(room.getLocation().getCordX(), room.getLocation().getCordY()))
                 .field("locationId", room.getLocationId())
-                .field("wifi",room.getWifi())
+                .field("wifi", room.getWifi())
                 .field("pool", room.getPool())
                 .field("shauna", room.getShauna())
                 .field("breakfast", room.getBreakfast())
-                .field("maxOccupants", room.getMaxOccupants())
-                .field("transactions", getJSonTransactions(room.getTransactions()))
-                .endObject();
+                .field("maxOccupants", room.getMaxOccupants());
+        res = addTransactions(res,room.getTransactions());
+        res = res.endObject();
+        return res;
     }
 
-    private List<XContentBuilder> getJSonTransactions(List<Transaction> transactions) throws IOException {
-        List<XContentBuilder> res = new ArrayList<>();
-        if (transactions == null) return res;
-        for (Transaction t : transactions){
-            res.add(TransactionToXContent(t));
+    private XContentBuilder addTransactions(XContentBuilder res,List<Transaction> transactions) throws IOException {
+        res = res.startArray("transactions");
+
+        for(Transaction t: transactions){
+            res = res.startObject()
+                    .field("start_date", t.getStartDate())
+                    .field("end_date", t.getEndDate())
+                    .endObject();
         }
+        res = res.endArray();
         return res;
+    }
+
+    private XContentBuilder transactionsToXContent(List<Transaction> transactions) throws IOException {
+        XContentBuilder res = jsonBuilder().startArray();
+        for (Transaction t : transactions){
+            res = res.startObject()
+                    .field("start_date", t.getStartDate())
+                    .field("end_date", t.getEndDate())
+                .endObject();
+        }
+
+        return res.endArray();
     }
 
     private XContentBuilder TransactionToXContent(Transaction transaction) throws IOException {
@@ -99,6 +118,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
                 .endObject();
     }
 
+
     @Override
     public void deleteRoom(int roomId) throws JTHDataBaseException {
         try {
@@ -107,6 +127,15 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
+    }
+
+    private QueryBuilder availabilityQuery(){
+        return QueryBuilders.boolQuery().mustNot(
+                QueryBuilders.nestedQuery("reservations",
+                        QueryBuilders.boolQuery(),
+
+                ScoreMode.Avg)
+        );
     }
 
     @Override
