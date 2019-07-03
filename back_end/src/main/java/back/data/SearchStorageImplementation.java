@@ -68,7 +68,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
     @Override
     public void deleteRoom(int roomId) throws JTHDataBaseException {
         try {
-            client.delete(new DeleteRequest("jth_rooms").id(Integer.toString(roomId)), RequestOptions.DEFAULT);
+            client.delete(new DeleteRequest("jth_rooms").type("room").id(Integer.toString(roomId)), RequestOptions.DEFAULT);
         } catch (IOException e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
