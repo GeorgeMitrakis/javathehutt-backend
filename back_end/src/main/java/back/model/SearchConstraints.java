@@ -129,7 +129,7 @@ public class SearchConstraints {
     }
 
     public boolean hasDateConstraints(){
-        return this.startDate != null;
+        return this.startDate != null && this.endDate != null;
     }
 
     public boolean hasCityName() {
