@@ -22,7 +22,7 @@
 #### /users
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
-| GET    | -     | users: JSon array of all User Objects | returns all users |
+| GET    | [limit, offset] | users: JSon array of all User Objects | returns all users (unless specified a limit and offset) |
 | GET    | id    | user: User object with given id (if it exists) | returns user with given id (if it exists) |
 | GET    | email | user: User object with given email (if it exists) | returns user with given email (if it exists) |
 | GET    | emailPrefix | users: JSon array of all User Objects with given prefix on their emails | returns user with given prefix on their emails |
