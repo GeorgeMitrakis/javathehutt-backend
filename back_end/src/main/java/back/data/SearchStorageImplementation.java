@@ -82,7 +82,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             .field("providerId",room.getProviderId())
             .field("locationId",room.getLocationId())
             .field("maxOccupants", room.getMaxOccupants())
-
+            .field("cityName", room.getLocation().getCityname())
             .endObject()
             ;
 

@@ -57,7 +57,7 @@ public class Room {
                 (boolean)source.get("wifi"),
                 true,//(boolean)source.get("pool"),
                 (boolean)source.get("shauna"),
-                new Location((Map<String, Object>) source.get("location")),
+                new Location((Map<String, Object>) source.get("location"), (String)source.get("cityName")),
                 (String)source.get("description"),
                 (int)source.get("maxOccupants"),
                 false
