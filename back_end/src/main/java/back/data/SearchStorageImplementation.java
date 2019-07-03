@@ -114,7 +114,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
                 B = B.must(QueryBuilders.matchQuery("description", constraints.getDescription()).fuzziness(Fuzziness.AUTO));
             }
 
-            if (constraints.hasRange()) {
+            if (constraints.hasRange() && constraints.getLocation() != null && constraints.getLocation().hasCords()) {
                 B = B.must(QueryBuilders.geoDistanceQuery("location")
                      .point(constraints.getLocation().getCordX(),constraints.getLocation().getCordY()).distance(constraints.getRange(), DistanceUnit.KILOMETERS));
             }

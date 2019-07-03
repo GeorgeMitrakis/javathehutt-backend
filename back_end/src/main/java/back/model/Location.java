@@ -6,17 +6,17 @@ import java.util.Map;
 public class Location {
 
     private String cityname;
-    private double cordX, cordY;
+    private Double cordX, cordY;
 
-    public Location(String cityname, double cordX, double cordY){
+    public Location(String cityname, Double cordX, Double cordY){
         this.setCityname(cityname);
         this.cordX = cordX;
         this.cordY = cordY;
     }
 
     public Location(Map<String,Object> location, String cityname) {
-        cordX = (double)location.get("lat");
-        cordY = (double)location.get("lon");
+        cordX = (double) location.get("lat");
+        cordY = (double) location.get("lon");
         this.cityname = cityname;
     }
 
@@ -24,20 +24,16 @@ public class Location {
         this.cityname = cityname;
     }
 
-    public void setCordX(String cords) {
-        this.cordX = Integer.getInteger(cords.replace("POINT(", "").replace(")", "").split(" ")[0]);
-    }
-
-    public void setCordY(String cords) {
-        this.cordY = Integer.getInteger(cords.replace("POINT(", "").replace(")", "").split(" ")[1]);
-    }
-
     public double getCordX() {
-        return cordX;
+        return (cordX != null) ? cordX : 0.0;
     }
 
     public double getCordY() {
-        return cordY;
+        return (cordY != null) ? cordY : 0.0;
+    }
+
+    public boolean hasCords(){
+        return cordX != null && cordY != null;
     }
 
     public String getCityname() {

@@ -60,7 +60,7 @@ public class SearchConstraints {
         return location;
     }
 
-    public void setLocation(String cityname, double cordX, double cordY) {
+    public void setLocation(String cityname, Double cordX, Double cordY) {
         this.location = new Location(cityname, cordX, cordY);
     }
 

@@ -45,7 +45,7 @@ public class SearchConstraintsBuilder {
     }
 
     public SearchConstraintsBuilder setLocation(String cityName, Double cordX, Double cordY){
-        if (cordX != null && cordY != null) searchConstraints.setLocation(cityName, cordX, cordY);
+        if ((cordX != null && cordY != null) || cityName != null) searchConstraints.setLocation(cityName, cordX, cordY);
         return this;
     }
 
