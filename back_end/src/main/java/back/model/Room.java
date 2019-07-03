@@ -48,19 +48,20 @@ public class Room {
         System.out.println("source:");
         System.out.println(source);
         return new Room(
-                (int)source.get("id"),
-                (String)source.get("roomName"),
-                (int)source.get("providerId"),
-                (int)source.get("locationId"),
-                (double)source.get("price"),
-                (int)source.get("capacity"),
-                (boolean)source.get("wifi"),
-                true,//(boolean)source.get("pool"),
-                (boolean)source.get("shauna"),
+                (int) source.get("id"),
+                (String) source.get("roomName"),
+                (int) source.get("providerId"),
+                (int) source.get("locationId"),
+                (double) source.get("price"),
+                (int) source.get("capacity"),
+                (boolean) source.get("wifi"),
+                false, // (boolean) source.get("pool"),
+                false, // (boolean) source.get("breakfast"),
+                (boolean) source.get("shauna"),
                 new Location((Map<String, Object>) source.get("location"), (String)source.get("cityName")),
-                (String)source.get("description"),
-                (int)source.get("maxOccupants"),
-                false
+                (String) source.get("description"),
+                (int) source.get("maxOccupants"),
+                true
         );
     }
 

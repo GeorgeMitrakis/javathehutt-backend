@@ -44,4 +44,9 @@ public class Transaction {
     public double getCost() {
         return cost;
     }
+
+    public int getOccupants() {
+        return occupants;
+    }
+
 }

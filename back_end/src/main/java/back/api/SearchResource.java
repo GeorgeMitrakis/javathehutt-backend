@@ -30,6 +30,7 @@ public class SearchResource extends ServerResource {
         String maxDist = getQueryValue("maxDist");
         String hasPool = getQueryValue("hasPool");
         String hasWifi = getQueryValue("hasWifi");
+        String hasBreakfast = getQueryValue("hasBreakfast");
         String hasShauna = getQueryValue("hasShauna");
         String cityName = getQueryValue("cityName");
         String pointX = getQueryValue("pointX");
@@ -46,6 +47,7 @@ public class SearchResource extends ServerResource {
                     .setWifi((hasWifi == null) ? null : "true".equals(hasWifi))
                     .setPool((hasPool == null) ? null : "true".equals(hasPool))
                     .setShauna((hasShauna == null) ? null : "true".equals(hasShauna))
+                    .setBreakfast((hasBreakfast == null) ? null : "true".equals(hasBreakfast))
                     .setLocation(cityName, (pointX == null) ? null : Double.parseDouble(pointX), (pointY == null) ? null : Double.parseDouble(pointY))
                     .setOccupants((occupants == null) ? 1 : Integer.parseInt(occupants))
                     .setDescription(description)

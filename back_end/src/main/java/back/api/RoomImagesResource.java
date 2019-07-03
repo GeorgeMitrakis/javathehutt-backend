@@ -18,12 +18,16 @@ public class RoomImagesResource extends ServerResource {
     @Override
     protected Representation get() throws ResourceException {
         try {
-            long roomId;
+            String roomIdStr = getQueryValue("roomId");
+            if (roomIdStr == null){
+                throw new JTHInputException("missing roomId parameter");
+            }
+
+            int roomId;
             try {
-                String roomIdStr = getQueryValue("roomId");
-                roomId = new Long(roomIdStr).longValue();
-            } catch (Exception e) {
-                throw new JTHInputException("No room id specified / invalid room Id");
+                roomId = Integer.parseInt(roomIdStr);
+            } catch (ArithmeticException e) {
+                throw new JTHInputException("roomId given is not a number");
             }
             List<Long> ids = imageDAO.getRoomImageIds(roomId);
             Map<String, Object> res = new HashMap<>();

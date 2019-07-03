@@ -8,10 +8,9 @@ public class SearchConstraints {
     private boolean wifi = false;
     private boolean pool = false;
     private boolean shauna = false;
+    private boolean breakfast = false;
     private double range = -1.0;          // in kms
     private int occupants = 1;            // 1 is the default
-
-
     private String description = null;
 
     // Setters and Getters
@@ -47,6 +46,14 @@ public class SearchConstraints {
         this.shauna = shauna;
     }
 
+    public boolean getBreakfast() {
+        return breakfast;
+    }
+
+    public void setBreakfast(boolean breakfast) {
+        this.breakfast = breakfast;
+    }
+
     public Location getLocation() {
         return location;
     }
@@ -75,10 +82,6 @@ public class SearchConstraints {
         return range;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
     public void setRange(double range) {
         this.range = range;
     }
@@ -97,6 +100,10 @@ public class SearchConstraints {
 
     public boolean hasDescription(){
         return description != null;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void setDescription(String description) {

@@ -56,12 +56,10 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 
     @Override
     public void pushRoom(Room room, List<Transaction> transactions) throws JTHDataBaseException {
-        try{
-            IndexRequest request = new IndexRequest("jth_rooms").type("room").id(Integer.toString(room.getId())).source(
-                    RoomToXContent(room)
-            );
+        try {
+            IndexRequest request = new IndexRequest("jth_rooms").type("room").id(Integer.toString(room.getId())).source(RoomToXContent(room));
             client.index(request, RequestOptions.DEFAULT);
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
@@ -74,6 +72,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
             .field("price", room.getPrice())
             .field("wifi",room.getWifi())
             .field("shauna", room.getShauna())
+            .field("breakfast", room.getBreakfast())
             .field("description", room.getDescription())
             .field("capacity", room.getCapacity())
             .field("transactions", new ArrayList<>())
@@ -92,7 +91,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
         return jsonBuilder().startObject()
             .field("start_date", transaction.getStartDate())
             .field("end_date", transaction.getEndDate())
-                .endObject()
+            .endObject()
         ;
     }
 
@@ -134,6 +133,10 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 
             if (constraints.getPool()) {
                 B = B.must(QueryBuilders.matchQuery("pool", true));
+            }
+
+            if (constraints.getBreakfast()) {
+                B = B.must(QueryBuilders.matchQuery("breakfast", true));
             }
 
             if (constraints.hasMinCost()) {

@@ -70,18 +70,17 @@ public class DataAccess {
     }
 
     public List<User> getUsers(long start, long count) throws JTHDataBaseException {
-        // TODO return extended objects: ex Visitor?
         try {
-            return jdbcTemplate.query("(SELECT \"user\".*, \"provider\".*, '-' AS \"name\", '-' AS \"surname\" FROM \"user\", provider WHERE \"user\".id = provider.id" +
-                    ") UNION (" +
-                    "SELECT \"user\".*, visitor.*, '-' AS providerName FROM \"user\", visitor WHERE \"user\".id = visitor.id) LIMIT ? OFFSET ?", new Long[]{count, start}, new UltimateUserRowMapper());
+            return jdbcTemplate.query("(SELECT \"user\".*, \"provider\".providername, '-' AS \"name\", '-' AS \"surname\" FROM \"user\", provider WHERE \"user\".id = provider.id)" +
+                    " UNION ALL " +
+                    "(SELECT \"user\".*, '-' AS providerName, visitor.name, visitor.surname FROM \"user\", visitor WHERE \"user\".id = visitor.id) LIMIT ? OFFSET ?", new Long[]{count, start}, new UltimateUserRowMapper());
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
     }
 
-    private User getUserByRole(String role, Object[] par, User u) throws EmptyResultDataAccessException, IncorrectResultSizeDataAccessException {
+    private User getUserByRole(String role, Object[] par, User u) throws IncorrectResultSizeDataAccessException {
         switch (role) {
             case "visitor":
                 return jdbcTemplate.queryForObject("SELECT * FROM visitor WHERE id = ?", par, new VisitorRowMapper(u));
@@ -163,9 +162,10 @@ public class DataAccess {
     }
 
     public List<User> getUsersByEmailPrefix(String emailPrefix) throws JTHDataBaseException {
-        // TODO return extended objects: ex Visitor?
         try {
-            return jdbcTemplate.query("SELECT * FROM \"user\" WHERE email LIKE ?", new Object[]{emailPrefix + "%"}, new UserRowMapper());
+            return jdbcTemplate.query("(SELECT \"user\".*, \"provider\".providername, '-' AS \"name\", '-' AS \"surname\" FROM \"user\", \"provider\" WHERE \"user\".id = \"provider\".id AND email LIKE ?)" +
+                    " UNION ALL " +
+                    "(SELECT \"user\".*, '-' AS providerName, visitor.name, visitor.surname FROM \"user\", visitor WHERE \"user\".id = visitor.id AND email LIKE ?)", new Object[]{emailPrefix + "%", emailPrefix + "%"}, new UltimateUserRowMapper());
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -237,12 +237,20 @@ public class DataAccess {
 
     public boolean deleteUser(User user) throws JTHDataBaseException {
         try {
+            // Note: make all transitive deletes in case there is no CASCADE in the database
             switch (user.getRole()) {
                 case "provider":
                     jdbcTemplate.update("DELETE FROM \"provider\" WHERE id = ?", user.getId());
+                    List<Room> hisRooms = getRoomsForProvider(user.getId());
+                    for (Room room: hisRooms) {
+                        removeRoom(room.getId());
+                    }
                     break;
                 case "visitor":
                     jdbcTemplate.update("DELETE FROM visitor WHERE id = ?", user.getId());
+                    jdbcTemplate.update("DELETE FROM favorites WHERE visitor_id = ?", user.getId());
+                    jdbcTemplate.update("DELETE FROM transactions WHERE visitor_id = ?", user.getId());
+                    jdbcTemplate.update("DELETE FROM rating WHERE visitor_id = ?", user.getId());
                     break;
                 case "admin":
                     System.out.println("Warning: Deleting an administrator!");
@@ -325,7 +333,7 @@ public class DataAccess {
         }
     }
 
-    public boolean insertTransaction(User user, Room room, String sqlStartDate, String sqlEndDate, int occupants) throws JTHDataBaseException {
+    public int insertTransaction(User user, Room room, String sqlStartDate, String sqlEndDate, int occupants) throws JTHDataBaseException {
         try {
             Boolean res = transactionTemplate.execute(status -> {
                 if (occupants > room.getMaxOccupants()){
@@ -344,16 +352,16 @@ public class DataAccess {
                 return true;
             });
             if (res != null && !res) {
-                return false;  // not enough rooms
+                return -1;  // not enough rooms
             }
         } catch (DuplicateKeyException e) {  // should not happen for new db with seperate id PK
             System.err.println("Tried to make a duplicate booking");
-            return false;
+            return -1;
         } catch (Exception e) {
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
-        return true;
+        return jdbcTemplate.queryForObject("select id from transactions where room_id = ? and start_date = ? ::date and end_date = ? ::date", new Object[]{room.getId(), sqlStartDate, sqlEndDate}, Integer.class);
     }
 
     public int countTransactions(Room room, String sqlStartDate, String sqlEndDate) throws JTHDataBaseException {
@@ -371,10 +379,11 @@ public class DataAccess {
     public List<Room> searchRooms(SearchConstraints constraints) throws JTHDataBaseException {
         List<Room> results;
         try {
+            // TODO: This search is incomplete and possibly dangerous (for SQL Injection)
             String query = "select room.*, \"location\".*, city.name from room, \"location\", city where \"location\".city_id = city.id and \"location\".id = room.location_id";
 
             // check for range
-            if (constraints.getRange() != -1) query += " and ST_DWithin(location.geom, ST_GeomFromText('" + constraints.getLocation().getCoords() + "'), " + constraints.getRange() + ")";
+            if (constraints.getRange() != -1.0) query += " and ST_DWithin(location.geom, ST_GeomFromText('" + constraints.getLocation().getCoords() + "'), " + constraints.getRange() + ")";
 
             // check of occupants
             query += " and " + constraints.getOccupants() + " <= max_occupants";
@@ -391,6 +400,9 @@ public class DataAccess {
 
             // check for shauna
             if (constraints.getShauna()) query += " and shauna = true";
+
+            // check for breakfast
+            if (constraints.getBreakfast()) query += " and breakfast = true";
 
             results = jdbcTemplate.query(query, new RoomRowMapper());
         } catch (Exception e) {
@@ -475,13 +487,13 @@ public class DataAccess {
 
                 // finally insert the room
                 // Old way:
-                //jdbcTemplate.update("INSERT INTO room (id, provider_id, location_id, capacity, price, wifi, pool, shauna, room_name, description, max_occupants) " +
-                //                     "VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                //                     room.getProviderId(), location_id, room.getCapacity(), room.getPrice(), room.getWifi(), room.getPool(), room.getShauna(), room.getRoomName(), room.getDescription(), room.getMaxOccupants());
+                //jdbcTemplate.update("INSERT INTO room (id, provider_id, location_id, capacity, price, wifi, pool, shauna, breakfast, room_name, description, max_occupants) " +
+                //                     "VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                //                     room.getProviderId(), location_id, room.getCapacity(), room.getPrice(), room.getWifi(), room.getPool(), room.getShauna(), room.getBreakfast(), room.getRoomName(), room.getDescription(), room.getMaxOccupants());
                 keyHolder = new GeneratedKeyHolder();
                 jdbcTemplate.update(connection -> {
-                    PreparedStatement ps = connection.prepareStatement("INSERT INTO room (id, provider_id, location_id, capacity, price, wifi, pool, shauna, room_name, description, max_occupants) " +
-                            "VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                    PreparedStatement ps = connection.prepareStatement("INSERT INTO room (id, provider_id, location_id, capacity, price, wifi, pool, shauna, breakfast, room_name, description, max_occupants) " +
+                            "VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                     ps.setLong(1, room.getProviderId());
                     ps.setInt(2, location_id);
                     ps.setDouble(3, room.getCapacity());
@@ -489,9 +501,10 @@ public class DataAccess {
                     ps.setBoolean(5, room.getWifi());
                     ps.setBoolean(6, room.getPool());
                     ps.setBoolean(7, room.getShauna());
-                    ps.setString(8, room.getRoomName());
-                    ps.setString(9, room.getDescription());
-                    ps.setInt(10, room.getMaxOccupants());
+                    ps.setBoolean(8, room.getBreakfast());
+                    ps.setString(9, room.getRoomName());
+                    ps.setString(10, room.getDescription());
+                    ps.setInt(11, room.getMaxOccupants());
                     return ps;
                 }, keyHolder);
                 return (int) keyHolder.getKeys().get("id");
@@ -500,13 +513,10 @@ public class DataAccess {
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
-        System.out.println("room id coming right up");
-        System.out.println(room_id);
-        if(room_id != null && room_id != -1){
+        if (room_id != null && room_id != -1){
             room.setId(room_id);
             return room_id;
-        }
-        return -1;
+        } else return -1;
     }
 
     public boolean updateRoom(Room room) throws JTHDataBaseException {
@@ -532,8 +542,8 @@ public class DataAccess {
                 jdbcTemplate.update("UPDATE location SET city_id = ?, cordx = ?, cordY = ?, geom = ST_GeomFromText(?) WHERE id = ?", cityid, location.getCordX(), location.getCordY(), location.getCoords(), room.getLocationId());
 
                 // finally update the room
-                jdbcTemplate.update("UPDATE room SET location_id = ?, capacity = ?, price = ?, wifi = ?, pool = ?, shauna = ?, room_name = ?, description = ?, max_occupants = ? WHERE id = ?",
-                        room.getLocationId(), room.getCapacity(), room.getPrice(), room.getWifi(), room.getPool(), room.getShauna(), room.getRoomName(), room.getDescription(), room.getMaxOccupants(), room.getId());
+                jdbcTemplate.update("UPDATE room SET location_id = ?, capacity = ?, price = ?, wifi = ?, pool = ?, shauna = ?, breakfast = ?, room_name = ?, description = ?, max_occupants = ? WHERE id = ?",
+                        room.getLocationId(), room.getCapacity(), room.getPrice(), room.getWifi(), room.getPool(), room.getShauna(), room.getBreakfast(), room.getRoomName(), room.getDescription(), room.getMaxOccupants(), room.getId());
                 return true;
             });
         } catch (Exception e){
@@ -545,8 +555,12 @@ public class DataAccess {
 
     public void removeRoom(int roomId) throws JTHDataBaseException {
         try {
-            // CASCADE option should take care of all the necessary deletes on other tables like location and city (TODO: check)
+            // added all deletes in case there is no CASCADE set
             jdbcTemplate.update("DELETE FROM room WHERE id = ?", roomId);
+            jdbcTemplate.update("DELETE FROM transactions WHERE room_id = ?", roomId);
+            jdbcTemplate.update("DELETE FROM ratings WHERE room_id = ?", roomId);
+            jdbcTemplate.update("DELETE FROM favorites WHERE room_id = ?", roomId);
+            jdbcTemplate.update("DELETE FROM img WHERE room_id = ?", roomId);
         } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
@@ -608,24 +622,56 @@ public class DataAccess {
     }
 
     public Image getImageById(long imgId) throws JTHDataBaseException {
-        try{
-            Image img = jdbcTemplate.queryForObject("SELECT * FROM img where id = ?", new Long[]{imgId}, new ImageRowMapper());
+        try {
+            Image img = jdbcTemplate.queryForObject("SELECT * FROM img where id = ?", new Object[]{imgId}, new ImageRowMapper());
             return img;
-        }catch (Exception e){
+        } catch (IncorrectResultSizeDataAccessException e) {   // img does not exist
+            return null;
+        } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
     }
 
-    public List<Long> getRoomImageIds(long roomId) throws JTHDataBaseException {
+    public void addImage(int roomId, String url) throws JTHDataBaseException {
+        try {
+            jdbcTemplate.update("INSERT INTO img (id, url, room_id) VALUES (default, ?, ?)", url, roomId);
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public void deleteImage(long imgId) throws JTHDataBaseException {
+        try {
+            jdbcTemplate.update("DELETE FROM img WHERE id = ?", imgId);
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public List<Long> getRoomImageIds(int roomId) throws JTHDataBaseException {
         List<Long> results;
         try {
-            results = jdbcTemplate.queryForList("SELECT id FROM img WHERE room_id = ?", new Long[]{roomId}, Long.class);
+            results = jdbcTemplate.queryForList("SELECT id FROM img WHERE room_id = ?", new Object[]{roomId}, Long.class);
         } catch (Exception e){
             e.printStackTrace();
             throw new JTHDataBaseException();
         }
         return results;
+    }
+
+    public int getRoomIdForImage(long imgId) throws JTHDataBaseException {
+        try {
+            Integer roomId = jdbcTemplate.queryForObject("SELECT room_id FROM img WHERE id = ?", new Object[]{imgId}, Integer.class);
+            return (roomId != null) ? roomId : -1;
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return -1;
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
     }
 
     public List<Transaction> getTransactions() throws JTHDataBaseException {
@@ -650,11 +696,48 @@ public class DataAccess {
         return results;
     }
 
+    public List<Transaction> getTransactionsForProvider(long providerId) throws JTHDataBaseException {
+        List<Transaction> results;
+        try {
+            results = jdbcTemplate.query("SELECT * FROM transactions, room WHERE transactions.room_id = room.id AND room.provider_id = ?", new Object[]{providerId}, new TransactionRowMapper());
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+        return results;
+    }
+
+    public List<Transaction> getTransactionsForVisitor(long visitorId) throws JTHDataBaseException {
+        List<Transaction> results;
+        try {
+            results = jdbcTemplate.query("SELECT * FROM transactions WHERE visitor_id = ?", new Object[]{visitorId}, new TransactionRowMapper());
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+        return results;
+    }
+
     public double sumTransactionCosts() throws JTHDataBaseException {
         try{
-            double sum = jdbcTemplate.queryForObject("SELECT SUM(cost) FROM transactions", Double.class);
-            return sum;
-        }catch (Exception e){
+            Double sum = jdbcTemplate.queryForObject("SELECT SUM(cost) FROM transactions", Double.class);
+            return (sum != null) ? sum : 0.0;
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return 0.0;
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new JTHDataBaseException();
+        }
+    }
+
+    public double sumTransactionCosts(long providerId) throws JTHDataBaseException {
+        try{
+            Double sum = jdbcTemplate.queryForObject("SELECT SUM(transactions.cost) FROM transactions, room WHERE transactions.room_id = room.id and room.provider_id = ?", new Long[]{providerId}, Double.class);
+            return (sum != null) ? sum : 0.0;
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return 0.0;
+        } catch (Exception e){
+            e.printStackTrace();
             throw new JTHDataBaseException();
         }
     }

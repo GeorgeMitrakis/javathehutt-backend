@@ -34,6 +34,11 @@ public class SearchConstraintsBuilder {
         return this;
     }
 
+    public SearchConstraintsBuilder setBreakfast(Boolean breakfast){
+        if (breakfast != null) searchConstraints.setBreakfast(breakfast);
+        return this;
+    }
+
     public SearchConstraintsBuilder setRange(Double range){
         if (range != null) searchConstraints.setRange(range);
         return this;
@@ -54,7 +59,7 @@ public class SearchConstraintsBuilder {
     }
 
     public SearchConstraintsBuilder setDescription(String description) {
-        searchConstraints.setDescription(description);
+        if (description != null) searchConstraints.setDescription(description);
         return this;
     }
 }

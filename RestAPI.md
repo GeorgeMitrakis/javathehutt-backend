@@ -39,15 +39,19 @@
 #### /book
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
-| POST   | userId, roomId, startDate, endDate, occupants | success/error message | books given room for given user on given time frame if available for given number of occupants
+| GET    | -     | transaction: JSon array of all transactions | returns all system transactions for the admin
+| GET    | providerId         | transactions: JSon array of provider's transactions | returns all system transactions for given provider
+| GET    | providerId, profit | profit: a real number | returns the profit of transactions for given provider
+| GET    | visitorId |  transactions: JSon array of visitor's transactions | returns all system transactions for given visitor
+| POST   | userId, roomId, startDate, endDate, occupants | transactionId: the id of new transaction or error message | books given room for given user on given time frame if available for given number of occupants and returns transaction id
 
 #### /rooms
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
 | GET    | roomId | room: Room object | returns requested room
 | GET    | providerId | rooms: JSon array of Room objects | returns rooms by given provider
-| POST   | providerId, price, capacity, cordX, cordY, cityName, roomName, maxOccupants, [description, wifi, pool, shauna] | room: Room object on success or error | submits a new room to the system for given provider
-| PUT    | roomId, price, capacity, cordX, cordY, cityName, roomName, maxOccupants, [description, wifi, pool, shauna] | room: Room object on success or error | modifies and returns the new Room objects
+| POST   | providerId, price, capacity, cordX, cordY, cityName, roomName, maxOccupants, [description, wifi, pool, shauna, breakfast] | room: Room object on success or error | submits a new room to the system for given provider
+| PUT    | roomId, price, capacity, cordX, cordY, cityName, roomName, maxOccupants, [description, wifi, pool, shauna, breakfast] | room: Room object on success or error | modifies and returns the new Room objects
 | DELETE | roomId | success/error message | deletes room with given room id
 
 #### /favourite_rooms
@@ -69,15 +73,17 @@
 | ------ | ----- | ------ | ------ |
 | GET    | str   | cityNames: JSon array of city names that match str as a prefix | returns list of autocompleted city names
 
-#### /search (TODO: add more parameters?)
+#### /search
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
-| GET    | [occupants, minPrice, maxPrice, maxDist, pointX, pointY, cityName, hasWifi, hasPool, hasShauna, people] | results: JSon array of eligible Rooms | returns eligible rooms based on search constraints given
+| GET    | [occupants, minPrice, maxPrice, maxDist, pointX, pointY, cityName, hasWifi, hasPool, hasShauna, hasBreakfast, people] | results: JSon array of eligible Rooms | returns eligible rooms based on search constraints given
 
 #### /img
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
 | GET    | imgId | actual binary images | returns image with given id |
+| POST   | roomId, url | success/error message | adds img to given room (must be owner or admin) |
+| DELETE | imgId | success/error message | deletes img with given id (must be owner or admin) |
 
 #### /roomImages
 | Method | Input | Output | Action |

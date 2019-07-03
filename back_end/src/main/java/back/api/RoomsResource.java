@@ -5,6 +5,7 @@ import back.exceptions.JTHInputException;
 import back.conf.Configuration;
 import back.data.RoomsDAO;
 import back.model.Location;
+import back.model.Provider;
 import back.model.Room;
 import back.model.User;
 import back.util.JWT;
@@ -89,6 +90,7 @@ public class RoomsResource extends ServerResource  {
         String wifi = form.getFirstValue("wifi");
         String pool = form.getFirstValue("pool");
         String shauna = form.getFirstValue("shauna");
+        String breakfast = form.getFirstValue("breakfast");
         String cordXStr = form.getFirstValue("cordX");
         String cordYStr = form.getFirstValue("cordY");
         String cityName = form.getFirstValue("cityName");
@@ -123,7 +125,11 @@ public class RoomsResource extends ServerResource  {
             return JsonMapRepresentation.result(false, "Post room: arithmetic parameter(s) given not a number", null);
         }
 
-        if (false && Configuration.CHECK_AUTHORISATION) {
+        if (cordX < -90 || cordX > 90 || cordY < -180 || cordY > 180){
+            return JsonMapRepresentation.result(false, "Post room: Invalid coordinates given", null);
+        }
+
+        if (Configuration.CHECK_AUTHORISATION) {
             try {
                 String jwt = JWT.getJWTFromHeaders(getRequest());
                 if (!JWT.assertRole(jwt, "provider")){
@@ -137,7 +143,7 @@ public class RoomsResource extends ServerResource  {
         }
 
         Location location = new Location(cityName, cordX, cordY);
-        Room room = new Room(-1, roomName, providerId, -1, price, capacity, "true".equals(wifi), "true".equals(pool), "true".equals(shauna), location, description, maxOccupants, false);
+        Room room = new Room(-1, roomName, providerId, -1, price, capacity, "true".equals(wifi), "true".equals(pool), "true".equals(shauna), "true".equals(breakfast), location, description, maxOccupants, false);
 
         int roomId;
         try {
@@ -147,9 +153,7 @@ public class RoomsResource extends ServerResource  {
         }
 
         room.setId(roomId);
-        // so that it's there in JSon return value:
-        room.fetchProvider();
-        room.fetchRatings();
+        room.fetchProvider();  // so that it's there in JSon return value
 
         Map<String, Object> m = new HashMap<>();
         m.put("room", room);
@@ -212,6 +216,7 @@ public class RoomsResource extends ServerResource  {
         String wifi = form.getFirstValue("wifi");
         String pool = form.getFirstValue("pool");
         String shauna = form.getFirstValue("shauna");
+        String breakfast = form.getFirstValue("breakfast");
         String cordXStr = form.getFirstValue("cordX");
         String cordYStr = form.getFirstValue("cordY");
         String cityName = form.getFirstValue("cityName");
@@ -246,12 +251,26 @@ public class RoomsResource extends ServerResource  {
             return JsonMapRepresentation.result(false, "Put room: arithmetic parameter(s) given not a number", null);
         }
 
+        if (cordX < -90 || cordX > 90 || cordY < -180 || cordY > 180){
+            return JsonMapRepresentation.result(false, "Post room: Invalid coordinates given", null);
+        }
+
+        Provider provider;
+        try {
+            provider = roomsDAO.getProviderForRoom(roomId);
+            if (provider == null){
+                return JsonMapRepresentation.result(false, "Put room: invalid roomId given (could not find its provider)", null);
+            }
+        } catch (JTHDataBaseException e) {
+            return JsonMapRepresentation.result(false, "Put room: DataBase error (or invalid roomId given)", null);
+        }
+
         if (Configuration.CHECK_AUTHORISATION) {
             try {
                 String jwt = JWT.getJWTFromHeaders(getRequest());
                 if (!JWT.assertRole(jwt, "provider")){
                     return JsonMapRepresentation.result(false,"Put room: forbidden (not a provider)",null);
-                } else if (!JWT.assertUser(jwt, roomId)) {
+                } else if (!JWT.assertUser(jwt, provider.getId())) {
                     return JsonMapRepresentation.result(false,"Put room: forbidden (not allowed to submit a room for another provider)",null);
                 }
             } catch (JTHInputException e){
@@ -271,10 +290,10 @@ public class RoomsResource extends ServerResource  {
         // restore defaults if not provided from old room
         if (description == null) description = oldRoom.getDescription();
         boolean _wifi = (wifi == null) ? oldRoom.getWifi() : "true".equals(wifi) ;
-        boolean _pool = (wifi == null) ? oldRoom.getPool() : "true".equals(pool) ;
-        boolean _shauna = (wifi == null) ? oldRoom.getShauna() : "true".equals(shauna) ;
-
-        Room room = new Room(roomId, roomName, oldRoom.getProviderId(), oldRoom.getLocationId(), price, capacity, _wifi, _pool, _shauna, location, description, maxOccupants, true);
+        boolean _pool = (pool == null) ? oldRoom.getPool() : "true".equals(pool) ;
+        boolean _shauna = (shauna == null) ? oldRoom.getShauna() : "true".equals(shauna) ;
+        boolean _breakfast = (breakfast == null) ? oldRoom.getBreakfast() : "true".equals(breakfast);
+        Room room = new Room(roomId, roomName, oldRoom.getProviderId(), oldRoom.getLocationId(), price, capacity, _wifi, _pool, _shauna, _breakfast, location, description, maxOccupants, true);
 
         try {
             roomsDAO.updateRoom(room);

@@ -12,7 +12,7 @@ public interface BookingDAO {
 
     // Interface for accessing the Book-keeping part of the database
 
-    boolean bookRoomForVisitor(User user, Room room, String sqlStartDate, String sqlEndDate, int occupants) throws JTHDataBaseException;
+    int bookRoomForVisitor(User user, Room room, String sqlStartDate, String sqlEndDate, int occupants) throws JTHDataBaseException;
 
     boolean addRoomToFavourites(long visitorId, int roomId) throws JTHDataBaseException;
 
@@ -24,6 +24,11 @@ public interface BookingDAO {
 
     List<Transaction> getTransactionsForRoom(int roomId) throws JTHDataBaseException;
 
+    List<Transaction> getTransactionsForProvider(long providerId) throws JTHDataBaseException;
+
+    List<Transaction> getTransactionsForVisitor(long visitorId) throws JTHDataBaseException;
+
     double calcSystemProfit() throws JTHDataBaseException;
 
+    double calcProviderProfit(long providerId) throws JTHDataBaseException;
 }

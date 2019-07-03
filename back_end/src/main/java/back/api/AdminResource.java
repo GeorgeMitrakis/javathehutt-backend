@@ -24,7 +24,6 @@ public class AdminResource  extends ServerResource {
 
     @Override
     protected Representation get() throws ResourceException {
-        double systemProfit;
 
         if (Configuration.CHECK_AUTHORISATION) {
             try {
@@ -37,6 +36,7 @@ public class AdminResource  extends ServerResource {
             }
         }
 
+        double systemProfit;
         try {
             systemProfit = bookingDAO.calcSystemProfit();
         } catch (JTHDataBaseException e) {
