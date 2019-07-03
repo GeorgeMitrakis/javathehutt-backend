@@ -1,6 +1,7 @@
 package back.data;
 
 import back.exceptions.JTHDataBaseException;
+import back.model.Provider;
 import back.model.Room;
 import back.model.SearchConstraints;
 import back.model.Transaction;
@@ -65,7 +66,9 @@ public class SearchStorageImplementation implements SearchStorageAPI {
         pushRoom(room, room.getTransactions());
     }
 
-    private XContentBuilder RoomToXContent(Room room) throws IOException {
+    private XContentBuilder RoomToXContent(Room room) throws IOException, JTHDataBaseException {
+        Provider provider = room.fetchProvider();
+        if (provider == null) throw new JTHDataBaseException();
         XContentBuilder res = jsonBuilder().startObject()
                 .field("id", room.getId())
                 .field("providerId", room.getProviderId())
@@ -80,7 +83,10 @@ public class SearchStorageImplementation implements SearchStorageAPI {
                 .field("pool", room.getPool())
                 .field("shauna", room.getShauna())
                 .field("breakfast", room.getBreakfast())
-                .field("maxOccupants", room.getMaxOccupants());
+                .field("maxOccupants", room.getMaxOccupants())
+                .field("email", provider.getEmail())
+                .field("isBanned", provider.isBanned())
+                .field("providerName", provider.getProvidername());
         res = addTransactions(res,room.getTransactions());
         res = res.endObject();
         return res;

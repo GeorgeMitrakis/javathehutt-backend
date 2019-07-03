@@ -1,8 +1,10 @@
 package back.data.jdbc;
 
 import back.model.Location;
+import back.model.Provider;
 import back.model.Room;
 
+import back.model.User;
 import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,6 +26,17 @@ public class RoomRowMapper implements RowMapper<Room> {
         Location location = new Location(rs.getString("name"), rs.getDouble("cordX"), rs.getDouble("cordY"));
         String description = rs.getString("description");
         int maxOccupants = rs.getInt("max_occupants");
-        return new Room(id, roomName, provider_id, location_id, price, capacity, wifi, pool, shauna, breakfast, location, description, maxOccupants, true);
+        Provider provider = null;
+        try {
+            long uid = rs.getLong("uid");
+            String email = rs.getString("email");
+            String role = rs.getString("role");
+            Boolean isBanned = rs.getBoolean("isBanned");
+            String providerName = rs.getString("providerName");
+            provider = new Provider(new User(uid, email, role, isBanned), providerName);
+        } catch (Exception e){
+            System.err.println("Warning: missing extra provider info on RoomRowMapper");
+        }
+        return new Room(id, roomName, provider_id, location_id, price, capacity, wifi, pool, shauna, breakfast, location, description, maxOccupants, provider);
     }
 }
