@@ -21,6 +21,11 @@ public class ImageDAOImpl implements ImageDAO {
     }
 
     @Override
+    public String getRandomImageUrl() throws JTHDataBaseException{
+        return dataAccess.getRandomImageUrl();
+    }
+
+    @Override
     public List<Long> getRoomImageIds(int roomId) throws JTHDataBaseException {
         return dataAccess.getRoomImageIds(roomId);
     }

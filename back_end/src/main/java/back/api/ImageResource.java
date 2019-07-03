@@ -24,18 +24,17 @@ public class ImageResource extends ServerResource {
     @Override
     protected Representation get() throws ResourceException {
         try {
-            String imgIdStr = getQueryValue("imgId");
-            if(imgIdStr == null){
-                throw new JTHInputException("no image id specified");
-            }
-            long imgId = Long.parseLong(imgIdStr);
-            Image img = imageDAO.getById(imgId);
-            if (img == null){
+//            String imgIdStr = getQueryValue("imgId");
+//            if(imgIdStr == null){
+//                throw new JTHInputException("no image id specified");
+//            }
+//            long imgId = Long.parseLong(imgIdStr);
+//            Image img = imageDAO.getById(imgId);
+            String randomUrl = imageDAO.getRandomImageUrl();
+            if (randomUrl.isEmpty()){
                 return JsonMapRepresentation.result(false,"Image not found", null);
             }
-            return ImgFetch.fetch(img.getUrl());
-        } catch (JTHInputException e){
-            return JsonMapRepresentation.result(false,"Image error: " + e.getErrorMsg(), null);
+            return ImgFetch.fetch(randomUrl);
         } catch (Exception e){
             e.printStackTrace();
             return JsonMapRepresentation.result(false,"Image error", null);

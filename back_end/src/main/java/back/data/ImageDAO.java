@@ -9,6 +9,8 @@ public interface ImageDAO {
 
     Image getById(long imgId) throws JTHDataBaseException;
 
+    String getRandomImageUrl() throws JTHDataBaseException;
+
     List<Long> getRoomImageIds(int roomId) throws JTHDataBaseException;
 
     int getRoomIdForImage(long imgId) throws JTHDataBaseException;
