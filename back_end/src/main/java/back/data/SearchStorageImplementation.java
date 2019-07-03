@@ -90,6 +90,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
         res = addTransactions(res,room.getTransactions());
         res = res.endObject();
         return res;
+
     }
 
     private XContentBuilder addTransactions(XContentBuilder res,List<Transaction> transactions) throws IOException {
@@ -105,17 +106,8 @@ public class SearchStorageImplementation implements SearchStorageAPI {
         return res;
     }
 
-    private XContentBuilder transactionsToXContent(List<Transaction> transactions) throws IOException {
-        XContentBuilder res = jsonBuilder().startArray();
-        for (Transaction t : transactions){
-            res = res.startObject()
-                    .field("start_date", t.getStartDate())
-                    .field("end_date", t.getEndDate())
-                .endObject();
-        }
 
-        return res.endArray();
-    }
+
 
     private XContentBuilder TransactionToXContent(Transaction transaction) throws IOException {
         return jsonBuilder().startObject()
@@ -135,10 +127,19 @@ public class SearchStorageImplementation implements SearchStorageAPI {
         }
     }
 
-    private QueryBuilder availabilityQuery(){
+    private BoolQueryBuilder availabilityQuery(BoolQueryBuilder b, String start, String end){
+
         return QueryBuilders.boolQuery().mustNot(
-                QueryBuilders.nestedQuery("reservations",
-                        QueryBuilders.boolQuery(),
+                QueryBuilders.nestedQuery("transactions",
+                        QueryBuilders.boolQuery()
+                        .should(QueryBuilders.rangeQuery("transactions.start_date").gte(start).lt(end))
+                        .should(QueryBuilders.rangeQuery("transactions.end_date").gte(start).lt(end))
+                        .should(QueryBuilders
+                            .boolQuery()
+                                .must(QueryBuilders.rangeQuery("transactions.start_date").lt(start))
+                                .must(QueryBuilders.rangeQuery("transactions.end_date").gt(end))
+                        )
+                        ,
 
                 ScoreMode.Avg)
         );
@@ -175,7 +176,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 
             B = B.must(QueryBuilders.rangeQuery("maxOccupants").gte(constraints.getOccupants()));
 
-            if (constraints.getLocation().getCityname() != null && !"".equals(constraints.getLocation().getCityname())){
+            if (constraints.hasCityName()){
                 B = B.must(QueryBuilders.matchQuery("cityName", constraints.getLocation().getCityname()).fuzziness(Fuzziness.AUTO));
             }
 
@@ -188,9 +189,9 @@ public class SearchStorageImplementation implements SearchStorageAPI {
                         .point(constraints.getLocation().getCordX(),constraints.getLocation().getCordY()).distance(constraints.getRange(), DistanceUnit.KILOMETERS));
             }
 
-            // TODO: do something with:
-            //constraints.getStartDate()
-            //constraints.getEndDate()
+            if (constraints.hasDateConstraints()) {
+                B = availabilityQuery(B, constraints.getStartDate(), constraints.getEndDate());
+            }
 
             SearchRequest request = new SearchRequest("jth_rooms").source(new SearchSourceBuilder().from(offset).size(limit).query(B));
             SearchResponse response = client.search(request, RequestOptions.DEFAULT);

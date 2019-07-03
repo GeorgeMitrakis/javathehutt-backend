@@ -127,4 +127,12 @@ public class SearchConstraints {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public boolean hasDateConstraints(){
+        return this.startDate != null;
+    }
+
+    public boolean hasCityName() {
+        return this.location != null && this.location.getCityname() != null;
+    }
 }
