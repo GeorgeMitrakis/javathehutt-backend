@@ -76,7 +76,7 @@
 #### /search
 | Method | Input | Output | Action |
 | ------ | ----- | ------ | ------ |
-| GET    | [occupants, minPrice, maxPrice, maxDist, pointX, pointY, cityName, hasWifi, hasPool, hasShauna, hasBreakfast, people] | results: JSon array of eligible Rooms | returns eligible rooms based on search constraints given
+| GET    | [occupants, minPrice, maxPrice, maxDist, pointX, pointY, cityName, hasWifi, hasPool, hasShauna, hasBreakfast, people], [limit, offset] | results: JSon array of eligible Rooms | returns eligible rooms based on search constraints given (uses limit and offset given or else default)
 
 #### /img
 | Method | Input | Output | Action |

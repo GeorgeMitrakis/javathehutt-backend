@@ -12,7 +12,7 @@ public interface SearchStorageAPI {
 
     void pushRoom(Room room, List<Transaction> transactions) throws JTHDataBaseException;
 
-    void pushTransaction(int roomId, Transaction transaction) throws Exception;
+    void pushTransaction(Room room, Transaction transaction) throws Exception;
 
     void deleteRoom(int roomId) throws JTHDataBaseException;
 

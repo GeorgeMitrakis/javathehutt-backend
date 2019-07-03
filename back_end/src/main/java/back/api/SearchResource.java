@@ -57,10 +57,20 @@ public class SearchResource extends ServerResource {
             return JsonMapRepresentation.result(false, "Search error: non number sent for a number parameter", null);
         }
 
+        String limitStr = getQueryValue("limit");
+        String offsetStr = getQueryValue("offset");
+        int limit = 10, offset = 0;   // default
+        if (limitStr != null)  {
+            try { limit = Integer.parseInt(limitStr); } catch (NumberFormatException e) { return JsonMapRepresentation.result(false, "Search error: non number sent for a number parameter", null); }
+        }
+        if (offsetStr != null) {
+            try { offset = Integer.parseInt(offsetStr); } catch (NumberFormatException e) { return JsonMapRepresentation.result(false, "Search error: non number sent for a number parameter", null); }
+        }
+
         // search based on those constraints
         List<Room> results;
         try {
-             results = roomsDAO.searchRooms(constraints);
+             results = roomsDAO.searchRooms(constraints, limit, offset);
         } catch (JTHDataBaseException e){
             return JsonMapRepresentation.result(false, "Search error: database error", null);
         }
