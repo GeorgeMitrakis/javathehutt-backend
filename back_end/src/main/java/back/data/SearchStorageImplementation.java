@@ -35,7 +35,7 @@ public class SearchStorageImplementation implements SearchStorageAPI {
 /*
     NoSQL document structure:
 
-    { id, providerId, roomName, description, price, capacity, cityName, location, maxOccupants, transactions: [ { start_date, end_date } , ... ], wifi, pool, shauna, breakfast }
+    { id, providerId, roomName, description, price, capacity, cityName, location, maxOccupants, transactions: [ { start_date, end_date } , ... ], wifi, pool, shauna, breakfast, email, isBanned, providerName }
 
  */
 

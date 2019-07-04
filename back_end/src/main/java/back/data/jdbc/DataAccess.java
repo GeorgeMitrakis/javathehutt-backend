@@ -646,6 +646,7 @@ public class DataAccess {
     public String getRandomImageUrl(int roomId) throws JTHDataBaseException {
         try{
             List<String> imgList = jdbcTemplate.queryForList("SELECT url FROM img WHERE room_id = ?", new Object[]{roomId}, String.class);
+            if (imgList.isEmpty()) return null;
             Random randomGenerator = new Random();
             int randomInt = randomGenerator.nextInt(imgList.size());
             return imgList.get(randomInt);

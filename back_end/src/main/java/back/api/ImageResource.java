@@ -28,7 +28,7 @@ public class ImageResource extends ServerResource {
             if (imgIdStr == null && roomIdStr != null){
                 int roomId = Integer.parseInt(roomIdStr);
                 String randomUrl = imageDAO.getRandomImageUrl(roomId);
-                if (randomUrl.isEmpty()){
+                if (randomUrl == null){
                     return JsonMapRepresentation.result(false,"There is no image for given room", null);
                 }
                 return ImgFetch.fetch(randomUrl);
