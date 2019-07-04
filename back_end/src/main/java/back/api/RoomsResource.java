@@ -1,5 +1,6 @@
 package back.api;
 
+import back.data.ImageDAO;
 import back.exceptions.JTHDataBaseException;
 import back.exceptions.JTHInputException;
 import back.conf.Configuration;
@@ -22,7 +23,7 @@ import java.util.Map;
 public class RoomsResource extends ServerResource  {
 
     private final RoomsDAO roomsDAO = Configuration.getInstance().getRoomsDAO();
-
+    private final ImageDAO imageDAO = Configuration.getInstance().getImageDAO();
 
     @Override
     protected Representation get() throws ResourceException {
@@ -154,6 +155,16 @@ public class RoomsResource extends ServerResource  {
 
         room.setId(roomId);
         room.fetchProvider();  // so that it's there in JSon return value
+
+        // also add an image if given as a preview or sth
+        String imgUrl = form.getFirstValue("imgUrl");
+        if (imgUrl != null){
+            try {
+                imageDAO.addImage(roomId, imgUrl);
+            } catch (JTHDataBaseException e) {
+                return JsonMapRepresentation.result(false, "Post room: DataBase error trying to save imgUrl", null);
+            }
+        }
 
         Map<String, Object> m = new HashMap<>();
         m.put("room", room);
