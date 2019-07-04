@@ -6,7 +6,7 @@ import java.security.MessageDigest;
 
 public class Hashing {
 
-    // TODO: Is this secure enough? Or should we keep a SALT per user?
+    // Note: For better security we should we keep a SALT per user?
 
     /* WARNING: Do not change hashSalt if the database isn't empty! *
      * Doing so will render user's accounts inaccessible!           */

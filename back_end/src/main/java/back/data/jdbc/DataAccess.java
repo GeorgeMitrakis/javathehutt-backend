@@ -214,7 +214,7 @@ public class DataAccess {
                     jdbcTemplate.update("DELETE FROM \"provider\" WHERE id = ?", user.getId());
                     jdbcTemplate.update("UPDATE \"user\" SET role = 'admin' WHERE id = ?", user.getId());
                     jdbcTemplate.update("INSERT INTO administrator (id, name, surname) VALUES (?, ?, ?)",
-                            user.getId(), "Guy from " + ((Provider) user).getProvidername(), "Guy from " + ((Provider) user).getProvidername());  // TODO what name to give?
+                            user.getId(), "Guy from " + ((Provider) user).getProvidername(), "Guy from " + ((Provider) user).getProvidername());
                     break;
                 case "visitor":
                     jdbcTemplate.update("DELETE FROM visitor WHERE id = ?", user.getId());
@@ -383,7 +383,7 @@ public class DataAccess {
     public List<Room> searchRooms(SearchConstraints constraints) throws JTHDataBaseException {
         List<Room> results;
         try {
-            // TODO: This search is incomplete and possibly dangerous (for SQL Injection)
+            // Warning: This search is incomplete and possibly dangerous (for SQL Injection) - use elastic instead
             String query =  "SELECT room.*, \"location\".*, city.name, provider.providerName, \"user\".id AS \"uid\", \"user\".email, \"user\".role, \"user\".isBanned " +
                             "FROM room, \"location\", city, provider, \"user\" " +
                             "WHERE \"location\".city_id = city.id AND \"location\".id = room.location_id and room.provider_id = provider.id and provider.id = \"user\".id";
