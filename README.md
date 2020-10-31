@@ -27,4 +27,4 @@ The project was split in a Backend Repo (current) and a [Frontend Repo](https://
 
 ## Install dependencies and serve:
 
- - > ./gradlew apprun
+ - \> ./gradlew apprun
