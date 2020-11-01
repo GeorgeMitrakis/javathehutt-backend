@@ -2,7 +2,7 @@
 
 A [booking.com](https://www.booking.com/) clone written as a Single Page Web Application using React and a RESTful API written in Java, Restlet and Gradle.
 
-It was a group project required for the 'Software Technology' University Subject (DIT ,NKUA).
+It was a group project required for the 'Software Engineering' University Subject (DIT ,NKUA).
 
 The project was split in a Backend Repo (current) and a [Frontend Repo](https://github.com/GeorgeMitrakis/javathehutt-frontend).
 
